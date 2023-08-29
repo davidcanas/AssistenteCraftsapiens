@@ -65,7 +65,7 @@ module.exports = class extends Event {
                     this.client.db.get(message.channel.id).sent
         ) {
           console.log(
-            'Ignorando tentativa de acionar sistema em ' +
+            '\u001b[33m', 'Ignorando tentativa de acionar sistema em ' +
                         message.channel.name +
                         ' !'
           )
@@ -115,7 +115,7 @@ module.exports = class extends Event {
                 this.client.db.get(message.author.id).sent
       ) {
         console.log(
-          'Ignorando tentativa de acionar sistema em ' +
+          '\u001b[33m', 'Ignorando tentativa de acionar sistema em ' +
                     message.channel.name +
                     ' !'
         )
@@ -243,7 +243,7 @@ module.exports = class extends Event {
 
       setTimeout(() => {
         console.log(
-          '| Removendo ' +
+          '\u001b[33m', '| Removendo ' +
                     message.author.id +
                     ' da lista de usuários que acionaram o sistema!'
         )

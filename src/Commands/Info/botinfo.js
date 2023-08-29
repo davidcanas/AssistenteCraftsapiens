@@ -9,7 +9,6 @@ module.exports = class PingInteraction extends InteractionBase {
   }
 
   async run (interaction) {
-    // variavel com o uptime do bot
     const totalSeconds = this.client.uptime / 1000
     const days = Math.floor(totalSeconds / 86400)
     const hours = Math.floor(totalSeconds / 3600)

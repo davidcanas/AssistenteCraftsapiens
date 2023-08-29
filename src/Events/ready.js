@@ -12,7 +12,7 @@ module.exports = class extends Event {
       .loadInteractions()
       .then(
         console.log(
-          '[ASSISTENTE_CRAFTSAPIENS] - Interações carregadas com sucesso | BOT ONLINE!'
+          '\u001b[32m', '[ASSISTENTE_CRAFTSAPIENS] - Interações carregadas com sucesso | BOT ONLINE!'
         )
       )
       .catch(console.error)

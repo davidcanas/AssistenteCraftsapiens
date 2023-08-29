@@ -16,7 +16,7 @@ module.exports = class extends Event {
       } catch (err) {
         interaction.createMessage({
           content: 'Ocorreu um erro na execução desse comando!',
-          ephemeral: true
+          flags: 1 << 6
         })
         console.log(err)
       }

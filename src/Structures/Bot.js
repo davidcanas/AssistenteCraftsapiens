@@ -29,7 +29,7 @@ module.exports = class BotClient extends Client {
       .loadEvents()
       .then(
         console.log(
-          '[ASSISTENTE_CRAFTSAPIENS] - Eventos carregados com sucesso!'
+          '\u001b[32m', '[ASSISTENTE_CRAFTSAPIENS] - Eventos carregados com sucesso!'
         )
       )
       .catch(console.error)
