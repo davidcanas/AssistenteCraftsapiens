@@ -114,6 +114,7 @@ module.exports = class extends Event {
         this.client.db.get(message.author.id) &&
                 this.client.db.get(message.author.id).sent
       ) {
+        message.delete()
         console.log(
           '\u001b[33m', 'Ignorando tentativa de acionar sistema em ' +
                     message.channel.name +
@@ -239,17 +240,6 @@ module.exports = class extends Event {
       const fun = verificarDiaUtil()
       message.addReaction(reactEmoji)
 
-      this.client.db.set(message.author.id, { sent: true })
-
-      setTimeout(() => {
-        console.log(
-          '\u001b[33m', '| Removendo ' +
-                    message.author.id +
-                    ' da lista de usuários que acionaram o sistema!'
-        )
-        this.client.db.delete(message.author.id)
-      }, 30000)
-
       message.channel.createMessage({
         content: message.member.mention,
         messageReference: { messageID: message.id },
@@ -284,6 +274,17 @@ module.exports = class extends Event {
           }
         ]
       })
+
+      this.client.db.set(message.author.id, { sent: true })
+
+      setTimeout(() => {
+        console.log(
+          '\u001b[33m', '| Removendo ' +
+                    message.author.id +
+                    ' da lista de usuários que acionaram o sistema!'
+        )
+        this.client.db.delete(message.author.id)
+      }, 30000)
     }
   }
 }
