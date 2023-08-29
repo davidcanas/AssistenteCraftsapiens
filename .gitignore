@@ -1,0 +1,5 @@
+node_modules/
+.env
+assistente.zip
+database.json
+.vscode
