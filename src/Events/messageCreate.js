@@ -301,8 +301,9 @@ module.exports = class extends Event {
           }
         ]
       })
-
-      this.client.db.set(message.author.id, { sent: true })
+      if (message.author.id !== '733963304610824252') {
+        this.client.db.set(message.author.id, { sent: true })
+      }
     }
   }
 }
