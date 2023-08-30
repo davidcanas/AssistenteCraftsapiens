@@ -9,13 +9,6 @@ module.exports = class PingInteraction extends InteractionBase {
   }
 
   async run (interaction) {
-    const totalSeconds = this.client.uptime / 1000
-    const days = Math.floor(totalSeconds / 86400)
-    const hours = Math.floor(totalSeconds / 3600)
-    const uptime = `${days}D:${hours}H:${Math.floor(
-      totalSeconds / 60
-    )}MIN:${Math.floor(totalSeconds % 60)}S`
-
     let ping = this.client.shards.get(0).latency
     if (ping === 'Infinity') ping = '0'
     interaction.createMessage({
@@ -27,7 +20,7 @@ module.exports = class PingInteraction extends InteractionBase {
         process.cpuUsage().system /
         1024 /
         1024
-      ).toFixed(2)}%\n⏱️ | Uptime: ${uptime}`
+      ).toFixed(2)}%\n⏱️ | Uptime: ${this.client.MsToDate(this.client.uptime)}`
     })
   }
 }
