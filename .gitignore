@@ -3,3 +3,4 @@ node_modules/
 assistente.zip
 database.json
 .vscode
+collections/*

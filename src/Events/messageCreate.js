@@ -130,6 +130,7 @@ module.exports = class extends Event {
         .split(':')[0]
       const mes = hoje.getMonth() + 1
       const dia = hoje.getDate()
+      const diaSemanaHoje = hoje.getDay()
       let diaSemana = hoje.getDay()
       let saudacao = ''
       if (hora >= 6 && hora < 12) {
@@ -186,6 +187,7 @@ module.exports = class extends Event {
         diaSemana = hoje.getDay()
       }
 
+      // eslint-disable-next-line no-inner-declarations
       function verificarDiaUtil () {
         if (ehFeriado) {
           reactEmoji = '❌'
@@ -239,16 +241,42 @@ module.exports = class extends Event {
       }
       const fun = verificarDiaUtil()
       message.addReaction(reactEmoji)
+      // a variavel dia retorna "Hoje" / "Amanhã" / "Segunda" / "Terça" / "Quarta" / "Quinta" / "Sexta" / "Sábado" / "Domingo"
+      let diaTxt = ''
+      if (diaSemana === diaSemanaHoje) {
+        diaTxt = 'Hoje'
+      } else if (diaSemana === diaSemanaHoje + 1) {
+        diaTxt = 'Amanhã'
+      } else if (diaSemana === 1) {
+        diaTxt = 'Segunda-feira'
+      } else if (diaSemana === 2) {
+        diaTxt = 'Terça-feira'
+      } else if (diaSemana === 3) {
+        diaTxt = 'Quarta-feira'
+      } else if (diaSemana === 4) {
+        diaTxt = 'Quinta-feira'
+      } else if (diaSemana === 5) {
+        diaTxt = 'Sexta-feira'
+      } else if (diaSemana === 6) {
+        diaTxt = 'Sábado'
+      }
 
+      let textoIfAula = ''
+      console.log(dataAtual)
+      if (this.client.dbaula.get(d => d.ns === diaSemana)) {
+        textoIfAula = `${diaTxt} temos aula de \`${this.client.dbaula.get(d => d.ns === diaSemana).aula}\`!`
+      } else {
+        textoIfAula = ''
+      }
       message.channel.createMessage({
         content: message.member.mention,
         messageReference: { messageID: message.id },
         embeds: [
           {
-            description: `${emojiInicio} Olá, ${saudacao}. ${fun}\n\n<:purplearrow:1145719018121089045> Verifique o [Cronograma](https://discord.com/channels/892472046729179136/939937615325560912) ou nosso [Instagram](https://www.instagram.com/universidadecraftsapiens/) para mais informações!\n<:purplearrow:1145719018121089045> [Saiba como entrar no servidor](https://craftsapiens.canasdev.tech/)`,
+            description: `${emojiInicio} Olá, ${saudacao}. ${textoIfAula} ${fun}\n\n<:purplearrow:1145719018121089045> Verifique o [Cronograma](https://discord.com/channels/892472046729179136/939937615325560912) ou nosso [Instagram](https://www.instagram.com/universidadecraftsapiens/) para mais informações!\n<:purplearrow:1145719018121089045> [Saiba como entrar no servidor](https://craftsapiens.canasdev.tech/)`,
             color: embedColor,
             footer: {
-              text: 'Assistente | Craftsapiens',
+              text: 'Assistente | Confirme a leitura para poder acionar o sistema de novo',
               icon_url:
                                 'https://cdn.discordapp.com/avatars/968686499409313804/9c644fe8502c2dfdf976947c66671749.png?size=4096'
             }
@@ -276,15 +304,6 @@ module.exports = class extends Event {
       })
 
       this.client.db.set(message.author.id, { sent: true })
-
-      setTimeout(() => {
-        console.log(
-          '\u001b[33m', '| Removendo ' +
-                    message.author.id +
-                    ' da lista de usuários que acionaram o sistema!'
-        )
-        this.client.db.delete(message.author.id)
-      }, 30000)
     }
   }
 }

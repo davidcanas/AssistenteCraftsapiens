@@ -32,7 +32,14 @@ module.exports = class extends Event {
           interaction.message.channel.deleteMessage(
             interaction.message.messageReference.messageID
           )
+
           interaction.message.delete()
+          this.client.db.delete(autor.id)
+          console.log(
+            '\u001b[33m', '| Removendo @' +
+                      autor.username +
+                      ' da lista de usuários que acionaram o sistema!'
+          )
           return interaction.createMessage({
             content:
               '😳 Opa opa, você acaba de usar **ADMIN POWER** , mensagem apagada com sucesso, rs.',
@@ -49,6 +56,7 @@ module.exports = class extends Event {
             flags: 1 << 6
           })
         }
+
         interaction.createMessage({
           content: 'Obrigado por confirmar a sua leitura :D.',
           flags: 1 << 6
@@ -59,6 +67,11 @@ module.exports = class extends Event {
         )
         interaction.message.delete()
         this.client.db.delete(autor.id)
+        console.log(
+          '\u001b[33m', '| Removendo @' +
+                    autor.username +
+                    ' da lista de usuários que acionaram o sistema!'
+        )
       }
     }
   }

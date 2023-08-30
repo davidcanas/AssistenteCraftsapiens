@@ -24,6 +24,13 @@ function MsToDate (time) {
 
   return `${d}D:${h}H:${m}M:${s}S`
 }
+const dbaula = db.createCollection('aulas')
+const whitelistedID = ['733963304610824252',
+  '286573832913813516',
+  '402190502172295168',
+  '828745580125225031']
 client.MsToDate = MsToDate
 client.db = db
+client.dbaula = dbaula
+client.whitelistedID = whitelistedID
 client.connect()
