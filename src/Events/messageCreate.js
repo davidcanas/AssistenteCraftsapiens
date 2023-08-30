@@ -114,7 +114,6 @@ module.exports = class extends Event {
         this.client.db.get(message.author.id) &&
                 this.client.db.get(message.author.id).sent
       ) {
-        message.delete()
         console.log(
           '\u001b[33m', 'Ignorando tentativa de acionar sistema em ' +
                     message.channel.name +
