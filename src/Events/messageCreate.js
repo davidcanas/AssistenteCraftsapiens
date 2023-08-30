@@ -92,6 +92,8 @@ module.exports = class extends Event {
     }
 
     const arrayHoje = [
+      'quando',
+      'horas',
       'hoje',
       'hj',
       'vai',
