@@ -269,7 +269,7 @@ module.exports = class extends Event {
       } else {
         textoIfAula = ''
       }
-      message.channel.createMessage({
+      const msg = await message.channel.createMessage({
         content: message.member.mention,
         messageReference: { messageID: message.id },
         embeds: [
@@ -306,6 +306,30 @@ module.exports = class extends Event {
       if (message.author.id !== '733963304610824252') {
         this.client.db.set(message.author.id, { sent: true })
       }
+      setTimeout(() => {
+        this.client.db.delete(message.author.id)
+        message.delete()
+        msg.delete()
+        console.log(
+          '\u001b[33m', 'Devido a 10 minutos sem resposta ' + message.author.username + ' foi removido da lista de usuários que acionaram o sistema, e a mensagem foi deletada.'
+        )
+      }
+      , 600000)
+    }
+
+    const blacklistedWords = [
+      'meu servidor',
+      'meu server',
+      'meu sv',
+      'aternos',
+      'jogar no meu',
+      'entrar no meu',
+      'redelufty'
+    ]
+
+    if (blacklistedWords.some((v) => message.content.toLowerCase().includes(v))) {
+      this.client.users.get('733963304610824252').getDMChannel().then(a => a.createMessage(`Mensagem de **@${message.author.username} (${message.author.id})** foi deletada por conter possiveis divulgações de outros servidores.\n\n\`\`\`${message.content}\`\`\``))
+      return message.delete()
     }
   }
 }
