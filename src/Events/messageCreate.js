@@ -113,8 +113,7 @@ module.exports = class extends Event {
             arrayHoje.some((v) => message.content.toLowerCase().includes(v))
     ) {
       if (
-        this.client.db.get(message.author.id) &&
-                this.client.db.get(message.author.id).sent
+        this.client.dbuser.get(u => u.id === message.author.id && u.sent === true)
       ) {
         console.log(
           '\u001b[33m', 'Ignorando tentativa de acionar sistema em ' +
@@ -131,7 +130,6 @@ module.exports = class extends Event {
         .split(':')[0]
       const mes = hoje.getMonth() + 1
       const dia = hoje.getDate()
-      const diaSemanaHoje = hoje.getDay()
       let diaSemana = hoje.getDay()
       let saudacao = ''
       if (hora >= 6 && hora < 12) {
@@ -187,9 +185,9 @@ module.exports = class extends Event {
       } else {
         diaSemana = hoje.getDay()
       }
-
+      console.log(this.client.db.get('noclass'))
       // eslint-disable-next-line no-inner-declarations
-      function verificarDiaUtil () {
+      function verificarDiaUtil (client) {
         if (ehFeriado) {
           reactEmoji = '❌'
           embedColor = 15204352
@@ -223,6 +221,12 @@ module.exports = class extends Event {
               break
           }
           return `Durante os feriados não temos aula. As aulas gratuitas ocorrem todos os dias, de segunda a sexta-feira. às 18:30h e as aulas Premium às 19:30h. Eventualmente ocorrem aulas ao sábado, fique de olho no cronograma.\nHoje é feriado de \`${nomeFeriado}\`, logo não haverá aula`
+        } else if (client.db.get('noclass.state')) {
+          const reason = client.db.get('noclass.reason')
+          reactEmoji = '❌'
+          embedColor = 15204352
+          emojiInicio = '<:pepetear:1145856597579542568>'
+          return `Foi definido pela equipe que não haverá aulas por motivo de \`${reason}\`. As aulas gratuitas ocorrem todos os dias, de segunda a sexta-feira. às 18:30h e as aulas Premium às 19:30h. Eventualmente ocorrem aulas ao sábado, fique de olho no cronograma.`
         } else if (diaSemana === 0) {
           reactEmoji = '❌'
           embedColor = 15204352
@@ -240,41 +244,16 @@ module.exports = class extends Event {
           return 'As aulas gratuitas ocorrem todos os dias, de segunda a sexta-feira. às 18:30h e as aulas Premium às 19:30h. Eventualmente ocorrem aulas ao sábado, fique de olho no cronograma.'
         }
       }
-      const fun = verificarDiaUtil()
+      const fun = verificarDiaUtil(this.client)
       message.addReaction(reactEmoji)
-      // a variavel dia retorna "Hoje" / "Amanhã" / "Segunda" / "Terça" / "Quarta" / "Quinta" / "Sexta" / "Sábado" / "Domingo"
-      let diaTxt = ''
-      if (diaSemana === diaSemanaHoje) {
-        diaTxt = 'Hoje'
-      } else if (diaSemana === diaSemanaHoje + 1) {
-        diaTxt = 'Amanhã'
-      } else if (diaSemana === 1) {
-        diaTxt = 'Segunda-feira'
-      } else if (diaSemana === 2) {
-        diaTxt = 'Terça-feira'
-      } else if (diaSemana === 3) {
-        diaTxt = 'Quarta-feira'
-      } else if (diaSemana === 4) {
-        diaTxt = 'Quinta-feira'
-      } else if (diaSemana === 5) {
-        diaTxt = 'Sexta-feira'
-      } else if (diaSemana === 6) {
-        diaTxt = 'Sábado'
-      }
-
-      let textoIfAula = ''
       console.log(dataAtual)
-      if (this.client.dbaula.get(d => d.ns === diaSemana)) {
-        textoIfAula = `${diaTxt} temos aula de \`${this.client.dbaula.get(d => d.ns === diaSemana).aula}\`!`
-      } else {
-        textoIfAula = ''
-      }
+
       const msg = await message.channel.createMessage({
         content: message.member.mention,
         messageReference: { messageID: message.id },
         embeds: [
           {
-            description: `${emojiInicio} Olá, ${saudacao}. ${textoIfAula} ${fun}\n\n<:purplearrow:1145719018121089045> Verifique o [Cronograma](https://discord.com/channels/892472046729179136/939937615325560912) ou nosso [Instagram](https://www.instagram.com/universidadecraftsapiens/) para mais informações!\n<:purplearrow:1145719018121089045> [Saiba como entrar no servidor](https://craftsapiens.canasdev.tech/)`,
+            description: `${emojiInicio} Olá, ${saudacao}. ${fun}\n\n<:purplearrow:1145719018121089045> Verifique o [Cronograma](https://discord.com/channels/892472046729179136/939937615325560912) ou nosso [Instagram](https://www.instagram.com/universidadecraftsapiens/) para mais informações!\n<:purplearrow:1145719018121089045> [Saiba como entrar no servidor](https://craftsapiens.canasdev.tech/)`,
             color: embedColor,
             footer: {
               text: 'Assistente | Confirme a leitura para poder acionar o sistema de novo',
@@ -304,10 +283,10 @@ module.exports = class extends Event {
         ]
       })
       if (message.author.id !== '733963304610824252') {
-        this.client.db.set(message.author.id, { sent: true })
+        this.client.dbuser.create({ id: message.author.id, sent: true })
       }
       setTimeout(() => {
-        this.client.db.delete(message.author.id)
+        this.client.dbuser.delete(u => u.id === message.author.id)
         message.delete()
         msg.delete()
         console.log(

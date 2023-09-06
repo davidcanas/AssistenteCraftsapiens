@@ -34,7 +34,7 @@ module.exports = class extends Event {
           )
 
           interaction.message.delete()
-          this.client.db.delete(autor.id)
+          this.client.dbuser.remove(u => u.id === autor.id)
           console.log(
             '\u001b[33m', '| Removendo @' +
                       autor.username +
@@ -66,7 +66,7 @@ module.exports = class extends Event {
           interaction.message.messageReference.messageID
         )
         interaction.message.delete()
-        this.client.db.delete(autor.id)
+        this.client.dbuser.remove(u => u.id === autor.id)
         console.log(
           '\u001b[33m', '| Removendo @' +
                     autor.username +

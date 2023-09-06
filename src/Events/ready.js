@@ -17,7 +17,7 @@ module.exports = class extends Event {
       )
       .catch(console.error)
 
-    this.client.db.clear()
+    this.client.dbuser.remove(a => a.sent === true)
     this.client.editStatus('online', [
       {
         name: '👀 jogar.craftsapiens.com.br',

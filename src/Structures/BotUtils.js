@@ -23,7 +23,7 @@ module.exports = class Utilities {
       this.client.interactions.set(interaction.name, interaction)
       cmds.push(interaction)
     }
-    // this.client.bulkEditGuildCommands("892472046729179136", cmds);
+    // this.client.bulkEditGuildCommands('892472046729179136', cmds)
   }
 
   async loadEvents () {
