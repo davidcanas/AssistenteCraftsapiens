@@ -36,5 +36,5 @@ client.whitelistedID = whitelistedID
 client.connect()
 
 cron.schedule('10,55 * * * *', () => {
-  this.client.dbuser.remove(a => a.sent === true)
+  client.dbuser.remove(a => a.sent === true)
 })
