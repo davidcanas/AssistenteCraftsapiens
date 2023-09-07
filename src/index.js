@@ -6,7 +6,7 @@ process.on('uncaughtException', (error) => {
 process.on('unhandledRejection', (error) => {
   console.error(error)
 })
-
+const cron = require('node-cron')
 const SimplDB = require('simpl.db')
 const db = new SimplDB()
 const Acol = require('./Structures/Bot')
@@ -34,3 +34,7 @@ client.db = db
 client.dbuser = dbuser
 client.whitelistedID = whitelistedID
 client.connect()
+
+cron.schedule('10,55 * * * *', () => {
+  this.client.dbuser.remove(a => a.sent === true)
+})

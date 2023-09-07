@@ -13,6 +13,7 @@
     "dotenv": "^10.0.0",
     "eris": "github:DonovanDMC/eris#ed41313d9df5ff7c31bc955e0888f9c6f732c963",
     "glob": "^7.2.0",
+    "node-cron": "^3.0.2",
     "simpl.db": "^2.12.1"
   },
   "devDependencies": {

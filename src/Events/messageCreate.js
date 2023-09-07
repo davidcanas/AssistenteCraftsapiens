@@ -290,10 +290,10 @@ module.exports = class extends Event {
         message.delete()
         msg.delete()
         console.log(
-          '\u001b[33m', 'Devido a 10 minutos sem resposta ' + message.author.username + ' foi removido da lista de usuários que acionaram o sistema, e a mensagem foi deletada.'
+          '\u001b[33m', 'Devido a 5 minutos sem resposta ' + message.author.username + ' foi removido da lista de usuários que acionaram o sistema, e a mensagem foi deletada.'
         )
       }
-      , 600000)
+      , 300000)
     }
 
     const blacklistedWords = [
