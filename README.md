@@ -1,12 +1,10 @@
-
-<p align="center">
 <img src="https://i.imgur.com/WINt2vo.jpg" width=85>
-
-
+  
 # Assistente Craftsapiens 
 
 Um projeto de código-aberto criado para auxiliar jogadores no [Discord da Craftsapiens](https://is.gd/craftsapiens).
-</p>
+<br>
+
 
 ˚　　　　　. ✦ 　　　　.   　 　　　˚　　　　　*　　 　　✦　　　.　　.　　　✦　　˚ 　　　🌍 　　˚　.　*　　. 　˚　　.　　. 　 ˚🌒 ˚.   　 　✦             .                ✦        .        ✦
 
