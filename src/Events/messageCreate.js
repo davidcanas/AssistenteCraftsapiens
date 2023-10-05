@@ -88,6 +88,7 @@ module.exports = class extends Event {
             }
           ]
         })
+        this.client.db.add('uses', 1)
       }
     }
 
@@ -129,7 +130,7 @@ module.exports = class extends Event {
         .split(' ')[1]
         .split(':')[0]
       const mes = hoje.getMonth() + 1
-      const dia = hoje.getDate()
+      const dia = (hoje.getDate() < 10 ? '0' : '') + hoje.getDate()
       let diaSemana = hoje.getDay()
       let saudacao = ''
       if (hora >= 6 && hora < 12) {
@@ -143,13 +144,13 @@ module.exports = class extends Event {
       }
 
       const feriadosBrasil = [
-        '1/1/' + ano,
-        '1/1/' + ano,
+        '01/1/' + ano,
+        '01/1/' + ano,
         '21/04/' + ano,
-        '1/5/' + ano,
-        '7/9/' + ano,
+        '01/5/' + ano,
+        '07/9/' + ano,
         '12/10/' + ano,
-        '2/11/' + ano,
+        '02/11/' + ano,
         '15/11/' + ano,
         '25/12/' + ano
       ]
@@ -195,22 +196,22 @@ module.exports = class extends Event {
 
           let nomeFeriado
           switch (dataAtual) {
-            case '1/1/' + ano:
+            case '01/1/' + ano:
               nomeFeriado = 'Ano Novo'
               break
             case '21/4/' + ano:
               nomeFeriado = 'Tiradentes'
               break
-            case '1/5/' + ano:
+            case '01/5/' + ano:
               nomeFeriado = 'Dia do Trabalho'
               break
-            case '7/9/' + ano:
+            case '07/9/' + ano:
               nomeFeriado = 'Independência do Brasil'
               break
             case '12/10/' + ano:
               nomeFeriado = 'Nossa Senhora Aparecida'
               break
-            case '2/11/' + ano:
+            case '02/11/' + ano:
               nomeFeriado = 'Finados'
               break
             case '15/11/' + ano:
@@ -282,11 +283,13 @@ module.exports = class extends Event {
           }
         ]
       })
+      this.client.db.add('uses', 1)
+
       if (message.author.id !== '733963304610824252') {
         this.client.dbuser.create({ id: message.author.id, sent: true })
       }
       setTimeout(() => {
-        this.client.dbuser.delete(u => u.id === message.author.id)
+        this.client.dbuser.remove(u => u.id === message.author.id)
         message.delete()
         msg.delete()
         console.log(
@@ -303,7 +306,10 @@ module.exports = class extends Event {
       'aternos',
       'jogar no meu',
       'entrar no meu',
-      'redelufty'
+      'redelufty',
+      'hypixel',
+      'mush',
+      'hylex'
     ]
 
     if (blacklistedWords.some((v) => message.content.toLowerCase().includes(v))) {
