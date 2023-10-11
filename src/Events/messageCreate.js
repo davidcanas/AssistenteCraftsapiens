@@ -109,6 +109,12 @@ module.exports = class extends Event {
       'amanhã',
       'amanha'
     ]
+    // Ignora o Helton ou qualquer mensagem no canal de avisos
+    if (message.author.id === '828745580125225031' || message.channel.id === '1010026917208002591') {
+      console.log('Ignorando canal de avisos e/ou Helton acionando sistema')
+      return
+    }
+
     if (
       message.content.toLowerCase().includes('aula') &&
             arrayHoje.some((v) => message.content.toLowerCase().includes(v))
@@ -290,8 +296,8 @@ module.exports = class extends Event {
       }
       setTimeout(() => {
         this.client.dbuser.remove(u => u.id === message.author.id)
-        message.delete()
-        msg.delete()
+        if (message) message.delete()
+        if (msg) msg.delete()
         console.log(
           '\u001b[33m', 'Devido a 5 minutos sem resposta ' + message.author.username + ' foi removido da lista de usuários que acionaram o sistema, e a mensagem foi deletada.'
         )
