@@ -2,9 +2,9 @@ const Event = require('../Structures/EventBase')
 module.exports = class extends Event {
   async run (message) {
     if (message.author.bot) return
-   if (message.author.id === "828745580125225031") {
-    return console.log("Ignorando Heltonn")
-   }
+    if (message.author.id === '828745580125225031') {
+      return console.log('Ignorando Heltonn')
+    }
     if (
       message.channel.name.includes('ticket-') ||
             message.channel.name.includes('closed-')
