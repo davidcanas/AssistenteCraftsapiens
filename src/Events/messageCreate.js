@@ -1,21 +1,22 @@
 const Event = require('../Structures/EventBase')
+
 module.exports = class extends Event {
     async run(message) {
         if (message.author.bot) return
-        if (message.author.id === '828745580125225031') {
-            return console.log('Ignorando Heltonn')
+        if (
+            message.member.roles.includes('939956623441555558') ||
+            message.member.roles.includes('917900552225054750') ||
+            message.member.roles.includes('901251917991256124') ||
+            message.member.roles.includes('901263077025140786')
+        ) {
+            return console.log('Ignorando membros da equipe tentando acionar o sistema')
         }
+
         if (
             message.channel.name.includes('ticket-') ||
             message.channel.name.includes('closed-')
         ) {
-            if (
-                message.member.roles.includes('939956623441555558') ||
-                message.member.roles.includes('917900552225054750') ||
-                message.member.roles.includes('901251917991256124')
-            ) {
-                return
-            }
+            
 
             const hora = new Date()
                 .toLocaleString('pt-BR', {timeZone: 'America/Sao_Paulo'})
