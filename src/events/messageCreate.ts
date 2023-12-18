@@ -17,6 +17,7 @@ export default class MessageCreate {
         collector.collect(message);
       }
     }
+  // anti spam 
 
     if (
       message.channel.name.includes('ticket-') ||

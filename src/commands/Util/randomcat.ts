@@ -24,8 +24,8 @@ export default class randomCatClass extends Command {
 
     async execute(ctx: CommandContext): Promise<void> {
         const texto = encodeURIComponent(ctx.args[0])
-        if (texto && texto.length > 30) {
-            ctx.sendMessage({ content: 'O texto não pode ter mais de 30 caracteres!' })
+        if (texto && texto.length > 40) {
+            ctx.sendMessage({ content: 'O texto não pode ter mais de 40 caracteres!' })
             return;
         }
         const fetch = await this.client.fetch("https://cataas.com/cat?json=true")

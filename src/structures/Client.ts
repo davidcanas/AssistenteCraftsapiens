@@ -71,7 +71,7 @@ export default class DGClient extends Client {
     this.componentCollectors = [];
     this.reactionCollectors = [];
     this.owner = this.users.get("733963304610824252");
-    this.allowedUsers = ["733963304610824252", "402190502172295168", "286573832913813516"];
+    this.allowedUsers = ["733963304610824252", "402190502172295168"];
     this.ignoreRoles = [
       "939956623441555558",
       "917900552225054750",

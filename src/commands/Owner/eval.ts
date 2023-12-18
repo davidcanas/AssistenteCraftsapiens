@@ -22,7 +22,7 @@ export default class Eval extends Command {
 
   async execute(ctx: CommandContext): Promise<void> {
     try {
-      if (ctx.author.id !== "733963304610824252") {
+      if (!this.client.allowedUsers.includes(ctx.author.id)) {
         ctx.sendMessage({
           content: "Você não tem acesso a esse comando!",
           flags: 1 << 6,
