@@ -5,7 +5,8 @@ interface CommandSettings {
   description: string;
   aliases?: Array<string>;
   usage?: string;
-  category: "Info" | "DG" | "Util";
+  category: "Info" | "DG" | "Util" | "Music";
+  default_member_permissions?: number;
   options: Array<Object>;
 }
 
@@ -77,7 +78,7 @@ interface IEditInteractionData {
 
 declare module "vulkava" {
   export interface Player {
-    isRadio?: Boolean;
+    olderMessageID?: string;
     speedup?: Boolean;
   }
 }

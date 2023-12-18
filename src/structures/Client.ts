@@ -14,6 +14,10 @@ import global from "../models/globalDB";
 
 import Embed from "./Embed";
 
+import { NodeOptions } from "vulkava";
+
+import Music from "./Music";
+
 import levenshteinDistance from "../utils/levenshteinDistance";
 
 import {
@@ -28,6 +32,7 @@ import path from "path";
 
 export default class DGClient extends Client {
   commands: Array<Command>;
+  music: Music;
   db: {
     global: typeof global;
   };
@@ -197,10 +202,30 @@ export default class DGClient extends Client {
         name: command.name,
         description: command.description,
         options: command.options,
+        permissions: command.permissions,
         type: command.type || 1,
       });
     }
     this.application.bulkEditGuildCommands("892472046729179136", cmds);
     console.log("Os slashs foram atualizados");
   }
+  connectLavaLink(): void {
+    const nodes: NodeOptions[] = [
+      {
+        id: "Craftsapiens Virginia Node",
+        hostname: process.env.LAVALINKURL as string,
+        port: 2333,
+        password: process.env.LAVALINKPASSWORD as string,
+        maxRetryAttempts: 10,
+        retryAttemptsInterval: 3000,
+        secure: false,
+      },
+    ];
+
+    this.music = new Music(this, nodes);
+
+    this.music.init();
+    super.on("packet", (packet) => this.music.handleVoiceUpdate(packet));
+  }
+
 }

@@ -6,8 +6,9 @@ export default class Command implements CommandSettings {
   description: string;
   name: string;
   aliases?: Array<string>;
-  category: "Info" | "DG" | "Util";
+  category: "Info" | "DG" | "Util" | "Music";
   options: Array<Object>;
+  default_member_permissions?: number;
   type: number;
   constructor(client: Client, options: CommandSettings) {
     this.client = client;
@@ -18,6 +19,7 @@ export default class Command implements CommandSettings {
     this.aliases = options.aliases;
     this.category = options.category;
     this.options = options.options;
+    this.default_member_permissions = options.default_member_permissions;
     this.type = 1;
   }
 }

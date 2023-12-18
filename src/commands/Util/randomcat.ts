@@ -23,7 +23,8 @@ export default class randomCatClass extends Command {
     }
 
     async execute(ctx: CommandContext): Promise<void> {
-        const texto = encodeURIComponent(ctx.args[0])
+        let texto = encodeURIComponent(ctx.args[0])
+        if (texto.length < 1) texto = undefined
         if (texto && texto.length > 40) {
             ctx.sendMessage({ content: 'O texto não pode ter mais de 40 caracteres!' })
             return;

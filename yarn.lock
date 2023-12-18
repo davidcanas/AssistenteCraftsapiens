@@ -287,12 +287,20 @@ undici-types@~5.26.4:
   resolved "https://registry.yarnpkg.com/undici-types/-/undici-types-5.26.5.tgz#bcd539893d00b56e964fd2657a4866b221a65617"
   integrity sha512-JlCMO+ehdEIKqlFxk6IfVoAUVmgz7cU7zD/h9XZ0qzeosSHmUJVOzSQvvYSYWXkFXC+IfLKSIffhv0sVZup6pA==
 
-undici@^5.25.2:
+undici@^5.22.1, undici@^5.25.2:
   version "5.28.2"
   resolved "https://registry.yarnpkg.com/undici/-/undici-5.28.2.tgz#fea200eac65fc7ecaff80a023d1a0543423b4c91"
   integrity sha512-wh1pHJHnUeQV5Xa8/kyQhO7WFa8M34l026L5P/+2TYiakvGy5Rdc8jWZVyG7ieht/0WgJLEd3kcU5gKx+6GC8w==
   dependencies:
     "@fastify/busboy" "^2.0.0"
+
+vulkava@^1.6.2:
+  version "1.6.2"
+  resolved "https://registry.yarnpkg.com/vulkava/-/vulkava-1.6.2.tgz#573d287da2cbf60769f01486e3227c57dcb6bc60"
+  integrity sha512-LMqIUD0GUIHIhah8H8AFW0vVOgyPYGkqvDD8ySv6XLKmFrXRTPRlkADT7F3NCqPI9AZyUYu5Z435dSejtUNHPA==
+  dependencies:
+    undici "^5.22.1"
+    ws "^8.13.0"
 
 webidl-conversions@^3.0.0:
   version "3.0.1"
@@ -320,7 +328,7 @@ whatwg-url@^5.0.0:
     tr46 "~0.0.3"
     webidl-conversions "^3.0.0"
 
-ws@^8.14.2:
+ws@^8.13.0, ws@^8.14.2:
   version "8.15.1"
   resolved "https://registry.yarnpkg.com/ws/-/ws-8.15.1.tgz#271ba33a45ca0cc477940f7f200cd7fba7ee1997"
   integrity sha512-W5OZiCjXEmk0yZ66ZN82beM5Sz7l7coYxpRkzS+p9PP+ToQry8szKh+61eNktr7EA9DOwvFGhfC605jDHbP6QQ==

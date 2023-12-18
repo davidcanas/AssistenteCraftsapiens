@@ -17,7 +17,8 @@
     "oceanic.js": "^1.8.1",
     "prettier": "^3.1.1",
     "sourcebin": "^5.0.0",
-    "typescript": "^5.3.3"
+    "typescript": "^5.3.3",
+    "vulkava": "^1.6.2"
   },
   "devDependencies": {
     "@types/dotenv": "^8.2.0",
