@@ -37,6 +37,29 @@ export default class InteractionCreate {
           if (interaction.member?.id !== "733963304610824252") return;
           interaction.channel.messages.get(interaction.message.id).delete();
         }
+        if (interaction.data.customID === "changelog") {
+          let baseurl = `https://api.github.com/repos/davidcanas/AssistenteCraftsapiens/releases/latest`
+          const res = await this.client.fetch(baseurl)
+          const json = await res.json()
+
+          interaction.channel.messages.get(interaction.message.id).edit({
+            content: `[[Changelog]](https://github.com/davidcanas/AssistenteCraftsapiens/releases/latest)\n\n${json.body}`,
+            components: [
+              {
+                type: 1,
+                components: [
+                  {
+                    type: 2,
+                    style: 4,
+                    label: "✨ Changelog",
+                    disabled: true,
+                    customID: "changelog",
+                  },
+                ],
+              },
+            ],
+          })
+        }
         if (interaction.data.customID === 'confirm') {
           const dbremove = await this.client.db.global.findOne({ id: interaction.guild.id });
           const autor = interaction.message.mentions.users[0]
