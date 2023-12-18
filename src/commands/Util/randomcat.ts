@@ -22,15 +22,15 @@ export default class randomCatClass extends Command {
     }
 
     async execute(ctx: CommandContext): Promise<void> {
-        const texto = ctx.args[0]
+        const texto = encodeURIComponent(ctx.args[0])
         if (texto && texto.length > 30) {
             ctx.sendMessage({ content: 'O texto não pode ter mais de 30 caracteres!' })
             return;
         }
-        
+        const url = `https://cataas.com/cat${texto ? `/says/${texto}?fontSize=30&fontColor=white` : ''}?r=${Math.floor(Math.random() * 100)}`
         const embed = new this.client.embed()
         .setColor('#ff0000')
-        .setImage(`https://cataas.com/cat${texto ? `/says/${texto}?fontSize=30&fontColor=white` : ''}?r=${Math.floor(Math.random() * 100)}`)
+        .setImage(url)
         .setTitle('Gato aleatório')
 
         ctx.sendMessage({ embeds: [embed] })
