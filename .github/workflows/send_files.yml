@@ -1,0 +1,46 @@
+name: Enviar para a VPS
+
+on: [push]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v1
+
+      - name: Enviar os ficheiros via ssh para a vps
+        uses: appleboy/scp-action@master
+        env:
+          HOST: ${{ secrets.HOST }}
+          USERNAME: ubuntu
+          PORT: 22
+          KEY: ${{ secrets.KEY }}
+        with:
+          source: "."
+          target: "/home/david/assistentecraftsapiens"
+  updateDani:
+    name: Build and re-run Assistant 
+    needs: [build]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Iniciando o assistente
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.HOST }}
+          username: ubuntu
+          key: ${{ secrets.KEY }}
+          port: 22
+          script: |
+            echo "Entrando no dirétorio"
+            cd assistentecraftsapiens
+
+            echo "Desligando o processo anterior"
+            docker stop assistentecraftsapiens
+            docker rm assistentecraftsapiens
+            sleep 3
+            echo "Buildando o bot"
+            docker build -t assistentecraftsapiens .
+            sleep 2
+            echo "Ligando AssistenteCraftSapiens"
+            docker run -d --name=AssistenteCraftsapiens --memory=300m --memory-reservation=100m assistentecraftsapiens
