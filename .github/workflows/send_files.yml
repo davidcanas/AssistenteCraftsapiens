@@ -43,4 +43,4 @@ jobs:
             docker build -t assistentecraftsapiens .
             sleep 2
             echo "Ligando AssistenteCraftSapiens"
-            docker run -d --name=AssistenteCraftsapiens --memory=300m --memory-reservation=100m assistentecraftsapiens
+            docker run -d --name=assistentecraftsapiens --memory=300m --memory-reservation=100m assistentecraftsapiens
