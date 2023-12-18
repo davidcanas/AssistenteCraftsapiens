@@ -1,6 +1,7 @@
 import Command from "../../structures/Command";
 import Client from "../../structures/Client";
 import CommandContext from "../../structures/CommandContext";
+import { buffer } from "stream/consumers";
 
 export default class randomCatClass extends Command {
     constructor(client: Client) {
@@ -27,12 +28,19 @@ export default class randomCatClass extends Command {
             ctx.sendMessage({ content: 'O texto não pode ter mais de 30 caracteres!' })
             return;
         }
-        const url = `https://cataas.com/cat${texto ? `/says/${texto}?fontSize=30&fontColor=white` : ''}?r=${Math.floor(Math.random() * 100)}`
+        const fetch = await this.client.fetch("https://cataas.com/cat?json=true")
+        const json = await fetch.json()
+        const url = `https://cataas.com/cat/${json._id}/${texto ? `/says/${texto}?fontSize=30&fontColor=white` : ''}`
+
+        if (fetch.status !== 200) {
+            ctx.sendMessage({ content: 'Ocorreu um erro ao gerar a imagem!' })
+            return;
+        }
+      
         const embed = new this.client.embed()
         .setColor('#ff0000')
-        .setImage(url)
         .setTitle('Gato aleatório')
-
+        .setImage(url)
         ctx.sendMessage({ embeds: [embed] })
     }
 }
