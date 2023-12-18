@@ -45,10 +45,7 @@ export default class Eval extends Command {
 
       if (
         code.includes(process.env.TOKEN) ||
-        code.includes(process.env.TOKEN2) ||
-        code.includes(process.env.MONGODB) ||
-        code.includes(process.env.LAVALINKURL) ||
-        code.includes(process.env.LAVALINKPASSWORD)
+        code.includes(process.env.MONGODB) 
       ) {
         ctx.sendMessage(
           "⚠ Não poderei enviar o codigo asseguir aqui porque ele contem dados privados. Ele foi enviado na DM do Canas",

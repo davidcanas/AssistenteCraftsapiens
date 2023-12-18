@@ -1,4 +1,3 @@
-/*                                   THX D4RKB     :)                                                       */
 import Client from "./Client";
 
 import {
