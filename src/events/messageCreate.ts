@@ -67,6 +67,10 @@ export default class MessageCreate {
       ]
 
       if (possibilidades.some((v) => message.content.toLowerCase().includes(v))) {
+        if (this.client.ignoreRoles.some((v) => message.member.roles.includes(v))) {
+          console.log('\u001b[33m', 'Ignorando tentativa de staff acionar sistema em ' + message.channel.name + ' !')
+          return
+        }
         const dbcheck = await this.client.db.global.findOne({ id: message.channel.guild.id })
 
         if (dbcheck && dbcheck.ignoredChannels.includes(message.channel.id)) {
@@ -121,6 +125,10 @@ export default class MessageCreate {
       message.content.toLowerCase().includes('aula') &&
       arrayHoje.some((v) => message.content.toLowerCase().includes(v))
     ) {
+      if (this.client.ignoreRoles.some((v) => message.member.roles.includes(v))) {
+        console.log('\u001b[33m', 'Ignorando tentativa de staff acionar sistema em ' + message.channel.name + ' !')
+        return
+      }
       const dbcheck = await this.client.db.global.findOne({ id: message.channel.guild.id })
       if (
         dbcheck && dbcheck.ignoredUsers.includes(message.author.id)
@@ -310,6 +318,23 @@ export default class MessageCreate {
       }
 
     }
+    const blacklistedWords = [
+      'meu servidor',
+      'meu server',
+      'meu sv',
+      'aternos',
+      'jogar no meu',
+      'entrar no meu',
+      'redelufty',
+      'hypixel',
+      'mush',
+      'hylex'
+  ]
+
+  if (blacklistedWords.some((v) => message.content.toLowerCase().includes(v))) {
+      this.client.users.get('733963304610824252').createDM().then(a => a.createMessage({content:`Mensagem de **@${message.author.username} (${message.author.id})** foi deletada por conter possiveis divulgações de outros servidores.\n\n\`\`\`${message.content}\`\`\``}))
+      return message.delete()
+  }
 
     let prefix = "-";
 
