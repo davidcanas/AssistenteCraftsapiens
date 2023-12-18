@@ -165,18 +165,17 @@ export default class CommandContext {
   }
 
   async createBin(sourcebin, data, language) {
-    const bin = await sourcebin.create(
-      [
-        {
-          content: data,
-          language: language,
-        },
+    const bin = await sourcebin.create({
+      title: 'AssistenteCraftsapiens',
+      description: 'Criado por AssistenteCraftsapiens',
+      files: [
+          {
+              content: data,
+              language: language,
+          },
       ],
-      {
-        title: "AssistenteCraftsapiens",
-        description: "Sourcebin created by AssistenteCraftsapiens",
-      },
-    );
+  },
+    )
     return bin;
   }
   MsToDate(time) {
