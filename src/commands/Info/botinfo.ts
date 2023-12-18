@@ -6,7 +6,7 @@ export default class Botinfo extends Command {
   constructor(client: Client) {
     super(client, {
       name: "botinfo",
-      description: "Informações sobre o Assistente",
+      description: "Informações sobre o estado do Assistente",
       category: "Info",
       aliases: ["bi"],
       options: [],
