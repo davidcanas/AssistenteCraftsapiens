@@ -220,6 +220,15 @@ export default class DGClient extends Client {
         retryAttemptsInterval: 3000,
         secure: false,
       },
+      {
+        id: "Craftsapiens Ohio Node",
+        hostname: process.env.LAVALINKURL1 as string,
+        port: 2333,
+        password: process.env.LAVALINKPASSWORD as string,
+        maxRetryAttempts: 10,
+        retryAttemptsInterval: 3000,
+        secure: false,
+      }
     ];
 
     this.music = new Music(this, nodes);

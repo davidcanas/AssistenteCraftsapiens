@@ -11,6 +11,7 @@
     "dev": "ts-node-dev --respawn --transpile-only src/main.ts"
   },
   "dependencies": {
+    "@iamtraction/google-translate": "^2.0.1",
     "dotenv": "^16.3.1",
     "mongoose": "^8.0.3",
     "node-fetch": "^2.6.7",

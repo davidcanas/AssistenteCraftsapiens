@@ -74,7 +74,7 @@ export default class Music extends Vulkava {
                 player.skip();
             }
         });
-
+        
         this.on("queueEnd", (player): void => {
             if (player.textChannelId) {
                 const channel = this.client.getChannel(player.textChannelId);
