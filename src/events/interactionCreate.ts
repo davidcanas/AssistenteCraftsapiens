@@ -43,7 +43,7 @@ export default class InteractionCreate {
           const json = await res.json()
 
           interaction.channel.messages.get(interaction.message.id).edit({
-            content: `[[Changelog]](https://github.com/davidcanas/AssistenteCraftsapiens/releases/latest)\n\n${json.body}`,
+            content: `[[Changelog]](<https://github.com/davidcanas/AssistenteCraftsapiens/releases/latest>) [[Github]](<https://github.com/davidcanas/AssistenteCraftsapiens>)\n\n${json.body}`,
             components: [
               {
                 type: 1,
