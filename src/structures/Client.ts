@@ -211,26 +211,8 @@ export default class DGClient extends Client {
   }
   connectLavaLink(): void {
     const nodes: NodeOptions[] = [
-      {
-        id: "Craftsapiens Virginia Node",
-        hostname: process.env.LAVALINKURL as string,
-        port: 2333,
-        password: process.env.LAVALINKPASSWORD as string,
-        maxRetryAttempts: 10,
-        retryAttemptsInterval: 3000,
-        secure: false,
-      },
-      {
-        id: "Craftsapiens Ohio Node",
-        hostname: process.env.LAVALINKURL1 as string,
-        port: 2333,
-        password: process.env.LAVALINKPASSWORD as string,
-        maxRetryAttempts: 10,
-        retryAttemptsInterval: 3000,
-        secure: false,
-      },
       { 
-        id: "Craftsapiens Azure Node", 
+        id: "Craftsapiens Lavalink Node", 
         hostname: process.env.LAVALINKURL2 as string,
         port: 2333,
         password: process.env.LAVALINKPASSWORD2 as string,
