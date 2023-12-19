@@ -228,6 +228,15 @@ export default class DGClient extends Client {
         maxRetryAttempts: 10,
         retryAttemptsInterval: 3000,
         secure: false,
+      },
+      { 
+        id: "Craftsapiens Azure Node", 
+        hostname: process.env.LAVALINKURL2 as string,
+        port: 2333,
+        password: process.env.LAVALINKPASSWORD2 as string,
+        maxRetryAttempts: 10,
+        retryAttemptsInterval: 3000,
+        secure: false,
       }
     ];
 
