@@ -1,7 +1,7 @@
 import Command from "../../structures/Command";
 import Client from "../../structures/Client";
 import CommandContext from "../../structures/CommandContext";
-import mathjs from "mathjs";
+import { create, all } from 'mathjs'
 
 export default class calcClass extends Command {
     constructor(client: Client) {
@@ -23,7 +23,7 @@ export default class calcClass extends Command {
     }
 
     async execute(ctx: CommandContext): Promise<void> {
-        const math = mathjs.create(mathjs.all);
+        const math = create(all);
         const limitedEvaluate = math.evaluate;
 
         math.import({
