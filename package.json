@@ -8,7 +8,8 @@
   "scripts": {
     "build": "tsc",
     "start": "node dist/main.js",
-    "dev": "ts-node-dev --respawn --transpile-only src/main.ts"
+    "dev": "ts-node --transpileOnly src/main.ts",
+    "run": "node run.js"
   },
   "dependencies": {
     "@iamtraction/google-translate": "^2.0.1",
@@ -25,6 +26,10 @@
   "devDependencies": {
     "@types/dotenv": "^8.2.0",
     "@types/node": "^20.10.4",
-    "@types/node-fetch": "^2.6.9"
+    "@types/node-fetch": "^2.6.9",
+    "ts-node": "^10.9.2"
+  },
+  "peerDependencies": {
+    "typescript": "^5.0.0"
   }
 }
