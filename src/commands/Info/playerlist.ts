@@ -16,7 +16,6 @@ export default class Botinfo extends Command {
   }
 
   async execute(ctx: CommandContext): Promise<void> {
-    if (ctx.msg.channel.type !== ChannelTypes.GUILD_TEXT) return
 
     ctx.defer()
 
