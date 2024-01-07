@@ -19,6 +19,7 @@ import { NodeOptions } from "vulkava";
 import Music from "./Music";
 
 import levenshteinDistance from "../utils/levenshteinDistance";
+import { getDynmapPlayers, getDynmapPlayersVanilla } from "../utils/getDynmapInfo";
 
 import {
   ComponentCollector,
@@ -58,7 +59,7 @@ export default class DGClient extends Client {
         ],
       },
       collectionLimits: {
-        messages: 10,
+        messages: 100,
       },
     };
 
@@ -69,6 +70,10 @@ export default class DGClient extends Client {
     };
     this.utils = {
       levDistance: levenshteinDistance,
+      dynmap: {
+        players: getDynmapPlayers,
+        playersVanilla: getDynmapPlayersVanilla,
+      },
     };
     this.fetch = fetch;
     this.embed = Embed;

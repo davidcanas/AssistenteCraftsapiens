@@ -13,9 +13,15 @@ interface CommandSettings {
 interface Command extends CommandSettings {
   execute: (ctx) => void;
 }
+
 interface Utils {
   levDistance: (src: string, target: string) => number;
+  dynmap: {
+   players: () => Promise<Array<string>>;
+   playersVanilla: () => Promise<Array<string>>;
+  }
 }
+
 interface InteractionOptions {
   name: string;
   value: string;
@@ -27,10 +33,9 @@ interface InteractionResolved {
   messages: Record<
     string,
     {
-      content: string; // only need content :>
+      content: string; 
     }
   >;
-  // users & members: <- don't need for now
 }
 
 interface InteractionData {
