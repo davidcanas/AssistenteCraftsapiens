@@ -19,38 +19,18 @@ export default class Botinfo extends Command {
 
     ctx.defer()
 
-    const players = await this.client.utils.dynmap.players()
-    const playersVanilla = await this.client.utils.dynmap.playersVanilla()
+    const players = await this.client.utils.dynmap.getDynmapPlayers()
+    const playersVanilla = await this.client.utils.dynmap.getDynmapPlayersVanilla()
 
     const embed = new this.client.embed()
-    .setTitle("Lista de jogadores online")
-    .setDescription(players.join("\n"))
-    .setFooter(`Total: ${players.length}`)
-    .setColor("RANDOM")
-    
-     ctx.sendMessage({
-        embeds: [embed],
-        components: [
-            //{
-                //type: 1 //,
-               // components: [
-                //{
-                  //  type: 3,
-                    //customID: "playerlist",
-                    //options: playersVanilla.map((player) => ({
-                    //label: player,
-                    //value: player,
-                    //})),
-                    //placeholder: "Selecione um jogador [+Info]",
-               // },
-                //],
-           // },
-            ],
+      .setTitle("Lista de jogadores online")
+      .setDescription(players.join("\n"))
+      .setFooter(`Total: ${players.length}`)
+      .setColor("RANDOM")
 
+    ctx.sendMessage({
+      embeds: [embed],
     })
-
-
- 
 
   }
 }

@@ -2,7 +2,9 @@ import Client from "../structures/Client";
 import {
   Interaction,
   CommandInteraction,
-  ComponentInteraction
+  ComponentInteraction,
+  AutocompleteInteraction,
+  InteractionOptionsWithValue
 } from "oceanic.js";
 import CommandContext from "../structures/CommandContext";
 
@@ -14,6 +16,21 @@ export default class InteractionCreate {
   }
 
   async run(interaction: Interaction) {
+    if (interaction instanceof AutocompleteInteraction) {
+      
+      if (!interaction.member) return;
+      const cmd = this.client.commands.find(c => c.name === interaction.data.name);
+
+      if (!cmd) throw new Error(`Command not found`);
+
+      const options = interaction.data.options.raw as InteractionOptionsWithValue[];
+
+      const focusedField = options.find(o => o.focused);
+
+      cmd.runAutoComplete?.(interaction, focusedField!.value as string, options);
+      return;
+    }
+
     if (interaction instanceof CommandInteraction) {
       const cmd = this.client.commands.find(
         (c) => c.name === interaction.data.name,
@@ -37,6 +54,7 @@ export default class InteractionCreate {
           if (interaction.member?.id !== "733963304610824252") return;
           interaction.channel.messages.get(interaction.message.id).delete();
         }
+      
         if (interaction.data.customID === "changelog") {
           let baseurl = `https://api.github.com/repos/davidcanas/AssistenteCraftsapiens/releases/latest`
           const res = await this.client.fetch(baseurl)

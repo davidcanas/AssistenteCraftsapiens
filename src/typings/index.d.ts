@@ -1,4 +1,18 @@
-import { Message } from "oceanic.js";
+import { Message, AutocompleteInteraction } from "oceanic.js";
+
+interface Player {
+  world?: string;
+  armor?: number;
+  online?: boolean;
+  name?: string;
+  x?: number;
+  y?: number;
+  z?: number;
+  health?: number;
+  sort?: number;
+  type?: string;
+  account?: string;
+}
 
 interface CommandSettings {
   name: string;
@@ -7,18 +21,32 @@ interface CommandSettings {
   usage?: string;
   category: "Info" | "DG" | "Util" | "Music";
   default_member_permissions?: number;
+  autocomplete?: boolean;
   options: Array<Object>;
+}
+
+interface CityInfo {
+  city: string;
+  mayor: string;
+  nation: string;
+  members: string[];
 }
 
 interface Command extends CommandSettings {
   execute: (ctx) => void;
+  runAutoComplete?: (interaction: AutocompleteInteraction, value: string, options?: any) => void;
 }
 
 interface Utils {
   levDistance: (src: string, target: string) => number;
   dynmap: {
-   players: () => Promise<Array<string>>;
-   playersVanilla: () => Promise<Array<string>>;
+   findPlayerCity: (serverData: ServerData, playerName: string) => CityInfo | undefined;
+   findCityInfo: (serverData: ServerData, cityName: string) => CityInfo | undefined;
+   getAllRegisteredCities: (serverData: ServerData) => string[];
+   getAllRegisteredPlayers: (serverData: ServerData) => string[];
+   getDynmapPlayers: () => Promise<string[]>;
+   getDynmapPlayersVanilla: () => Promise<string[]>;
+   getOnlinePlayerInfo: (serverData: ServerData, playerName: string) => Player | undefined;
   }
 }
 

@@ -9,6 +9,7 @@ export default class Command implements CommandSettings {
   category: "Info" | "DG" | "Util" | "Music";
   options: Array<Object>;
   default_member_permissions?: number;
+  autocomplete?: boolean;
   type: number;
   constructor(client: Client, options: CommandSettings) {
     this.client = client;
@@ -20,6 +21,7 @@ export default class Command implements CommandSettings {
     this.category = options.category;
     this.options = options.options;
     this.default_member_permissions = options.default_member_permissions;
+    this.autocomplete = options.autocomplete;
     this.type = 1;
   }
 }

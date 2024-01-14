@@ -7,10 +7,10 @@ import { VoiceChannel, ApplicationCommand } from "oceanic.js";
 export default class play extends Command {
   constructor(client: Client) {
     super(client, {
-      name: "play",
+      name: "tocar",
       description: "[STAFF] Toca uma música ",
       category: "Music",
-      aliases: ["p"],
+      aliases: ["p", "play"],
       default_member_permissions: 1 << 40,
       options: [{
         name: "music",

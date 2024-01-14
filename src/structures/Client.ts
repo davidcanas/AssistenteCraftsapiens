@@ -8,7 +8,9 @@ import {
   ClientEvents,
 } from "oceanic.js";
 
-import { Command, Utils } from "../typings/index";
+import { CityInfo, Command, Utils } from "../typings/index";
+
+import staffJSON from "../data/staff.json";
 
 import global from "../models/globalDB";
 
@@ -19,7 +21,7 @@ import { NodeOptions } from "vulkava";
 import Music from "./Music";
 
 import levenshteinDistance from "../utils/levenshteinDistance";
-import { getDynmapPlayers, getDynmapPlayersVanilla } from "../utils/getDynmapInfo";
+import { getOnlinePlayerInfo, findCityInfo, findPlayerCity, getAllRegisteredCities, getAllRegisteredPlayers, getDynmapPlayers, getDynmapPlayersVanilla } from "../utils/getDynmapInfo";
 
 import {
   ComponentCollector,
@@ -71,8 +73,13 @@ export default class DGClient extends Client {
     this.utils = {
       levDistance: levenshteinDistance,
       dynmap: {
-        players: getDynmapPlayers,
-        playersVanilla: getDynmapPlayersVanilla,
+        findPlayerCity,
+        findCityInfo,
+        getAllRegisteredCities,
+        getAllRegisteredPlayers,
+        getDynmapPlayers,
+        getDynmapPlayersVanilla,
+        getOnlinePlayerInfo,
       },
     };
     this.fetch = fetch;
@@ -98,11 +105,11 @@ export default class DGClient extends Client {
       try {
         user =
           this.users.get(matched[1]) || (await this.rest.users.get(matched[1]));
-      } catch {}
+      } catch { }
     } else if (/\d{17,18}/.test(param)) {
       try {
         user = this.users.get(param) || (await this.rest.users.get(param));
-      } catch {}
+      } catch { }
     }
 
     if (!guild) return null;
@@ -209,6 +216,7 @@ export default class DGClient extends Client {
         options: command.options,
         permissions: command.permissions,
         type: command.type || 1,
+        autocomplete: command.autocomplete || false,
       });
     }
     this.application.bulkEditGuildCommands("892472046729179136", cmds);
@@ -216,8 +224,8 @@ export default class DGClient extends Client {
   }
   connectLavaLink(): void {
     const nodes: NodeOptions[] = [
-      { 
-        id: "Craftsapiens Lavalink Node", 
+      {
+        id: "Craftsapiens Lavalink Node",
         hostname: process.env.LAVALINKURL2 as string,
         port: 2333,
         password: process.env.LAVALINKPASSWORD2 as string,
@@ -232,5 +240,61 @@ export default class DGClient extends Client {
     this.music.init();
     super.on("packet", (packet) => this.music.handleVoiceUpdate(packet));
   }
+
+  async getPlayerInfo(player: string) {
+    try {
+      let playerObj: { nick: string; uuid: null; original: boolean; discord?: string | null; staff?: string; isStaff?: boolean; city?: CityInfo; coords?: { x: number; y: number; z: number }; health?: number; armor?: number; online?: boolean };
+
+      const findInMojangRequest = await fetch(
+        `https://api.mojang.com/users/profiles/minecraft/${player}`
+      );
+      const findInDynmapData = await fetch(
+        `http://jogar.craftsapiens.com.br:10004/up/world/Earth/`
+      ).then((r) => r.json());
+
+      const findInMojang = await findInMojangRequest.json();
+
+      if (findInMojang.errorMessage) {
+        playerObj = {
+          nick: player.toLowerCase(),
+          uuid: null,
+          original: false,
+        };
+      } else {
+        playerObj = {
+          nick: findInMojang.name,
+          uuid: findInMojang.id,
+          original: true,
+        };
+      }
+      if (staffJSON.find(p => p.nick.toLowerCase() == playerObj.nick.toLowerCase())) {
+        playerObj.isStaff = true
+        playerObj.staff = staffJSON.find(p => p.nick.toLowerCase() == playerObj.nick.toLowerCase()).role
+        playerObj.discord = staffJSON.find(p => p.nick.toLowerCase() == playerObj.nick.toLowerCase()).discord
+      } else {
+        playerObj.isStaff = false
+        playerObj.discord = await this.guilds.get("892472046729179136")?.members.find(m => m?.nick && m.nick?.toLowerCase() == playerObj.nick?.toLowerCase() && m.roles.includes("1152666174157488258"))?.user.id || null;
+      }
+      const city = findPlayerCity(findInDynmapData, playerObj.nick);
+      if (city) {
+        playerObj.city = city;
+      }
+      const online = getOnlinePlayerInfo(findInDynmapData, playerObj.nick);
+      if (online.online) {
+        playerObj.coords = {
+          x: online.x,
+          y: online.y,
+          z: online.z,
+        };
+        playerObj.health = online.health || 0;
+        playerObj.online = true;
+      }
+      return playerObj;
+
+    } catch (err) {
+      console.log(err)
+    }
+  }
+
 
 }
