@@ -2,6 +2,8 @@
   
 # Assistente Craftsapiens
 
+[![wakatime](https://wakatime.com/badge/github/davidcanas/AssistenteCraftsapiens.svg)](https://wakatime.com/badge/github/davidcanas/AssistenteCraftsapiens)
+
 Um projeto de código-aberto criado para auxiliar jogadores no [Discord da Craftsapiens](https://is.gd/craftsapiens).
 <br>
 
