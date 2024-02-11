@@ -164,20 +164,6 @@ export default class CommandContext {
     this.sendMessage({ content: "", embeds: [embed], flags: 1 << 6 });
   }
 
-  async createBin(sourcebin, data, language) {
-    const bin = await sourcebin.create({
-      title: 'AssistenteCraftsapiens',
-      description: 'Criado por AssistenteCraftsapiens',
-      files: [
-          {
-              content: data,
-              language: language,
-          },
-      ],
-  },
-    )
-    return bin;
-  }
   MsToDate(time) {
     if (!time) return "No time provided";
     if (isNaN(time)) return "The time provided is not a number ! ";
