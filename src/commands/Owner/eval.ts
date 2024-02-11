@@ -60,15 +60,9 @@ export default class Eval extends Command {
       }
       const stop = process.hrtime(start);
       if (code.length > 1750) {
-        const bin = await ctx.createBin(
-          require("sourcebin"),
-          code,
-          "javascript",
-        );
+        
         ctx.sendMessage(
-          `Como o codigo passou dos 1800 caracteres envio um link com o código: ${
-            bin.short
-          }\n||(Tempo de Execução: ${(stop[0] * 1e9 + stop[1]) / 1e6}ms )||`,
+          `Como o codigo passou dos 1800 caracteres [em manutençao]\n||(Tempo de Execução: ${(stop[0] * 1e9 + stop[1]) / 1e6}ms )||`,
         );
 
         return;
