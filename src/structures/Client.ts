@@ -276,6 +276,7 @@ export default class DGClient extends Client {
         playerObj.discord = await this.guilds.get("892472046729179136")?.members.find(m => m?.nick && m.nick?.toLowerCase() == playerObj.nick?.toLowerCase() && m.roles.includes("1152666174157488258"))?.user.id || null;
       }
       const city = findPlayerCity(findInDynmapData, playerObj.nick);
+      console.log("Cidade: " + city?.city)
       if (city) {
         playerObj.city = city;
       }
