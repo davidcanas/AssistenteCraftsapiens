@@ -32,7 +32,7 @@ export default class playerinfo extends Command {
             }
 
             const playerinfo = await this.client.getPlayerInfo(ctx.args[0]);
-
+            console.log(playerinfo)
             const discordUser = this.client.guilds.get("892472046729179136").members.get(playerinfo?.discord);
             let embed;
 
@@ -62,7 +62,7 @@ export default class playerinfo extends Command {
 
             ctx.sendMessage({ embeds: [embed] });
         } catch (err) {
-            ctx.sendMessage({ content: "Ocorreu um erro ao executar este comando!", flags: 1 << 6 })
+            ctx.sendMessage({ content: `Ocorreu um erro ao executar este comando!\n**Erro:** \`${err}\``, flags: 1 << 6 })
             console.log(err)
         }
     }
