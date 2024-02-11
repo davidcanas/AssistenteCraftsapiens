@@ -62,20 +62,7 @@ export default class InteractionCreate {
 
           interaction.channel.messages.get(interaction.message.id).edit({
             content: `[[Changelog]](<https://github.com/davidcanas/AssistenteCraftsapiens/releases/latest>) [[Github]](<https://github.com/davidcanas/AssistenteCraftsapiens>)\n\n${json.body}`,
-            components: [
-              {
-                type: 1,
-                components: [
-                  {
-                    type: 2,
-                    style: 4,
-                    label: "✨ Changelog",
-                    disabled: true,
-                    customID: "changelog",
-                  },
-                ],
-              },
-            ],
+            components: [],
           })
         }
         if (interaction.data.customID === 'confirm') {

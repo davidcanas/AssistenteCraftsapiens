@@ -49,7 +49,7 @@ export default class cityinfo extends Command {
                 }
             ctx.sendMessage({ embeds: [embed] });
         } catch (err) {
-            ctx.sendMessage({ content: "Ocorreu um erro ao executar este comando!", flags: 1 << 6 })
+            ctx.sendMessage({ content: `Ocorreu um erro ao executar este comando!\n**Erro:** \`${err}\``, flags: 1 << 6 })
             console.log(err)
         }
     }
