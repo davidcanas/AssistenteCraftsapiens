@@ -17,7 +17,7 @@
         },
         {
             "nick": "DG0837",
-            "role": "Moderador",
+            "role": "Admin",
             "discord": "733963304610824252"
         },
     
@@ -27,8 +27,23 @@
             "discord": "766671069548380162"
         },
         {
-            "nick": "NiniAvilaa",
+            "nick": "ryna21xx",
             "role": "Ajuda",
-            "discord": "945376324921462905"
+            "discord": "1033797600698191963"
+        },
+        {
+          "nick": "Afonso_24",
+          "role": "Ajuda",
+          "discord": "991796724567920752"
+        },
+        {
+          "nick": "Felipe38494",
+          "role": "Ajuda",
+          "discord": "1077676234194034821"
+        },
+        {
+          "nick": "eduardotl15",
+          "role": "Ajuda",
+          "discord": "692521348807000114"
         }
 ]
