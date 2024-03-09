@@ -17,7 +17,36 @@ export default class MessageCreate {
         collector.collect(message);
       }
     }
-  // anti spam 
+
+    function checkForLinks(phrase: string) {
+      const words = phrase.split(" ");
+      const whitelisted = [
+        "tiktok.com",
+        "youtube.com",
+        "youtu.be",
+        "craftsapiens.com.br",
+        "instagram.com",
+        "twitch.tv",
+      ]
+
+      const found = words.filter(word => {
+        const linkRegex = new RegExp(/(www\.|http:|https:)+[^\s]+[\w]/);
+        if (whitelisted.some(whitelisted => word.includes(whitelisted))) {
+          return false;
+        }
+        return linkRegex.test(word);
+      });
+
+      return found.length > 0;
+    }
+    
+    if (message.author.id !== '733963304610824252' || message.author.id !== '402190502172295168' || message.author.id !== '828745580125225031') {
+      if (checkForLinks(message.content)) {
+        message.delete();
+        console.log('Mensagem de ' + message.author.username + ' foi deletada por conter links.')
+        return;
+      }
+    }
 
     if (
       message.channel.name.includes('ticket-') ||
@@ -302,7 +331,7 @@ export default class MessageCreate {
         ]
       })
       dbcheck.helped++
-      if(message.author.id == '733963304610824252') dbcheck.save()
+      if (message.author.id == '733963304610824252') dbcheck.save()
       if (message.author.id !== '733963304610824252') {
         dbcheck.ignoredUsers.push(message.author.id)
         dbcheck.save()
@@ -330,12 +359,12 @@ export default class MessageCreate {
       'hypixel',
       'mush',
       'hylex'
-  ]
+    ]
 
-  if (blacklistedWords.some((v) => message.content.toLowerCase().includes(v))) {
-      this.client.users.get('733963304610824252').createDM().then(a => a.createMessage({content:`Mensagem de **@${message.author.username} (${message.author.id})** foi deletada por conter possiveis divulgações de outros servidores.\n\n\`\`\`${message.content}\`\`\``}))
+    if (blacklistedWords.some((v) => message.content.toLowerCase().includes(v))) {
+      this.client.users.get('733963304610824252').createDM().then(a => a.createMessage({ content: `Mensagem de **@${message.author.username} (${message.author.id})** foi deletada por conter possiveis divulgações de outros servidores.\n\n\`\`\`${message.content}\`\`\`` }))
       return message.delete()
-  }
+    }
 
     let prefix = "-";
 
