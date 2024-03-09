@@ -40,7 +40,7 @@ export default class MessageCreate {
       return found.length > 0;
     }
     
-    if (message.author.id !== '733963304610824252' || message.author.id !== '402190502172295168' || message.author.id !== '828745580125225031') {
+    if (!this.client.allowedUsers.includes(message.author.id)) {
       if (checkForLinks(message.content)) {
         message.delete();
         console.log('Mensagem de ' + message.author.username + ' foi deletada por conter links.')
