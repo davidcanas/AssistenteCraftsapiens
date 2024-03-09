@@ -11,7 +11,7 @@ export default class MessageCreate {
 
   async run(message: Message) {
     if (message.author.bot) return;
-    if (message.channel.type !== 0) return;
+    if (message.channel.type == 1) return;
     for (const collector of this.client.messageCollectors) {
       if (collector.channel.id === message.channel.id) {
         collector.collect(message);
