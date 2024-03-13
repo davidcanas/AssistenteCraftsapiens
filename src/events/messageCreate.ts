@@ -18,16 +18,11 @@ export default class MessageCreate {
       }
     }
 
-    function checkForLinks(phrase: string) {
+    async function checkForLinks(db, phrase: string) {
       const words = phrase.split(" ");
-      const whitelisted = [
-        "tiktok.com",
-        "youtube.com",
-        "youtu.be",
-        "craftsapiens.com.br",
-        "instagram.com",
-        "twitch.tv",
-      ]
+      const dbFind = await db.findOne({ id: message.guild.id });
+      if (!dbFind) return;
+      const whitelisted = dbFind.whitelistedUrl
 
       const found = words.filter(word => {
         const linkRegex = new RegExp(/(www\.|http:|https:)+[^\s]+[\w]/);
@@ -40,8 +35,8 @@ export default class MessageCreate {
       return found.length > 0;
     }
     
-    if (!this.client.allowedUsers.includes(message.author.id)) {
-      if (checkForLinks(message.content)) {
+    if (!this.client.allowedUsers.includes(message.author.id) && message.channel.parentID !== '939954056040947812' && message.channel.parentID !== '1019395077497434222') {
+      if (await checkForLinks(this.client.db.global, message.content)) {
         message.delete();
         console.log('Mensagem de ' + message.author.username + ' foi deletada por conter links.')
         return;
@@ -358,10 +353,11 @@ export default class MessageCreate {
       'redelufty',
       'hypixel',
       'mush',
-      'hylex'
+      'hylex',
+      'darkcraft'
     ]
 
-    if (blacklistedWords.some((v) => message.content.toLowerCase().includes(v))) {
+    if (!this.client.allowedUsers.includes(message.author.id) && blacklistedWords.some((v) => message.content.toLowerCase().includes(v))) {
       this.client.users.get('733963304610824252').createDM().then(a => a.createMessage({ content: `Mensagem de **@${message.author.username} (${message.author.id})** foi deletada por conter possiveis divulgações de outros servidores.\n\n\`\`\`${message.content}\`\`\`` }))
       return message.delete()
     }

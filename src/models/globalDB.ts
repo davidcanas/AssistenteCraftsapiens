@@ -9,6 +9,7 @@ interface globalDB extends Document {
   helped: number;
   ignoredChannels: string[];
   ignoredUsers: string[];
+  whitelistedUrl: string[];
 }
 
 const globalDB: Schema = new Schema(
@@ -32,6 +33,12 @@ const globalDB: Schema = new Schema(
       type: Number,
       default: 1,
     },
+    
+    whitelistedUrl: {
+      type: Array,
+      default: [],  
+    },
+    
     ignoredChannels: {
       type: Array,
       default: [],
