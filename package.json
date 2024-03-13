@@ -1,6 +1,6 @@
 {
   "name": "assistentecraftsapiens",
-  "version": "3.0.0",
+  "version": "3.5.0",
   "description": "Um projeto de código-aberto criado para auxiliar jogadores da craftsapiens",
   "main": "dist/main.js",
   "author": "davidcanas",
