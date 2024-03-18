@@ -429,25 +429,30 @@ undici-types@~5.26.4:
   resolved "https://registry.yarnpkg.com/undici-types/-/undici-types-5.26.5.tgz#bcd539893d00b56e964fd2657a4866b221a65617"
   integrity sha512-JlCMO+ehdEIKqlFxk6IfVoAUVmgz7cU7zD/h9XZ0qzeosSHmUJVOzSQvvYSYWXkFXC+IfLKSIffhv0sVZup6pA==
 
-undici@^5.12.0, undici@^5.22.1, undici@^5.25.2:
+undici@^5.12.0, undici@^5.25.2:
   version "5.28.2"
   resolved "https://registry.yarnpkg.com/undici/-/undici-5.28.2.tgz#fea200eac65fc7ecaff80a023d1a0543423b4c91"
   integrity sha512-wh1pHJHnUeQV5Xa8/kyQhO7WFa8M34l026L5P/+2TYiakvGy5Rdc8jWZVyG7ieht/0WgJLEd3kcU5gKx+6GC8w==
   dependencies:
     "@fastify/busboy" "^2.0.0"
 
+undici@^6.7.1:
+  version "6.9.0"
+  resolved "https://registry.yarnpkg.com/undici/-/undici-6.9.0.tgz#281b3c8bf29cafa957e743ab2a710b586b01e66e"
+  integrity sha512-XPWfXzJedevUziHwun70EKNvGnxv4CnfraFZ4f/JV01+fcvMYzHE26r/j8AY/9c/70nkN4B1zX7E2Oyuqwz4+Q==
+
 v8-compile-cache-lib@^3.0.1:
   version "3.0.1"
   resolved "https://registry.yarnpkg.com/v8-compile-cache-lib/-/v8-compile-cache-lib-3.0.1.tgz#6336e8d71965cb3d35a1bbb7868445a7c05264bf"
   integrity sha512-wa7YjyUGfNZngI/vtK0UHAN+lgDCxBPCylVXGp0zu59Fz5aiGtNXaq3DhIov063MorB+VfufLh3JlF2KdTK3xg==
 
-vulkava@^1.6.2:
-  version "1.6.2"
-  resolved "https://registry.yarnpkg.com/vulkava/-/vulkava-1.6.2.tgz#573d287da2cbf60769f01486e3227c57dcb6bc60"
-  integrity sha512-LMqIUD0GUIHIhah8H8AFW0vVOgyPYGkqvDD8ySv6XLKmFrXRTPRlkADT7F3NCqPI9AZyUYu5Z435dSejtUNHPA==
+vulkava@^1.6.3:
+  version "1.6.3"
+  resolved "https://registry.yarnpkg.com/vulkava/-/vulkava-1.6.3.tgz#dcb49f85cfeb3d89d9dd65bdc694ec08dc808bee"
+  integrity sha512-ZyShgibAp7nfMWsqqlhaTwaalEUiropGYPaJ3XYdwsbNHJnylbMe/vIYn4uLGj4OqA9NseGW2LgEc3pwgjOm4w==
   dependencies:
-    undici "^5.22.1"
-    ws "^8.13.0"
+    undici "^6.7.1"
+    ws "^8.16.0"
 
 webidl-conversions@^3.0.0:
   version "3.0.1"
@@ -475,10 +480,15 @@ whatwg-url@^5.0.0:
     tr46 "~0.0.3"
     webidl-conversions "^3.0.0"
 
-ws@^8.13.0, ws@^8.14.2:
+ws@^8.14.2:
   version "8.15.1"
   resolved "https://registry.yarnpkg.com/ws/-/ws-8.15.1.tgz#271ba33a45ca0cc477940f7f200cd7fba7ee1997"
   integrity sha512-W5OZiCjXEmk0yZ66ZN82beM5Sz7l7coYxpRkzS+p9PP+ToQry8szKh+61eNktr7EA9DOwvFGhfC605jDHbP6QQ==
+
+ws@^8.16.0:
+  version "8.16.0"
+  resolved "https://registry.yarnpkg.com/ws/-/ws-8.16.0.tgz#d1cd774f36fbc07165066a60e40323eab6446fd4"
+  integrity sha512-HS0c//TP7Ina87TfiPUz1rQzMhHrl/SG2guqRcTOIUYD2q8uhUdNHZYJUaQ8aTGPzCh+c6oawMKW35nFl1dxyQ==
 
 yn@3.1.1:
   version "3.1.1"
