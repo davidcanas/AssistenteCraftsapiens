@@ -267,28 +267,28 @@ export default class MessageCreate {
 						nomeFeriado = 'Natal';
 						break;
 					}
-					return `Durante os feriados não temos aula. As aulas ocorrem todos os dias, de segunda a sexta-feira, e eventualmente no sábado, **fique de olho no cronograma**.\nHoje é feriado de \`${nomeFeriado}\`, logo não haverá aula`;
+					return `Durante os feriados não temos aula. As aulas ocorrem todos os dias, de segunda a sexta-feira, e eventualmente no sábado, **fique atento ao cronograma**.\nHoje é feriado de \`${nomeFeriado}\`, logo não haverá aula`;
 				} else if (!dbcheck.classes.enabled) {
 					const reason = dbcheck.classes.reason;
 					reactEmoji = '❌';
 					embedColor = 15204352;
 					emojiInicio = '<:pepetear:1145856597579542568>';
-					return `Foi definido pela equipe que não haverá aulas por motivo de \`${reason}\`. As aulas ocorrem todos os dias, de segunda a sexta-feira, e eventualmente no sábado, **fique de olho no cronograma**.`;
+					return `Foi definido pela equipe que não haverá aulas por motivo de \`${reason}\`. As aulas ocorrem todos os dias, de segunda a sexta-feira, e eventualmente no sábado, **fique atento ao cronograma**.`;
 				} else if (diaSemana === 0) {
 					reactEmoji = '❌';
 					embedColor = 15204352;
 					emojiInicio = '<:pepetear:1145856597579542568>';
-					return 'Durante os finais de semana não temos aula. As aulas gratuitas ocorrem todos os dias, de segunda a sexta-feira. às 18:30h e as aulas Premium às 19:30h. Eventualmente ocorrem aulas ao sábado, fique de olho no cronograma.';
+					return 'Durante os finais de semana não temos aula. As aulas ocorrem todos os dias, de segunda a sexta-feira, e eventualmente no sábado, **fique atento ao cronograma**.';
 				} else if (diaSemana === 6) {
 					reactEmoji = 'steve_pensando:905024502038147142';
 					embedColor = 16776960;
 					emojiInicio = '<:steve_pensando:905024502038147142>';
-					return 'As aulas ocorrem todos os dias, de segunda a sexta-feira, e eventualmente no sábado, **fique de olho no cronograma**.';
+					return 'As aulas ocorrem todos os dias, de segunda a sexta-feira, e eventualmente no sábado, **fique atento ao cronograma**.';
 				} else {
 					reactEmoji = '✅';
 					embedColor = 3066993;
 					emojiInicio = '<:sir_derp:1145737198868647936>';
-					return 'As aulas gratuitas ocorrem todos os dias, de segunda a sexta-feira. às 18:30h e as aulas Premium às 19:30h. Eventualmente ocorrem aulas ao sábado, fique de olho no cronograma.';
+					return 'As aulas gratuitas ocorrem todos os dias, de segunda a sexta-feira. às 18:30h e as aulas Premium às 19:30h. Eventualmente ocorrem aulas ao sábado, fique atento ao cronograma.';
 				}
 			}
 
