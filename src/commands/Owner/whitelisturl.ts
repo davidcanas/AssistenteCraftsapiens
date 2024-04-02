@@ -26,13 +26,11 @@ export default class noAulaClass extends Command {
                 {
                     name: "remove",
                     description: "Remove um URL da whitelist",
-                    autocomplete: true,
                     type: 1,
                     options:[{
                         type: 3,
                         name: 'dominio',
                         description: 'Domínio que deseja remover da whitelist (Exemplo: google.com)',
-                        autocomplete: true, 
                         required: true
         
                     }]
