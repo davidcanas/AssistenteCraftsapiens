@@ -1,131 +1,150 @@
-import Client from "../structures/Client";
+import Client from '../structures/Client';
 import {
-  Interaction,
-  CommandInteraction,
-  ComponentInteraction,
-  AutocompleteInteraction,
-  InteractionOptionsWithValue
-} from "oceanic.js";
-import CommandContext from "../structures/CommandContext";
+	Interaction,
+	CommandInteraction,
+	ComponentInteraction,
+	AutocompleteInteraction,
+	InteractionOptionsWithValue
+} from 'oceanic.js';
+import CommandContext from '../structures/CommandContext';
 
 export default class InteractionCreate {
-  client: Client;
+	client: Client;
 
-  constructor(client: Client) {
-    this.client = client;
-  }
+	constructor(client: Client) {
+		this.client = client;
+	}
 
-  async run(interaction: Interaction) {
-    if (interaction instanceof AutocompleteInteraction) {
-      
-      if (!interaction.member) return;
-      const cmd = this.client.commands.find(c => c.name === interaction.data.name);
+	async run(interaction: Interaction) {
+		if (interaction instanceof AutocompleteInteraction) {
 
-      if (!cmd) throw new Error(`Command not found`);
+			if (!interaction.member) return;
+			const cmd = this.client.commands.find(c => c.name === interaction.data.name);
 
-      const options = interaction.data.options.raw as InteractionOptionsWithValue[];
+			if (!cmd) throw new Error('Command not found');
 
-      const focusedField = options.find(o => o.focused);
+			const options = interaction.data.options.raw as InteractionOptionsWithValue[];
 
-      cmd.runAutoComplete?.(interaction, focusedField!.value as string, options);
-      return;
-    }
+			const focusedField = options.find(o => o.focused);
 
-    if (interaction instanceof CommandInteraction) {
-      const cmd = this.client.commands.find(
-        (c) => c.name === interaction.data.name,
-      );
-      if (!cmd) throw new Error("<!> Command not found");
+			cmd.runAutoComplete?.(interaction, focusedField!.value as string, options);
+			return;
+		}
 
-      const ctx = new CommandContext(this.client, interaction);
+		if (interaction instanceof CommandInteraction) {
+			const cmd = this.client.commands.find(
+				(c) => c.name === interaction.data.name,
+			);
+			if (!cmd) throw new Error('<!> Command not found');
 
-      cmd.execute(ctx);
-    }
-    if (!(interaction instanceof CommandInteraction)) {
-      if (interaction instanceof ComponentInteraction) {
-        for (const collector of this.client.componentCollectors) {
-          if (collector.message.id === interaction.message.id) {
-            collector.collect(interaction);
-            break;
-          }
-        }
+			const ctx = new CommandContext(this.client, interaction);
 
-        if (interaction.data.customID === "delmsgeval") {
-          if (interaction.member?.id !== "733963304610824252") return;
-          interaction.channel.messages.get(interaction.message.id).delete();
-        }
-      
-        if (interaction.data.customID === "changelog") {
-          let baseurl = `https://api.github.com/repos/davidcanas/AssistenteCraftsapiens/releases/latest`
-          const res = await this.client.fetch(baseurl)
-          const json = await res.json()
+			cmd.execute(ctx);
+		}
+		if (!(interaction instanceof CommandInteraction)) {
+			if (interaction instanceof ComponentInteraction) {
+				for (const collector of this.client.componentCollectors) {
+					if (collector.message.id === interaction.message.id) {
+						collector.collect(interaction);
+						break;
+					}
+				}
 
-          interaction.channel.messages.get(interaction.message.id).edit({
-            content: `[[Changelog]](<https://github.com/davidcanas/AssistenteCraftsapiens/releases/latest>) [[Github]](<https://github.com/davidcanas/AssistenteCraftsapiens>)\n\n${json.body}`,
-            components: [],
-          })
-        }
-        if (interaction.data.customID === 'confirm') {
-          const dbremove = await this.client.db.global.findOne({ id: interaction.guild.id });
-          const autor = interaction.message.mentions.users[0]
+				if (interaction.data.customID === 'silenciar') {
+					const autor = interaction.message.mentions.users[0];
+					if (interaction.member.id !== autor.id) {
+						interaction.createMessage({
+							content:
+                'Esse botão é de @' +
+                autor.username +
+                ' , apenas ele pode silenciar!',
+							flags: 1 << 6
+						});
+						return;
+					}
 
-          if (
-            interaction.member.roles.includes('959259258829021255') ||
+					const db = await this.client.db.global.findOne({ id: interaction.guild.id });
+					db.ignoredUsers.push(interaction.member.id);
+					await db.save();
+					interaction.createMessage({ content: 'Agora você não receberá mais informações sobre as aulas quando perguntar sobre aulas.\nPara ativar novamente use o comando `/silenciar aviso_aulas`', flags: 1 << 6 });
+				}
+        
+				if (interaction.data.customID === 'delmsgeval') {
+					if (interaction.member?.id !== '733963304610824252') return;
+					interaction.channel.messages.get(interaction.message.id).delete();
+				}
+
+				if (interaction.data.customID === 'changelog') {
+					const baseurl = 'https://api.github.com/repos/davidcanas/AssistenteCraftsapiens/releases/latest';
+					const res = await this.client.fetch(baseurl);
+					const json = await res.json();
+
+					interaction.channel.messages.get(interaction.message.id).edit({
+						content: `[[Changelog]](<https://github.com/davidcanas/AssistenteCraftsapiens/releases/latest>) [[Github]](<https://github.com/davidcanas/AssistenteCraftsapiens>)\n\n${json.body}`,
+						components: [],
+					});
+				}
+				if (interaction.data.customID === 'confirm') {
+					const dbremove = await this.client.db.global.findOne({ id: interaction.guild.id });
+					const autor = interaction.message.mentions.users[0];
+
+					if (
+						interaction.member.roles.includes('959259258829021255') ||
             interaction.member.roles.includes('917900552225054750') ||
             interaction.member.roles.includes('901251917991256124')
-          ) {
-            interaction.message.channel.deleteMessage(
-              interaction.message.messageReference.messageID
-            )
+					) {
+						interaction.message.channel.deleteMessage(
+							interaction.message.messageReference.messageID
+						);
 
-            interaction.message.delete()
+						interaction.message.delete();
 
-            dbremove.ignoredUsers.splice(dbremove.ignoredUsers.indexOf(autor.id), 1);
-            dbremove.save();
+						dbremove.usersInCooldown.splice(dbremove.usersInCooldown.indexOf(autor.id), 1);
+						dbremove.save();
 
-            console.log(
-              '\u001b[33m', '| Removendo @' +
+						console.log(
+							'\u001b[33m', '| Removendo @' +
               autor.username +
             ' da lista de usuários que acionaram o sistema!'
-            )
-            return interaction.createMessage({
-              content:
+						);
+						return interaction.createMessage({
+							content:
                 '**[ADMIN]** Você acaba de usar poderes de fontes suspeitas e apagou essa mensagem com sucesso!',
-              flags: 1 << 6
-            })
-          }
+							flags: 1 << 6
+						});
+					}
 
-          if (interaction.member.id !== autor.id) {
-            return interaction.createMessage({
-              content:
+					if (interaction.member.id !== autor.id) {
+						return interaction.createMessage({
+							content:
                 'Esse botão é de @' +
                 autor.username +
                 ' , apenas ele pode confirmar a leitura!',
-              flags: 1 << 6
-            })
-          }
+							flags: 1 << 6
+						});
+					}
 
-          interaction.createMessage({
-            content: 'Obrigado por confirmar a sua leitura :D.',
-            flags: 1 << 6
-          })
+					interaction.createMessage({
+						content: 'Obrigado por confirmar a sua leitura :D.',
+						flags: 1 << 6
+					});
 
-          interaction.message.channel.deleteMessage(
-            interaction.message.messageReference.messageID
-          )
-          interaction.message.delete()
-          dbremove.ignoredUsers.splice(dbremove.ignoredUsers.indexOf(autor.id), 1);
-          dbremove.save();
+					interaction.message.channel.deleteMessage(
+						interaction.message.messageReference.messageID
+					);
+					interaction.message.delete();
+					dbremove.usersInCooldown.splice(dbremove.usersInCooldown.indexOf(autor.id), 1);
+					dbremove.save();
 
-          console.log(
-            '\u001b[33m', '| Removendo @' +
+					console.log(
+						'\u001b[33m', '| Removendo @' +
             autor.username +
           ' da lista de usuários que acionaram o sistema!'
-          )
-        }
-      }
-      return;
-    }
+					);
+				}
+			}
+			return;
+		}
 
-  }
+	}
 }

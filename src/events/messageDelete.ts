@@ -1,19 +1,19 @@
-import Client from "../structures/Client";
+import Client from '../structures/Client';
 
-import { Message } from "oceanic.js";
+import { Message } from 'oceanic.js';
 
 export default class MessageDelete {
-  client: Client;
+	client: Client;
 
-  constructor(client: Client) {
-    this.client = client;
-  }
+	constructor(client: Client) {
+		this.client = client;
+	}
 
-  run(message: Message) {
-    for (const collector of this.client.componentCollectors) {
-      if (collector.message.id === message.id) {
-        collector.stop("Message Delete");
-      }
-    }
-  }
+	run(message: Message) {
+		for (const collector of this.client.componentCollectors) {
+			if (collector.message.id === message.id) {
+				collector.stop('Message Delete');
+			}
+		}
+	}
 }
