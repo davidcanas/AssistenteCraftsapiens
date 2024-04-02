@@ -37,7 +37,7 @@ export default class MessageCreate {
 			return found.length > 0;
 		}
     
-		if (!this.client.allowedUsers.includes(message.author.id) && message.channel.parentID !== '939954056040947812' && message.channel.parentID !== '1019395077497434222' && !message.channel.parentID) {
+		if (!this.client.allowedUsers.includes(message.author.id) && message.channel.parentID !== '939954056040947812' && message.channel.parentID !== '1019395077497434222' && message.channel.parentID !== null) {
 			if (await checkForLinks(this.client.db.global, message.content)) {
 				message.delete();
 				console.log('Mensagem de ' + message.author.username + ' foi deletada por conter links.');
