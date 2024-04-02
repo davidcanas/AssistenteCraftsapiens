@@ -1,0 +1,39 @@
+{
+    "timezones": [
+        {
+            "name": "America/New_York",
+            "flag": "🇺🇸"
+        },
+        {
+            "name": "America/Sao_Paulo",
+            "flag": "🇧🇷"
+        },
+
+        {
+            "name": "Europe/Lisbon",
+            "flag": "🇵🇹"
+        },
+        {
+            "name": "Europe/Madrid",
+            "flag": "🇪🇸"
+        },
+        {
+            "name": "Europe/Moscow",
+            "flag": "🇷🇺"
+        },
+        {
+            "name": "Asia/Hong_Kong",
+            "flag": "🇨🇳"
+        },
+        {
+            "name": "Asia/Tokyo",
+            "flag": "🇯🇵"
+        },
+        {
+            "name": "Australia/Sydney",
+            "flag": "🇦🇺"
+        }
+
+        
+    ]
+}

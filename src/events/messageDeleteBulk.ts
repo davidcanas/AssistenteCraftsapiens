@@ -1,21 +1,21 @@
-import Client from "../structures/Client";
+import Client from '../structures/Client';
 
-import { Message } from "oceanic.js";
+import { Message } from 'oceanic.js';
 
 export default class MessageDeleteBulk {
-  client: Client;
+	client: Client;
 
-  constructor(client: Client) {
-    this.client = client;
-  }
+	constructor(client: Client) {
+		this.client = client;
+	}
 
-  run(message: Message[]) {
-    const msgIDs = message.map((m) => m.id);
+	run(message: Message[]) {
+		const msgIDs = message.map((m) => m.id);
 
-    for (const collector of this.client.componentCollectors) {
-      if (msgIDs.includes(collector.message.id)) {
-        collector.stop("Message Delete");
-      }
-    }
-  }
+		for (const collector of this.client.componentCollectors) {
+			if (msgIDs.includes(collector.message.id)) {
+				collector.stop('Message Delete');
+			}
+		}
+	}
 }
