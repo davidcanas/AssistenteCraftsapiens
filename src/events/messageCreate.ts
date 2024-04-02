@@ -283,12 +283,12 @@ export default class MessageCreate {
 					reactEmoji = 'steve_pensando:905024502038147142';
 					embedColor = 16776960;
 					emojiInicio = '<:steve_pensando:905024502038147142>';
-					return 'As aulas ocorrem todos os dias, de segunda a sexta-feira, e eventualmente no sábado, **fique atento ao cronograma**.';
+					return 'As aulas ocorrem todos os dias, de segunda a sexta-feira, e **eventualmente no sábado, fique atento ao cronograma**.';
 				} else {
 					reactEmoji = '✅';
 					embedColor = 3066993;
 					emojiInicio = '<:sir_derp:1145737198868647936>';
-					return 'As aulas gratuitas ocorrem todos os dias, de segunda a sexta-feira. às 18:30h e as aulas Premium às 19:30h. Eventualmente ocorrem aulas ao sábado, fique atento ao cronograma.';
+					return 'As aulas ocorrem todos os dias, de segunda a sexta-feira, e eventualmente no sábado, **fique atento ao cronograma**.';
 				}
 			}
 
