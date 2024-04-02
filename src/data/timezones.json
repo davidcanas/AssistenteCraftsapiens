@@ -32,7 +32,12 @@
         {
             "name": "Australia/Sydney",
             "flag": "🇦🇺"
+        },
+        {
+            "name": "Pacific/Kiritimati",
+            "flag": "🇰🇮"
         }
+
 
         
     ]
