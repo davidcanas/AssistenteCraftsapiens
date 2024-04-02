@@ -1,6 +1,6 @@
 {
   "name": "assistentecraftsapiens",
-  "version": "3.5.0",
+  "version": "3.6.0",
   "description": "Um projeto de código-aberto criado para auxiliar jogadores da craftsapiens",
   "main": "dist/main.js",
   "author": "davidcanas",
@@ -20,7 +20,7 @@
     "oceanic.js": "^1.8.1",
     "prettier": "^3.1.1",
     "typescript": "^5.3.3",
-    "vulkava": "^1.6.2"
+    "vulkava": "^1.6.3"
   },
   "devDependencies": {
     "@types/dotenv": "^8.2.0",
