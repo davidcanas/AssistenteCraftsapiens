@@ -1,13 +1,13 @@
-import Client from "../structures/Client";
+import Client from '../structures/Client';
 
 export default class Error {
-  client: Client;
+	client: Client;
 
-  constructor(client: Client) {
-    this.client = client;
-  }
+	constructor(client: Client) {
+		this.client = client;
+	}
 
-  run(err: Error): void {
-    console.error("Erro " + err);
-  }
+	run(err: Error): void {
+		console.error('Erro ' + err);
+	}
 }
