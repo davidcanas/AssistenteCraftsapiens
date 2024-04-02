@@ -1,6 +1,6 @@
 {
   "name": "assistentecraftsapiens",
-  "version": "3.6.0",
+  "version": "3.9.0",
   "description": "Um projeto de código-aberto criado para auxiliar jogadores da craftsapiens",
   "main": "dist/main.js",
   "author": "davidcanas",
@@ -17,7 +17,7 @@
     "mathjs": "^11.9.1",
     "mongoose": "^8.0.3",
     "node-fetch": "^2.6.7",
-    "oceanic.js": "^1.8.1",
+    "oceanic.js": "^1.10.1-dev.814dbf6",
     "prettier": "^3.1.1",
     "typescript": "^5.3.3",
     "vulkava": "^1.6.3"
@@ -26,6 +26,9 @@
     "@types/dotenv": "^8.2.0",
     "@types/node": "^20.10.4",
     "@types/node-fetch": "^2.6.9",
+    "@typescript-eslint/eslint-plugin": "^7.5.0",
+    "@typescript-eslint/parser": "^7.5.0",
+    "eslint": "^8.57.0",
     "ts-node": "^10.9.2"
   },
   "peerDependencies": {

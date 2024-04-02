@@ -1,4 +1,5 @@
-import { Message, AutocompleteInteraction } from "oceanic.js";
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import { AutocompleteInteraction } from 'oceanic.js';
 
 interface Player {
   world?: string;
@@ -19,10 +20,10 @@ interface CommandSettings {
   description: string;
   aliases?: Array<string>;
   usage?: string;
-  category: "Info" | "DG" | "Util" | "Music";
+  category: 'Info' | 'DG' | 'Util' | 'Music';
   default_member_permissions?: number;
   autocomplete?: boolean;
-  options: Array<Object>;
+  options: Array<object>;
 }
 
 interface CityInfo {
@@ -109,9 +110,9 @@ interface IEditInteractionData {
   file?: MessageFile;
 }
 
-declare module "vulkava" {
+declare module 'vulkava' {
   export interface Player {
     olderMessageID?: string;
-    speedup?: Boolean;
+    speedup?: boolean;
   }
 }
