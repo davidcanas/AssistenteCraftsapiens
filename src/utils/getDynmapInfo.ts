@@ -97,8 +97,8 @@ export function findCityInfo(serverData: ServerData, cityName: string): CityInfo
 		const associateListMatch = cityMarker.desc.match(/Associates\s+<span[^>]*>(.*?)<\/span>/);
 		const mayorMatch = cityMarker.desc.match(/Mayor\s+<span[^>]*>(.*?)<\/span>/);
 		const nationMatch = cityMarker.desc.match(/nation:\s+([^\s<]*)/);
-
-		if (associateListMatch && associateListMatch[1] && mayorMatch && mayorMatch[1] && nationMatch && nationMatch[1]) {
+        
+		if (associateListMatch && associateListMatch[1] && mayorMatch && mayorMatch[1]) {
 			const associates = associateListMatch[1].split(', ');
 			const mayor = mayorMatch[1];
 			const nation = nationMatch[1];
