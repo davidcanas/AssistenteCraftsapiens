@@ -34,11 +34,18 @@ export default class cityinfo extends Command {
 			const req = await this.client.fetch('http://jogar.craftsapiens.com.br:10004/up/world/Earth/').then(a => a.json());
 			const cityinfo = this.client.utils.dynmap.findCityInfo(req, ctx.args[0]);
 			const mayorinfo = await this.client.getPlayerInfo(cityinfo?.mayor);
+			let habitantes_n = '1';
+			if (cityinfo?.members.length >= 36) {
+				habitantes_n = 'mais de 36';
+			} else {
+              habitantes_n = cityinfo?.members.length.toString();
+			}
+
 			const embed = new this.client.embed()
 				.setTitle(`<:craftsapiens:905025137869463552> Informações da cidade ${cityinfo?.city}`)
 				.addField('👑 Prefeito', cityinfo?.mayor, true)
 				.addField('🗺️ Nação', `${cityinfo?.nation || 'N/A'}`, true)
-				.addField('👤 Habitantes (' + cityinfo?.members.length + ')', `\`${cityinfo?.members.join(', ') || 'N/A'}\``, false)
+				.addField('👤 Habitantes (' + habitantes_n + ')', `\`${cityinfo?.members.join(', ') || 'N/A'}\``, false)
 				.setFooter('Assistente | Craftsapiens')
 				.setColor('RANDOM')
 				.setThumbnail(`https://mineskin.eu/armor/bust/${cityinfo?.mayor}/100.png`);
