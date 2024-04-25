@@ -7,6 +7,7 @@ interface globalDB extends Document {
     reason: string;
   };
   helped: number;
+  urlsDeleted: number;
   ignoredChannels: string[];
   ignoredUsers: string[];
   usersInCooldown: string[];
@@ -34,7 +35,10 @@ const globalDB: Schema = new Schema(
 			type: Number,
 			default: 1,
 		},
-    
+        urlsDeleted: {
+			type: Number,
+			default: 1
+		},
 		whitelistedUrl: {
 			type: Array,
 			default: [],  

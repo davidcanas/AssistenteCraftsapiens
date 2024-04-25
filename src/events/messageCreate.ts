@@ -40,6 +40,9 @@ export default class MessageCreate {
 		if (!this.client.allowedUsers.includes(message.author.id) && message.channel.parentID !== '939954056040947812' && message.channel.parentID !== '1019395077497434222' && message.channel.parentID !== null) {
 			if (await checkForLinks(this.client.db.global, message.content)) {
 				message.delete();
+				const db = await this.client.db.global.findOne({id: message.guild.id});
+				db.urlsDeleted++;
+				db.save();
 				console.log('Mensagem de ' + message.author.username + ' foi deletada por conter links.');
 				return;
 			}
