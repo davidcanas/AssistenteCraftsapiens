@@ -35,7 +35,7 @@ export default class Botinfo extends Command {
         1024
 			).toFixed(2)}%\n⏱️ | ${ctx.MsToDate(
 				this.client.uptime,
-			)}\n<:peepo:1185985409075904602> | Já ajudei \`${db.helped}\` vezes\n💪 Já foram censurados \`${db.urlsDeleted}\` links!`, 
+			)}\n<:peepo:1185985409075904602> | Já ajudei \`${db.helped}\` vezes\n💪 | Já foram censurados \`${db.urlsDeleted}\` links!`, 
 			components: [
 				{
 					type: 1,
