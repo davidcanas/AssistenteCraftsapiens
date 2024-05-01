@@ -153,6 +153,9 @@ export default class noAulaClass extends Command {
 
 			return;
 		}
-
+        
+		const db = await this.client.db.global.findOne({ id: ctx.guild.id });
+        db.helped++;
+        await db.save();
 	}
 } 
