@@ -2,13 +2,13 @@ import Command from '../../structures/Command';
 import Client from '../../structures/Client';
 import CommandContext from '../../structures/CommandContext';
 
-export default class Botinfo extends Command {
+export default class cronograma extends Command {
 	constructor(client: Client) {
 		super(client, {
-			name: 'botinfo',
-			description: 'Informações sobre o estado do Assistente',
+			name: 'cronograma',
+			description: 'Obtenha o cronograma de aulas mais recente da Craftsapiens',
 			category: 'Info',
-			aliases: ['bi'],
+			aliases: ['cornograma'],
 			options: [],
 		});
 	}
