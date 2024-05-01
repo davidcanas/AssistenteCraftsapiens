@@ -18,5 +18,9 @@ export default class Botinfo extends Command {
 		ctx.sendMessage({
 			content: '<:craftsapiens:905025137869463552> [Clique aqui para acessar o mapa do servidor](<http://jogar.craftsapiens.com.br:10004>)'
 		});
+
+		const db = await this.client.db.global.findOne({ id: ctx.guild.id });
+        db.helped++;
+        await db.save();
 	}
 }
