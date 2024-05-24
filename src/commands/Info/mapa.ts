@@ -2,7 +2,7 @@ import Command from '../../structures/Command';
 import Client from '../../structures/Client';
 import CommandContext from '../../structures/CommandContext';
 
-export default class Botinfo extends Command {
+export default class Mapa extends Command {
 	constructor(client: Client) {
 		super(client, {
 			name: 'mapa',

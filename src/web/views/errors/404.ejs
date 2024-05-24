@@ -1,0 +1,82 @@
+<link rel="stylesheet" href="error.css">
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Erro 404 - Página não encontrada</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #282b30;
+      margin: 0;
+      padding: 0;
+      color: #fff;
+    }
+
+    .container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    .error-container {
+      text-align: center;
+    }
+
+    .error-code {
+      font-size: 120px;
+      color: #dc3545;
+      margin: 0;
+    }
+
+    .error-message {
+      font-size: 36px;
+      color: #fff;
+      margin: 10px 0;
+    }
+
+    .error-description {
+      font-size: 18px;
+      color: #bbb;
+      margin: 10px 0;
+    }
+
+    .back-button {
+      background-color: #007bff;
+      color: #fff;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 5px;
+      text-decoration: none;
+      transition: background-color 0.3s;
+    }
+
+    .back-button:hover {
+      background-color: #0056b3;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <div class="error-container">
+      <h1 class="error-code">404</h1>
+      <h2 class="error-message">Página não encontrada</h2>
+      <p class="error-description"> <span class="message" id="js-whoops"></span> <span class="message" id="js-appears"></span> <span class="message" id="js-error"></span> <span class="message" id="js-apology"></span></p>
+      <button class="back-button" onclick="goBack()">Voltar</button>
+    </div>
+  </div>
+
+  <script>
+    function goBack() {
+      window.history.back();
+    }
+  </script>
+</body>
+
+</html>
+
+<script src="error.js"></script>

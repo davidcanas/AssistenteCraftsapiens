@@ -1,0 +1,190 @@
+<title>Gestão | Craftsapiens</title>
+
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="yandex-verification" content="84fb1792d8d78546" />
+<meta name="author" content="Canas" />
+<meta name="keywords" content="bot, discord, danitto" />
+<meta name="description" content="ngc maluco do dg kkkkk" />
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.2/dist/js/bootstrap.bundle.min.js"></script>
+
+<style>
+  * {
+    margin: 0;
+    padding: 0;
+  }
+
+  #ban {
+
+    color: tomato;
+  }
+
+  #mute {
+    color: orange;
+
+  }
+
+  #info-text {
+    color: #0088ff
+  }
+
+  #music {
+
+    border-width: 2px;
+    border-style: solid;
+    border-color: #008000;
+  }
+
+  #music-text {
+    color: #008000
+  }
+
+  #fun {
+
+    border-width: 2px;
+    border-style: solid;
+    border-color: #ff2401;
+  }
+ #puni
+  #fun-text {
+    color: #ff2401
+  }
+
+  #adm {
+
+    border-width: 2px;
+    border-style: solid;
+    border-color: #c0c0c0;
+  }
+
+  #adm-text {
+    color: #c0c0c0
+  }
+
+  #util {
+
+    border-width: 2px;
+    border-style: solid;
+    border-color: #ffd700;
+  }
+
+  #util-text {
+    color: #ffd700
+  }
+
+  #mod {
+
+    border-width: 2px;
+    border-style: solid;
+    border-color: #FF1493;
+  }
+
+  #mod-text {
+    color: #FF1493
+  }
+  #Perm {
+    color: red
+  }
+  
+  html,
+  body {
+    height: 100%;
+  }
+
+  .footer {
+    position: fixed;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    background-color: red;
+    color: white;
+    text-align: center;
+  }
+
+  body {
+    background-color: #23272a;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6,
+  p {
+    color: white
+  }
+  .tag {
+    font-weight: bold;
+    font-size: 14px;
+    padding: 2px 6px;
+    border-radius: 4px;
+}
+
+.admin {
+    color: #AA0000; /* &4 */
+}
+
+.dev {
+    color: #55FFFF; /* &b */
+}
+.reitor {
+    color: #5555FF; /* &3 */
+}
+
+.moderador {
+    color: #FF5555; /* &c */
+}
+
+.ajuda {
+    color: #FFAA00; /* &6 */
+}
+.premium {
+    color: #55AA55; /* &2 */
+}
+
+.vip {
+    color: #FFFF55; /* &e */
+}
+
+.booster {
+    color: #FF55FF; /* &d */
+}
+
+.alunos {
+    color: #0f0330; /* &9 */
+}
+
+
+</style>
+<%- include('../../partials/navbar.ejs') %>
+  </head>
+
+  <body>
+    <center>
+      <h2>Histórico de punições</h2>
+      <h6><img src="https://mc-heads.net/avatar/<%=nick%>" width=30 large=30 style="border-radius: 50%"></img> Veja o
+        histórico de punições de <span class="tag <%=highestRole(guild, nick)%>">[<%=highestRole(guild, nick)%>]</span><%=nick%>
+      </h6>
+      <%let na=1%>
+        <%dados.punicoes.forEach((a, i, self) => { %>
+
+
+          <div class="container p-3 my-3 bg-dark text-white" id="punicao">
+            <small id="lol"><b>Punição #<%=i+1%> | <span id="<%=a.tipo%>">
+                  <%=a.tipo%>
+                </span> | <span id="<%=a.duracao%>"><%=a.duracao%></span> </b> | <a href="/punicoes/delete/<%=a.id%>" style="text-decoration: none;">❌</a></small>
+
+
+            <p>
+              <%=a.motivo%>
+            </p>
+          <span id="hora" style="color: gray; font-size: 12px;">Às <%=a.horario%> por <span class="tag <%=highestRole(guild, a.punido_por)%>" style="font-size: 12px;">[<%=highestRole(guild, a.punido_por)%>]</span><%=a.punido_por%></span>
+
+
+          </div>
+
+          <%})%>
+          
+  </body>

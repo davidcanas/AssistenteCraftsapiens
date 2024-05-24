@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Erro 401</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #282b30; 
+      margin: 0;
+      padding: 0;
+      color: #fff; 
+    }
+
+    .container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    .error-container {
+      text-align: center;
+    }
+
+    .error-code {
+      font-size: 120px;
+      color: #dc3545;
+      margin: 0;
+    }
+
+    .error-message {
+      font-size: 36px;
+      color: #fff; 
+      margin: 10px 0;
+    }
+
+    .error-description {
+      font-size: 18px;
+      color: #bbb; 
+      margin: 10px 0;
+    }
+
+    .login-button {
+      background-color: #007bff; 
+      color: #fff; 
+      padding: 10px 20px;
+      border: none;
+      border-radius: 5px;
+      text-decoration: none; 
+      transition: background-color 0.3s;
+    }
+
+    .login-button:hover {
+      background-color: #0056b3; 
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <div class="error-container">
+      <h1 class="error-code">401</h1>
+      <% if (!user) { %>
+      <h2 class="error-message">Você precisa estar logado para acessar esta página.</h2>
+      <p class="error-description">Por favor, faça login com sua conta do discord para continuar.</p>
+      <br>
+      <a href="/login" class="login-button">Fazer Login</a>
+        <% } else { %>
+      <h2 class="error-message">Você não tem permissão para acessar esta página.</h2>
+      <p class="error-description">Talvez... Você não devesse estar tentando acessar essa página..</p>
+      <% } %>
+
+    </div>
+  </div>
+</body>
+
+</html>
