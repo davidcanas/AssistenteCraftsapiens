@@ -26,13 +26,16 @@ export default class playerinfo extends Command {
 	async execute(ctx: CommandContext): Promise<void> {
 		ctx.defer();
 		try {
-			if (!ctx.args[0]) {
-				ctx.sendMessage('Você precisa especificar um jogador!');
-				return;
+	
+			let playerinfo;
+
+			if (!ctx.args[0] && ctx.member.nick) {
+				playerinfo = await this.client.getPlayerInfo(ctx.member.nick);
+
+			} else  {
+				playerinfo = await this.client.getPlayerInfo(ctx.args[0]);
 			}
 
-			const playerinfo = await this.client.getPlayerInfo(ctx.args[0]);
-			console.log(playerinfo);
 			const discordUser = this.client.guilds.get('892472046729179136').members.get(playerinfo?.discord);
 			const embed = new this.client.embed()
 				.setTitle(`<:craftsapiens:905025137869463552> Informações de ${playerinfo?.nick}`)

@@ -52,7 +52,7 @@ export default class noAulaClass extends Command {
 		}
 		const db = await this.client.db.global.findOne({ id: ctx.guild.id });
 		db.classes.enabled = args === 'on' ? true : false;
-		db.classes.reason = motivo ? motivo : 'Sem motivo especificado';
+		db.classes.reason = motivo ? motivo : '';
 		db.save();
 
 		ctx.sendMessage({ content: `Modo de aulas ativas foi ${args === 'on' ? 'ativado' : 'desativado'} com sucesso!\nMotivo: ${db.classes.reason}` });

@@ -23,13 +23,7 @@ export default class Volume extends Command {
 
 	async execute(ctx: CommandContext): Promise<void> {
 		if (ctx.channel.type !== 0 || !ctx.guild) return;
-		if (!this.client.ignoreRoles.some((v) => ctx.msg.member.roles.includes(v))) {
-			ctx.sendMessage({
-				content: 'Você não tem acesso a esse comando!',
-				flags: 1 << 6,
-			});
-			return;
-		}
+		
 		const currPlayer = this.client.music.players.get(ctx.guild.id as string);
 		const volume = Number(ctx.args[0]);
 
@@ -37,6 +31,14 @@ export default class Volume extends Command {
 			ctx.sendMessage('Não estou a tocar nada nesse momento.');
 			return;
 		}
+
+		const voiceChannelID = ctx.member?.voiceState?.channelID;
+
+        if (!voiceChannelID || (voiceChannelID && voiceChannelID !== currPlayer.voiceChannelId)) {
+          ctx.sendMessage({ content: 'Você não está no mesmo canal de voz onde a música está tocando!', flags: 1 << 6 });
+          return;
+        }
+
 		if (isNaN(volume) || volume < 0 || volume > 500) {
 			ctx.sendMessage('O volume deve ser um numero entre 0 e 500');
 			return;

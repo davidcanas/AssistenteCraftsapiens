@@ -1,9 +1,8 @@
 import Command from '../../structures/Command';
 import Client from '../../structures/Client';
 import CommandContext from '../../structures/CommandContext';
-import { AutocompleteInteraction } from 'oceanic.js';
 
-export default class noAulaClass extends Command {
+export default class whitelistUrl extends Command {
 	constructor(client: Client) {
 		super(client, {
 			name: 'whitelisturl',
@@ -38,6 +37,12 @@ export default class noAulaClass extends Command {
 				{
 					name: 'list',
 					description: 'Lista todos os URLs na whitelist',
+					type: 1,
+					options: []
+				},
+				{
+					name: 'toggle',
+					description: 'Ativa ou desativa o sistema de antilink',
 					type: 1,
 					options: []
 				}
@@ -120,6 +125,19 @@ export default class noAulaClass extends Command {
 				.setColor('RANDOM');
 			ctx.sendMessage({embeds: [embed]});
             
+
+		} else if (ctx.args[0] === 'toggle') {
+			const db = await this.client.db.global.findOne({id: ctx.guild.id});
+
+			if (!db) {
+				ctx.sendMessage('Erro ao buscar o banco de dados');
+				return;
+			}
+
+			db.whitelistedUrlEnabled = !db.whitelistedUrlEnabled;
+			db.save();
+
+			ctx.sendMessage('✅ **Sucesso!** Sistema de antilink ' + (db.whitelistedUrlEnabled ? '**ativado**\nAgora irei deletar links que não estejam na whitelist!' : '**desativado**\nAgora não irei deletar mais links no servidor!'));
 
 		}
 

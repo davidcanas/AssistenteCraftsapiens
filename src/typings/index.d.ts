@@ -46,7 +46,7 @@ interface Utils {
    getAllRegisteredCities: (serverData: ServerData) => string[];
    getAllRegisteredPlayers: (serverData: ServerData) => string[];
    getDynmapPlayers: () => Promise<string[]>;
-   getDynmapPlayersVanilla: () => Promise<string[]>;
+   //getDynmapPlayersVanilla: () => Promise<object[] | string[]>;
    getOnlinePlayerInfo: (serverData: ServerData, playerName: string) => Player | undefined;
   }
 }
@@ -88,7 +88,7 @@ interface InteractionPacket {
     user: {
       id: string;
     };
-  }; //dont need more stuff (for now)
+  };
 
   token: string;
   type: number;
@@ -116,3 +116,5 @@ declare module 'vulkava' {
     speedup?: boolean;
   }
 }
+
+

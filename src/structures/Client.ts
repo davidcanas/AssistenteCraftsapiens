@@ -7,6 +7,7 @@ import {
 	Guild,
 	User,
 	ClientEvents,
+	Member,
 } from 'oceanic.js';
 
 import { CityInfo, Command, Utils } from '../typings/index';
@@ -14,6 +15,8 @@ import { CityInfo, Command, Utils } from '../typings/index';
 import staffJSON from '../data/staff.json';
 
 import global from '../models/globalDB';
+import users from '../models/userDB';
+import staff from '../models/staffDB';
 
 import Embed from './Embed';
 
@@ -22,7 +25,7 @@ import { NodeOptions } from 'vulkava';
 import Music from './Music';
 
 import levenshteinDistance from '../utils/levenshteinDistance';
-import { getOnlinePlayerInfo, findCityInfo, findPlayerCity, getAllRegisteredCities, getAllRegisteredPlayers, getDynmapPlayers, getDynmapPlayersVanilla } from '../utils/getDynmapInfo';
+import { getOnlinePlayerInfo, findCityInfo, findPlayerCity, getAllRegisteredCities, getAllRegisteredPlayers, getDynmapPlayers } from '../utils/getDynmapInfo';
 
 import {
 	ComponentCollector,
@@ -39,11 +42,14 @@ export default class DGClient extends Client {
 	music: Music;
 	db: {
     global: typeof global;
+	users: typeof users;
+	staff: typeof staff;
   };
 	utils: Utils;
 	fetch: typeof fetch;
 	embed: typeof Embed;
 	owner: User;
+	guildID: string;
 	allowedUsers: Array<string>;
 	messageCollectors: Array<MessageCollector>;
 	componentCollectors: Array<ComponentCollector>;
@@ -69,6 +75,8 @@ export default class DGClient extends Client {
 		this.commands = [];
 		this.db = {
 			global: global,
+			users: users,
+			staff: staff,
 		};
 		this.utils = {
 			levDistance: levenshteinDistance,
@@ -78,7 +86,6 @@ export default class DGClient extends Client {
 				getAllRegisteredCities,
 				getAllRegisteredPlayers,
 				getDynmapPlayers,
-				getDynmapPlayersVanilla,
 				getOnlinePlayerInfo,
 			},
 		};
@@ -88,7 +95,8 @@ export default class DGClient extends Client {
 		this.componentCollectors = [];
 		this.reactionCollectors = [];
 		this.owner = this.users.get('733963304610824252');
-		this.allowedUsers = ['733963304610824252', '402190502172295168', '828745580125225031', ''];
+		this.guildID = '892472046729179136';
+		this.allowedUsers = ['733963304610824252', '402190502172295168', '828745580125225031', '286573832913813516'];
 		this.ignoreRoles = [
 			'939956623441555558',
 			'917900552225054750',
@@ -276,7 +284,7 @@ export default class DGClient extends Client {
 				playerObj.discord = await this.guilds.get('892472046729179136')?.members.find(m => m?.nick && m.nick?.toLowerCase() == playerObj.nick?.toLowerCase() && m.roles.includes('1152666174157488258'))?.user.id || null;
 			}
 			const city = findPlayerCity(findInDynmapData, playerObj.nick);
-			console.log('Cidade: ' + city?.city);
+			
 			if (city) {
 				playerObj.city = city;
 			}
@@ -306,5 +314,33 @@ export default class DGClient extends Client {
 		}
 		return null;
 	}
+	getHighestRole(guild, user: string): string {
+		const member = guild?.members.find(m => m.user.id == user || m.nick == user);
+		if (!member) return '';
+		const roles = member.roles.map(r => guild?.roles.get(r));
+		const highestRole = roles.reduce((a, b) => a.position > b.position ? a : b);
+		return highestRole.name;
+	}
+
+	nFormatter(num, digits) {
+		const lookup = [
+          { value: 1, symbol: '' },
+          { value: 1e3, symbol: 'k' },
+          { value: 1e6, symbol: 'M' },
+          { value: 1e9, symbol: 'G' },
+          { value: 1e12, symbol: 'T' },
+          { value: 1e15, symbol: 'P' },
+          { value: 1e18, symbol: 'E' }
+		];
+		const regexp = /\.0+$|(?<=\.[0-9]*[1-9])0+$/;
+		const item = lookup.findLast(item => num >= item.value);
+		return item ? (num / item.value).toFixed(digits).replace(regexp, '').concat(item.symbol) : '0';
+   }
+   
+    getDiscordByNick(nick): Member | null {
+	const member = this.guilds.get('892472046729179136')?.members.find(m => m?.nick && m.nick?.toLowerCase() == nick?.toLowerCase() && m.roles.includes('1152666174157488258')) || null;
+
+	return member;
+}
 
 }

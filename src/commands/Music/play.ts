@@ -7,11 +7,10 @@ import { VoiceChannel } from 'oceanic.js';
 export default class play extends Command {
 	constructor(client: Client) {
 		super(client, {
-			name: 'tocar',
-			description: '[STAFF] Toca uma música ',
+			name: 'play',
+			description: 'Toca uma música ',
 			category: 'Music',
-			aliases: ['p', 'play'],
-			default_member_permissions: 1 << 40,
+			aliases: ['p', 'tocar'],
 			options: [{
 				name: 'music',
 				description: 'A música a tocar',
@@ -23,17 +22,16 @@ export default class play extends Command {
 
 	async execute(ctx: CommandContext): Promise<void> {
 		if (ctx.channel.type !== 0 || !ctx.guild) return;
-		if (!this.client.ignoreRoles.some((v) => ctx.msg.member.roles.includes(v))) {
-			ctx.sendMessage({
-				content: 'Você não tem acesso a esse comando!',
-				flags: 1 << 6,
-			});
+		
+        if(!ctx.args[0]) {
+			ctx.sendMessage('Você precisa escolher uma música para tocar!');
 			return;
 		}
-
+       
 		const currPlayer = this.client.music.players.get(ctx.guild.id as string);
+        const canPlay = await this.client.music.canPlay(ctx, currPlayer);
 
-		if (!this.client.music.canPlay(ctx, currPlayer)) return;
+		if (!canPlay) return;
 
 		const voiceChannelID = ctx.member?.voiceState.channelID as string;
 		const voiceChannel = this.client.getChannel(voiceChannelID) as VoiceChannel;
@@ -94,7 +92,7 @@ export default class play extends Command {
 						.addField('Nome:', '`' + playlist.name + '`')
 						.addField('Total de musicas:', '`' + res.tracks.length + '`')
 						.setTimestamp()
-						.setFooter('Suporte | AssistenteCraftsapiens', ctx.author.defaultAvatarURL());
+						.setFooter('Suporte | Assistente Craftsapiens', ctx.author.defaultAvatarURL());
 
 					const urlRegex =
             /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_+.~#?&//=]*)/;
