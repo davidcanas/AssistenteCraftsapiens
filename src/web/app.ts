@@ -10,7 +10,7 @@ import punicoes from './routes/punicoes';
 import { getDynmapPlayersVanilla } from '../utils/getDynmapInfo';
 
 const app = express();
-const port = 3000;
+const port = 3200;
 
 
 app.use(session({
