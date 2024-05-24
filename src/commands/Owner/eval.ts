@@ -1,6 +1,7 @@
 import Command from '../../structures/Command';
 import Client from '../../structures/Client';
 import CommandContext from '../../structures/CommandContext';
+import { create } from 'sourcebin';
 
 export default class Eval extends Command {
 	constructor(client: Client) {
@@ -39,6 +40,7 @@ export default class Eval extends Command {
 			let code = eval(texto);
 			if (code instanceof Promise) code = await code;
 			if (typeof code !== 'string')
+				// eslint-disable-next-line @typescript-eslint/no-var-requires
 				code = require('util').inspect(code, {
 					depth: 0,
 				});
@@ -61,10 +63,23 @@ export default class Eval extends Command {
 			const stop = process.hrtime(start);
 			if (code.length > 1750) {
         
-				ctx.sendMessage(
-					`Como o codigo passou dos 1800 caracteres [em manutençao]\n||(Tempo de Execução: ${(stop[0] * 1e9 + stop[1]) / 1e6}ms )||`,
+				
+                const bin = await create(
+					{
+						title: 'Eval',
+						description: 'Criado pelo Eval do Assistente Craftsapiens', 
+						files: [
+							{
+								content: code,
+								language: 'javascript',
+							},
+						],
+					},
 				);
 
+				ctx.sendMessage(
+					`Como o código passou dos 1800 caracteres carreguei no Sourcebin! [Clica aqui](${bin.url}) \n||(Tempo de Execução: ${(stop[0] * 1e9 + stop[1]) / 1e6}ms )||`,
+				);
 				return;
 			}
 

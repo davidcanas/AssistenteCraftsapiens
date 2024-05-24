@@ -16,19 +16,21 @@ export default class Stop extends Command {
 
 	async execute(ctx: CommandContext): Promise<void> {
 		if (ctx.channel.type !== 0 || !ctx.guild) return;
-		if (!this.client.ignoreRoles.some((v) => ctx.msg.member.roles.includes(v))) {
-			ctx.sendMessage({
-				content: 'Você não tem acesso a esse comando!',
-				flags: 1 << 6,
-			});
-			return;
-		}
+		
 		const currPlayer = this.client.music.players.get(ctx.guild.id as string);
     
 		if (!currPlayer || currPlayer.state === ConnectionState.DISCONNECTED) {
 			ctx.sendMessage('Não estou tocando nada.');
 			return;
 		}
+
+		const voiceChannelID = ctx.member?.voiceState?.channelID;
+
+        if (!voiceChannelID || (voiceChannelID && voiceChannelID !== currPlayer.voiceChannelId)) {
+          ctx.sendMessage({ content: 'Você não está no mesmo canal de voz onde a música está tocando!', flags: 1 << 6 });
+          return;
+        }
+
 		if (currPlayer.olderMessageID) {
 			ctx.channel.deleteMessage(currPlayer.olderMessageID).catch(() => { });
 		}

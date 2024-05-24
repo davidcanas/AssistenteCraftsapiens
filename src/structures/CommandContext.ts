@@ -15,12 +15,12 @@ import {
 } from 'oceanic.js';
 
 export enum Type {
-  MESSAGE,
-  INTERACTION,
+	MESSAGE,
+	INTERACTION,
 }
 
 type Content = CreateMessageOptions & {
-  fetchReply?: boolean;
+	fetchReply?: boolean;
 };
 export default class CommandContext {
 	private readonly client: Client;
@@ -33,6 +33,7 @@ export default class CommandContext {
 	public declare readonly targetUsers?: User[];
 	public declare readonly targetRoles?: Role[];
 	public declare readonly targetChannels?: PartialChannel[];
+	public readonly argsObj: InteractionOptionsWithValue[];
 
 	constructor(
 		client: Client,
@@ -87,7 +88,12 @@ export default class CommandContext {
 					const options = interaction.data.options
 						.raw as InteractionOptionsWithValue[];
 
-					this.args = options?.map((ops) => ops.value.toString().trim()) ?? [];
+					this.args = options.map((ops) => ops.value.toString().trim());
+					this.argsObj = options.map((ops) => ops);
+						
+
+
+
 				}
 			} else if (interaction.data.type === 2) {
 				this.targetUsers = interaction.data.resolved?.users?.map(
@@ -134,6 +140,10 @@ export default class CommandContext {
 		if (content.content === undefined) content.content = '';
 
 		if (this.interactionOrMessage instanceof Message) {
+			content.messageReference = {
+				messageID: this.interactionOrMessage.id,
+			};
+
 			this.channel.createMessage(content);
 			return;
 		} else {
@@ -145,8 +155,8 @@ export default class CommandContext {
 
 			if (fetchReply) {
 				return this.interactionOrMessage.getOriginal() as Promise<
-          Message<TextableChannel>
-        >;
+					Message<TextableChannel>
+				>;
 			}
 		}
 	}
@@ -176,6 +186,25 @@ export default class CommandContext {
 
 		return `${d}D:${h}H:${m}M:${s}S`;
 	}
+
+	//MsToHour by: 5antos :D
+	MsToHour(time) {
+		time = Math.round(time / 1000);
+		const s = time % 60,
+		m = ~~((time / 60) % 60),
+		h = ~~(time / 60 / 60);
+
+		return h === 0
+		? `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`
+		: `${String(Math.abs(h) % 24).padStart(2, '0')}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+	}
+    progressBar(current, total, barSize) {
+		const progress = Math.round((barSize*current)/total);
+ 
+		return '━'.repeat(progress > 0 ? progress-1 : progress) + '🔘' + '━'.repeat(barSize-progress);
+		// 
+		}
+
 	async defer() {
 		if (this.interactionOrMessage instanceof CommandInteraction) {
 			this.interactionOrMessage.defer();

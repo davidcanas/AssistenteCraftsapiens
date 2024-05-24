@@ -19,4 +19,6 @@ client.loadCommands();
 client.loadEvents();
 client.connect();
 
+require('./web/app');
+
 export default client;
