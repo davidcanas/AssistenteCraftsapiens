@@ -90,6 +90,6 @@ app.get('*', (req, res) => {
     res.status(404).render('errors/404');
 });
 
-app.listen(port, process.env.LOCAL_IP, () => {
+app.listen(port, () => {
     console.log(`=> Dashboard online em: http://${process.env.LOCAL_IP}:${port}`);
 });
