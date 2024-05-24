@@ -3,11 +3,11 @@ import Client from '../../structures/Client';
 import CommandContext from '../../structures/CommandContext';
 import { ConnectionState } from 'vulkava';
 
-export default class Volume extends Command {
+export default class Speedup extends Command {
 	constructor(client: Client) {
 		super(client, {
 			name: 'effect',
-			description: '[STAFF] Ativa/desativa um efeito na queue atual',
+			description: ' Ativa/desativa um efeito na queue atual',
 			category: 'Music',
 			aliases: ['speedup'],
 			options: [
@@ -33,19 +33,19 @@ export default class Volume extends Command {
     
 		const currPlayer = this.client.music.players.get(ctx.guild.id as string);
   
-		if (!this.client.ignoreRoles.some((v) => ctx.msg.member.roles.includes(v))) {
-			ctx.sendMessage({
-				content: 'Você não tem acesso a esse comando!',
-				flags: 1 << 6,
-			});
-			return;
-		}
-  
 		if (!currPlayer || currPlayer.state === ConnectionState.DISCONNECTED) {
 			ctx.sendMessage('Não estou a tocar nada nesse momento.');
 			return; 
 		}
-    
+        
+		const voiceChannelID = ctx.member?.voiceState?.channelID;
+
+        if (!voiceChannelID || (voiceChannelID && voiceChannelID !== currPlayer.voiceChannelId)) {
+          ctx.sendMessage({ content: 'Você não está no mesmo canal de voz onde a música está tocando!', flags: 1 << 6 });
+          return;
+        }
+
+		
 		if (!currPlayer.speedup) {
 			currPlayer.filters.setTimescale({pitch: 1.18, rate: 1.10, speed: 1.15});
 			ctx.sendMessage('O efeito speedup foi ativado');

@@ -38,20 +38,20 @@ export default class MessageCreate {
 		}
     
 		if (!this.client.allowedUsers.includes(message.author.id) && message.channel.parentID !== '939954056040947812' && message.channel.parentID !== '1019395077497434222' && message.channel.parentID !== null) {
+			const db = await this.client.db.global.findOne({id: message.guild.id});
+			if (db.whitelistedUrlEnabled) {
 			if (await checkForLinks(this.client.db.global, message.content)) {
 				message.delete();
-				const db = await this.client.db.global.findOne({id: message.guild.id});
 				db.urlsDeleted++;
 				db.save();
 				console.log('Mensagem de ' + message.author.username + ' foi deletada por conter links.');
 				return;
+				}
 			}
+
 		}
 
-		if (
-			message.channel.name.includes('ticket-') ||
-      message.channel.name.includes('closed-')
-		) {
+	if (message.channel.name.includes('ticket-') || message.channel.name.includes('closed-')) {
 
 
 			const hora = new Date()
@@ -400,9 +400,51 @@ export default class MessageCreate {
 		);
 
 		if (command) {
+			const db = await this.client.db.global.findOne({ id: message.guild.id });
+
+			if (command.category === 'Music') {
+				if (db.music.blacklistedUsers.includes(message.author.id)) {
+				const embed = new this.client.embed()
+				.setDescription(':x: **Você foi proibido por um administrador de usar comandos de Música**\nMotivo: `Utilização indevida do sistema`')
+				.setColor('16711680')
+				.setFooter('Essa mensagem se autodestruirá em 15 segundos.');
+
+				const msg = await message.channel.createMessage({
+					embeds: [embed],
+					messageReference: { messageID: message.id }
+				});
+
+				setTimeout(() => {
+					if (msg) msg.delete();
+				}, 15000);
+
+				return;
+			}
+			if (!this.client.getDiscordByNick(message.member.nick)) {
+				const embed = new this.client.embed()
+				.setDescription('**Para usar o sistema de música da Craftsapiens, você precisa de ter a sua conta discord vinculada com o minecraft!**')
+				.addField('Como vincular?', '> Para vincular sua conta use o comando `/discord link` no minecraft da Craftsapiens!')
+				.setColor('16711680')
+				.setFooter('Qualquer duvida, contacte um STAFF | Essa mensagem se autodestruirá em 1 minuto.');
+
+				const msg = await message.channel.createMessage({
+					embeds: [embed],
+					messageReference: { messageID: message.id }
+				});
+
+				setTimeout(() => {
+					if (msg) msg.delete();
+				}, 60000);
+
+				return;
+			}
+			}
+
 			const ctx = new CommandContext(this.client, message, args);
 
 			command.execute(ctx);
 		}
-	}
+	
+}
+
 }

@@ -1,4 +1,5 @@
 import staffJSON from '../data/staff.json';
+import DGClient from '../structures/Client';
 
 interface Player {
     world?: string;
@@ -144,18 +145,20 @@ export async function getDynmapPlayers() {
 	return p;
 }
 
-export async function getDynmapPlayersVanilla() {
+export async function getDynmapPlayersVanilla(client: DGClient) {
 	const req = await fetch(
 		'http://jogar.craftsapiens.com.br:10004/up/world/Earth/'
 	);
 	const result = await req.json();
-
+    
 	const playerArray: object[] = [];
+     
+    const db = await client.db.staff.find({});
 
 	result.players.forEach((player: any) => {
 
 
-		if (staffJSON.find(p => p.nick == player.name)) {
+		if (db.find(p => p.nick == player.name)) {
 			playerArray.push({ name: player.name, health: player.health, order: 1 });
 			return;
 		} else {
@@ -168,9 +171,7 @@ export async function getDynmapPlayersVanilla() {
 	if (playerArray.length == 0) return ['Ninguém online no momento.'];
 
 
-	const p = playerArray.map((p: any) => p.name);
-
-	return p;
+	return playerArray;
 }
 
 export function getOnlinePlayerInfo(serverData: ServerData, playerName: string): Player {

@@ -89,9 +89,10 @@ export default class Music extends Vulkava {
 	}
 
 
-	canPlay(ctx: CommandContext, player?: Player | undefined): boolean {
+	async canPlay(ctx: CommandContext, player?: Player | undefined): Promise<boolean> {
+		const db = await this.client.db.global.findOne({ id: ctx.guild.id });
 		const voiceChannelID = ctx.member!.voiceState?.channelID;
-
+          
 		if (!voiceChannelID) {
 			ctx.sendMessage({
 				content: 'Você precisa de estar em um canal de voz para usar este comando.',
@@ -99,6 +100,15 @@ export default class Music extends Vulkava {
 			});
 			return false;
 		}
+        
+		if (db.music.restrictedChannels.includes(voiceChannelID)) {
+			ctx.sendMessage({
+				content: 'Você não pode usar comandos de música neste canal de voz.',
+				flags: 1 << 6,
+			});
+			return false;
+		}
+		
 
 		const voiceChannel = this.client.getChannel(voiceChannelID) as VoiceChannel;
 

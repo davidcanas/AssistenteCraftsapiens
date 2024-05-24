@@ -6,12 +6,17 @@ interface globalDB extends Document {
     enabled: boolean;
     reason: string;
   };
+  music: {
+	blacklistedUsers: string[];
+	restrictedChannels: string[];
+  };
   helped: number;
   urlsDeleted: number;
   ignoredChannels: string[];
   ignoredUsers: string[];
   usersInCooldown: string[];
   whitelistedUrl: string[];
+  whitelistedUrlEnabled: boolean;
 }
 
 const globalDB: Schema = new Schema(
@@ -43,6 +48,10 @@ const globalDB: Schema = new Schema(
 			type: Array,
 			default: [],  
 		},
+		whitelistedUrlEnabled: {
+			type: Boolean,
+			default: true,
+		},
     
 		ignoredChannels: {
 			type: Array,
@@ -58,8 +67,24 @@ const globalDB: Schema = new Schema(
 			type: Array,
 			default: [],
 		},
+       
+		music: {
+			blacklistedUsers: {
+				type: Array,
+				default: [],
+			},
+
+			restrictedChannels: {
+				type: Array,
+				default: [],
+        
+			},	
+
+		},
+			
+		
     
-	},
+		},	
 	{
 		versionKey: false,
 	},
