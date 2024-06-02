@@ -114,7 +114,7 @@ export function findCityInfo(serverData: ServerData, cityName: string): CityInfo
 
 export async function getDynmapPlayers() {
 	const req = await fetch(
-		'http://jogar.craftsapiens.com.br:10004/up/world/Earth/'
+		'http://jogar.craftsapiens.com.br:2053/up/world/Earth/'
 	);
 	const result = await req.json();
 
@@ -147,7 +147,7 @@ export async function getDynmapPlayers() {
 
 export async function getDynmapPlayersVanilla(client: DGClient) {
 	const req = await fetch(
-		'http://jogar.craftsapiens.com.br:10004/up/world/Earth/'
+		'http://jogar.craftsapiens.com.br:2053/up/world/Earth/'
 	);
 	const result = await req.json();
     
