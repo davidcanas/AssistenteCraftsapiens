@@ -31,7 +31,7 @@ export default class cityinfo extends Command {
 				ctx.sendMessage('Você precisa especificar um jogador!');
 				return;
 			}
-			const req = await this.client.fetch('http://20.232.190.137:3005/up/world/Earth/').then(a => a.json());
+			const req = await this.client.fetch('http://20.232.190.137:3005//').then(a => a.json());
 			const cityinfo = this.client.utils.dynmap.findCityInfo(req, ctx.args[0]);
 			const mayorinfo = await this.client.getPlayerInfo(cityinfo?.mayor);
 			let habitantes_n = '1';
@@ -66,7 +66,7 @@ export default class cityinfo extends Command {
 		}
 
 		const allCities = await this.client.utils.dynmap.getAllRegisteredCities(
-			await this.client.fetch('http://20.232.190.137:3005/up/world/Earth/').then(a => a.json())
+			await this.client.fetch('http://20.232.190.137:3005//').then(a => a.json())
 		);
 
 
