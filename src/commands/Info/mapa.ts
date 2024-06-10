@@ -16,7 +16,7 @@ export default class Mapa extends Command {
 	async execute(ctx: CommandContext): Promise<void> {
    
 		ctx.sendMessage({
-			content: '<:craftsapiens:905025137869463552> [Clique aqui para acessar o mapa do servidor](<http://jogar.craftsapiens.com.br:2053>)'
+			content: '<:craftsapiens:905025137869463552> [Clique aqui para acessar o mapa do servidor](<http://jogar.craftsapiens.com.br:50024/mapa>)'
 		});
 
 		const db = await this.client.db.global.findOne({ id: ctx.guild.id });
