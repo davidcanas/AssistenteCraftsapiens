@@ -1,5 +1,4 @@
-import staffJSON from '../data/staff.json';
-import DGClient from '../structures/Client';
+import staffDB from '../models/staffDB';
 
 interface Player {
     world?: string;
@@ -113,21 +112,25 @@ export function findCityInfo(serverData: ServerData, cityName: string): CityInfo
 }
 
 export async function getDynmapPlayers() {
+	
+
 	const req = await fetch(
-		'http://jogar.craftsapiens.com.br:10004/up/world/Earth/'
+		'http://jogar.craftsapiens.com.br:2053/up/world/Earth/'
 	);
 	const result = await req.json();
 
 	const playerArray: object[] = [];
 
-	result.players.forEach((player: any) => {
-
+	result.players.forEach(async (player: Player) => {
+  
 		if (player.name.includes('_')) {
 			player.name = player.name.replace(/_/g, '\\_');
 		}
-
-		if (staffJSON.find(p => p.nick == player.name)) {
-			player.name = `\`✨\` **[${staffJSON.find(p => p.nick == player.name).role}]** ${player.name}`;
+		
+		const db = await staffDB.find(p => p.nick == player.name)[0];
+        
+		if (db) {
+			player.name = `\`✨\` **[${db.role}]** ${player.name}`;
 			playerArray.push({ name: player.name, health: player.health, order: 1 });
 			return;
 		} else {
@@ -145,15 +148,15 @@ export async function getDynmapPlayers() {
 	return p;
 }
 
-export async function getDynmapPlayersVanilla(client: DGClient) {
+export async function getDynmapPlayersVanilla() {
 	const req = await fetch(
-		'http://jogar.craftsapiens.com.br:10004/up/world/Earth/'
+		'http://jogar.craftsapiens.com.br:2053/up/world/Earth/'
 	);
 	const result = await req.json();
     
 	const playerArray: object[] = [];
      
-    const db = await client.db.staff.find({});
+    const db = await staffDB.find({});
 
 	result.players.forEach((player: any) => {
 
