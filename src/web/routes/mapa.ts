@@ -15,7 +15,7 @@ router.get('/', async (req, res) => {
 });
 
 router.get('/iframe', async (req, res) => {
-    const serverData = await client.fetch('http://jogar.craftsapiens.com.br:2053/up/world/Earth/').then(res => res.json());
+    const serverData = await client.fetch('http://20.232.190.137:3005/up/world/Earth/').then(res => res.json());
 
     const cityName = req.query.cityName.replace(/\s+/g, '_');
 

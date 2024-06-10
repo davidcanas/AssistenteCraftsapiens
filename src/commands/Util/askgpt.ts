@@ -91,11 +91,13 @@ export default class askGPT extends Command {
         });
 
         const json = await response.json();
+        console.log(json);
+        console.log(json.choices[0].message);
+        
         if (json.choices[0].message.content.includes('timeout_member')) {
             ctx.member.edit({ communicationDisabledUntil: new Date(Date.now() + 3600000).toISOString() });
         }
-        console.log(json);
-        console.log(json.choices[0].message);
+        
         const embed = new this.client.embed()
             .setColor('RANDOM')
             .setDescription(json.choices[0].message.content);
