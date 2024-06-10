@@ -257,7 +257,7 @@ export default class DGClient extends Client {
 				`https://api.mojang.com/users/profiles/minecraft/${player}`
 			);
 			const findInDynmapData = await fetch(
-				'http://20.232.190.137:3005//'
+				'http://20.232.190.137:3005/'
 			).then((r) => r.json());
 
 			const findInMojang = await findInMojangRequest.json();
