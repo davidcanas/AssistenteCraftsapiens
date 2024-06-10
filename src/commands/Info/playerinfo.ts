@@ -75,7 +75,7 @@ export default class playerinfo extends Command {
 		}
 
 		const allPlayers = await this.client.utils.dynmap.getAllRegisteredPlayers(
-			await this.client.fetch('http://jogar.craftsapiens.com.br:2053/up/world/Earth/').then(a => a.json())
+			await this.client.fetch('http://20.232.190.137:3005/up/world/Earth/').then(a => a.json())
 		);
 
 
