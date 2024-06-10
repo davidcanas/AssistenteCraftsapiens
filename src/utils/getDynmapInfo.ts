@@ -97,7 +97,7 @@ export function findPlayerCity(serverData: ServerData, playerName: string): City
 }
 
 export function findCityInfo(serverData: ServerData, cityName: string): CityInfo | undefined {
-	const cityMarker = serverData.updates.find(update => update.type === 'component' && update.ctype === 'markers' && update.label === cityName.replace(/ /g, '_') && update.id === cityName + '__home') as CityMarker;
+	const cityMarker = serverData.updates.find(update => update.type === 'component' && update.ctype === 'markers' && update.label.toLowerCase() === cityName.toLowerCase().replace(/ /g, '_') && update.id.toLowerCase() === cityName.toLowerCase() + '__home') as CityMarker;
 
 	if (cityMarker && cityMarker.desc) {
 		const associateListMatch = cityMarker.desc.match(/Associates\s+<span[^>]*>(.*?)<\/span>/);
