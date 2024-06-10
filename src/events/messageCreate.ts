@@ -12,6 +12,9 @@ export default class MessageCreate {
 	}
 
 	async run(message: Message) {
+		const prefix = '-';
+
+
 		if (message.author.bot) return;
 		if (message.channel.type == 1) return;
 		for (const collector of this.client.messageCollectors) {
@@ -96,7 +99,7 @@ export default class MessageCreate {
 				'invadiu'
 			];
 
-			if (possibilidades.some((v) => message.content.toLowerCase().includes(v))) {
+			if (!message.content.startsWith(prefix) && possibilidades.some((v) => message.content.toLowerCase().includes(v))) {
 				if (this.client.ignoreRoles.some((v) => message.member.roles.includes(v))) {
 					console.log('\u001b[33m', 'Ignorando tentativa de staff acionar sistema em ' + message.channel.name + ' !');
 					return;
@@ -151,7 +154,7 @@ export default class MessageCreate {
 			return;
 		}
 
-		if (
+		if (!message.content.startsWith(prefix) &&
 			message.content.toLowerCase().includes('aula') &&
       arrayHoje.some((v) => message.content.toLowerCase().includes(v))
 		) {
@@ -386,7 +389,12 @@ export default class MessageCreate {
 			return message.delete();
 		}
 
-		const prefix = '-';
+		if(message.content.startsWith('<@!734297444744953907>') || message.content.startsWith('<@734297444744953907>')) {
+			const msg = message.content.slice(prefix.length).split(/ +/);
+
+			message.content = `${prefix}ask ${msg.slice(1).join(' ')}`;
+
+		}
 
 		if (!message.content.startsWith(prefix)) return;
 

@@ -21,7 +21,6 @@
     "he": "^1.2.0",
     "highlight.js": "^11.9.0",
     "html-minifier": "^4.0.0",
-    "jimp": "^0.22.12",
     "jsdom": "^24.0.0",
     "mathjs": "^11.9.1",
     "mongoose": "^8.0.3",
