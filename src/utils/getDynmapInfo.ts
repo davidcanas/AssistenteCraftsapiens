@@ -129,7 +129,7 @@ export async function getDynmapPlayers() {
 	
 
 	const req = await fetch(
-		'http://20.232.190.137:3005//'
+		'http://20.232.190.137:3005/'
 	);
 	const result = await req.json();
 
@@ -164,7 +164,7 @@ export async function getDynmapPlayers() {
 
 export async function getDynmapPlayersVanilla() {
 	const req = await fetch(
-		'http://20.232.190.137:3005//'
+		'http://20.232.190.137:3005/'
 	);
 	const result = await req.json();
     
