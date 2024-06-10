@@ -21,6 +21,9 @@ interface Marker {
 interface CityMarker extends Marker {
     id: string;
     label: string;
+	x: number;
+	y: number;
+	z: number;
 }
 
 interface ServerData {
@@ -33,6 +36,9 @@ interface CityInfo {
     mayor: string;
     nation: string;
     members: string[];
+	x?: number;
+	y?: number;
+	z?: number;
 }
 
 export function getAllRegisteredCities(serverData: ServerData): string[] {
@@ -91,7 +97,7 @@ export function findPlayerCity(serverData: ServerData, playerName: string): City
 }
 
 export function findCityInfo(serverData: ServerData, cityName: string): CityInfo | undefined {
-	const cityMarker = serverData.updates.find(update => update.type === 'component' && update.ctype === 'markers' && update.label === cityName.replace(/ /g, '_')) as CityMarker;
+	const cityMarker = serverData.updates.find(update => update.type === 'component' && update.ctype === 'markers' && update.label === cityName.replace(/ /g, '_') && update.id === cityName + '__home') as CityMarker;
 
 	if (cityMarker && cityMarker.desc) {
 		const associateListMatch = cityMarker.desc.match(/Associates\s+<span[^>]*>(.*?)<\/span>/);
@@ -103,7 +109,15 @@ export function findCityInfo(serverData: ServerData, cityName: string): CityInfo
 			const mayor = mayorMatch[1];
 			const nation = nationMatch[1];
 
-			return { city: cityMarker.label.replace(/_/g, ' '), mayor, nation, members: associates };
+			return {
+				city: cityMarker.label.replace(/_/g, ' '), 
+				mayor, 
+				nation, 
+				members: associates,  
+				x: cityMarker.x,
+                y: cityMarker.y,
+                z: cityMarker.z 
+			};
 		}
 	}
 

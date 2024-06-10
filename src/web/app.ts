@@ -7,6 +7,7 @@ import isLogged from './helpers/isLogged';
 import path from 'path';
 import dash from './routes/dash';
 import punicoes from './routes/punicoes';
+import mapa from './routes/mapa';
 import { getDynmapPlayersVanilla } from '../utils/getDynmapInfo';
 
 const app = express();
@@ -44,9 +45,10 @@ passport.serializeUser(function(user, done) {
   
   app.use(passport.initialize());
   app.use(passport.session());
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-app.use('/dash', dash);
-app.use('/punicoes', punicoes);
+
+  app.use('/dash', dash);
+  app.use('/punicoes', punicoes);
+  app.use('/mapa', mapa);
 
 app.get('/', isLogged, (req, res) => {
 	res.status(200).render('index', { 
@@ -62,7 +64,7 @@ app.get('/', isLogged, (req, res) => {
 
 app.get('/stats/survival', isLogged, async (req, res) => {
   
-  const playerList = await getDynmapPlayersVanilla(client);
+  const playerList = await getDynmapPlayersVanilla();
 
 	res.status(200).render('stats_survival', { 
     user: req.user,
