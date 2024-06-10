@@ -11,7 +11,7 @@ import mapa from './routes/mapa';
 import { getDynmapPlayersVanilla } from '../utils/getDynmapInfo';
 
 const app = express();
-const port = 3200;
+const port = process.env.PORT;
 
 
 app.use(session({
