@@ -44,7 +44,7 @@ export default class askGPT extends Command {
         const linksUteis = [
             { name: 'Site oficial da craftsapiens', value: 'https://craftsapiens.com.br' },
             { name: 'Loja da craftsapiens (apenas dá para comprar premium,vip, ou sapiens)', value: 'https://craftsapiens.lojasquare.net' },
-            { name: 'Mapa', value: 'http://jogar.craftsapiens.com.br:10004/' },
+            { name: 'Mapa', value: 'http://jogar.craftsapiens.com.br:50024/mapa' },
             { name: 'Código do Assistente (github)', value: 'https://github.com/davidcanas/AssistenteCraftsapiens' }
         ];
         const usefulLinks = linksUteis.map(link => `${link.name} - ${link.value}`).join(', ');
