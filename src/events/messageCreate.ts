@@ -16,6 +16,23 @@ export default class MessageCreate {
 
 
 		if (message.author.bot) return;
+
+		if (message.content.match(/^\d{4}$/)) {
+			if(message.type == 0) {
+				message.author.createDM().then(a => 
+					a.createMessage({ 
+						content: `<:sir_derp:1145737198868647936> Olá, ${message.author.mention}!\nParece que você está tentando vincular sua conta do discord com o Minecraft, por favor, envie o código \`${message.content}\` para o privado do <@968686499409313804>` 
+					}));
+
+				return;
+			}
+			return message.channel.createMessage({
+				content: `<:sir_derp:1145737198868647936> Olá, <@${message.author.id}>!\nParece que você está tentando vincular sua conta do discord com o Minecraft, por favor, envie o código \`${message.content}\` para o privado do <@968686499409313804>`,
+				messageReference: { messageID: message.id }
+			});
+
+		}
+
 		if (message.channel.type == 1) return;
 		for (const collector of this.client.messageCollectors) {
 			if (collector.channel.id === message.channel.id) {

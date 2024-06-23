@@ -126,41 +126,31 @@ export function findCityInfo(serverData: ServerData, cityName: string): CityInfo
 }
 
 export async function getDynmapPlayers() {
-	
-
-	const req = await fetch(
-		'http://20.232.190.137:3005/'
-	);
+	const req = await fetch('http://20.232.190.137:3005/');
 	const result = await req.json();
 
-	const playerArray: object[] = [];
+	const playerArray = [];
 
-	result.players.forEach(async (player: Player) => {
-  
-		if (player.name.includes('_')) {
-			player.name = player.name.replace(/_/g, '\\_');
-		}
+	for (const player of result.players) {
 		
-		const db = await staffDB.find(p => p.nick == player.name)[0];
+		const db = await staffDB.findOne({ nick: player.name });
         
 		if (db) {
-			player.name = `\`✨\` **[${db.role}]** ${player.name}`;
+			player.name = `[${db.role}] ${player.name}`;
 			playerArray.push({ name: player.name, health: player.health, order: 1 });
-			return;
 		} else {
 			playerArray.push({ name: player.name, health: player.health, order: player.name.length });
 		}
-	});
+	}
 
-	// @ts-expect-error - to make the sort work
 	playerArray.sort((a, b) => a.order - b.order);
-	if (playerArray.length == 0) return ['Ninguém online no momento.'];
 
+	if (playerArray.length === 0) return ['Ninguém online no momento.'];
 
-	const p = playerArray.map((p: any) => `${p.name} \`(${p.health} ❤️)\``);
-
+	const p = playerArray.map((p: any) => `${p.name} (${p.health} ❤️)`);
 	return p;
 }
+
 
 export async function getDynmapPlayersVanilla() {
 	const req = await fetch(
@@ -193,9 +183,9 @@ export async function getDynmapPlayersVanilla() {
 
 export function getOnlinePlayerInfo(serverData: ServerData, playerName: string): Player {
 	const player = serverData.players.find(player => player.name.toLowerCase() === playerName.toLowerCase());
-	console.log(player);
+
 	if (player && player?.x) {
-		console.log('player x');
+
 		return {
 			name: player.name,
 			online: true,
