@@ -12,8 +12,6 @@ import {
 
 import { CityInfo, Command, Utils } from '../typings/index';
 
-import staffJSON from '../data/staff.json';
-
 import global from '../models/globalDB';
 import users from '../models/userDB';
 import staff from '../models/staffDB';
@@ -275,10 +273,13 @@ export default class DGClient extends Client {
 					original: true,
 				};
 			}
-			if (staffJSON.find(p => p.nick.toLowerCase() == playerObj.nick.toLowerCase())) {
+
+			const db = await this.db.staff.find({}).then(p => p.find(p => p.nick.toLowerCase() == playerObj.nick.toLowerCase()));
+
+			if (db) {
 				playerObj.isStaff = true;
-				playerObj.staff = staffJSON.find(p => p.nick.toLowerCase() == playerObj.nick.toLowerCase()).role;
-				playerObj.discord = staffJSON.find(p => p.nick.toLowerCase() == playerObj.nick.toLowerCase()).discord;
+				playerObj.staff = db.role;
+				playerObj.discord = db.id;
 			} else {
 				playerObj.isStaff = false;
 				playerObj.discord = await this.guilds.get('892472046729179136')?.members.find(m => m?.nick && m.nick?.toLowerCase() == playerObj.nick?.toLowerCase() && m.roles.includes('1152666174157488258'))?.user.id || null;
