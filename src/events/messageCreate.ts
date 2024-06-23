@@ -32,7 +32,8 @@ export default class MessageCreate {
 			});
 
 		}
-		
+		if (message.channel.type === 1) return;
+
 		for (const collector of this.client.messageCollectors) {
 			if (collector.channel.id === message.channel.id) {
 				collector.collect(message);
