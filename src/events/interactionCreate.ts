@@ -186,7 +186,7 @@ export default class InteractionCreate {
 				}
 
 			if (interaction.data.customID === 'confirm_read') {
-				const autor = interaction.message.mentions.users[0];
+				const autor = interaction.message.mentions.users.find((u) => u.id !== '968686499409313804')[0];
 				
 				if (interaction.user.id !== autor.id) {
 					return interaction.createMessage({
