@@ -70,7 +70,7 @@ export default class Shell extends Command {
           return;
         }
         return ctx.sendMessage({
-          content: '```ansi\n' + output + '\n```',
+          content: '```js\n' + output + '\n```',
           components: [
             {
               type: 1,
