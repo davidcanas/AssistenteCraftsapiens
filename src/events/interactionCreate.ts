@@ -184,6 +184,27 @@ export default class InteractionCreate {
 					' da lista de usuários que acionaram o sistema!'
 					);
 				}
+
+			if (interaction.data.customID === 'confirm_read') {
+				const autor = interaction.message.mentions.users[0];
+				
+				if (interaction.user.id !== autor.id) {
+					return interaction.createMessage({
+						content:
+							'Esse botão é de @' +
+							autor.username +
+							' , apenas ele pode usar!',
+						flags: 1 << 6
+					});
+				}
+
+				interaction.message.channel.deleteMessage(
+					interaction.message.messageReference.messageID
+				);
+				interaction.message.delete();
+				
+				
+				} 
 			}
 			return;
 		}

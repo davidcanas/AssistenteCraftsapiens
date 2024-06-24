@@ -18,17 +18,35 @@ export default class MessageCreate {
 		if (message.author.bot) return;
 
 		if (message.content.match(/^\d{4}$/)) {
-			if(message.type == 0) {
+           const component = {
+				type: 1,
+				components: [
+					{
+						type: 2,
+						style: 2,
+						customID: 'confirm_read',
+						label: 'Ok, obrigado!',
+						emoji: {
+							id: '1145724790271910031',
+							name: 'pepereading'
+						}
+					}
+				]
+			};
+
+			if(!message.channel) {
+
 				message.author.createDM().then(a => 
 					a.createMessage({ 
-						content: `<:sir_derp:1145737198868647936> Olá, ${message.author.mention}!\nParece que você está tentando vincular sua conta do discord com o Minecraft, por favor, envie o código \`${message.content}\` para o privado do <@968686499409313804>` 
+						content: `<:sir_derp:1145737198868647936> Olá, ${message.author.mention}!\nParece que você está tentando vincular sua conta do discord com o Minecraft, por favor, envie o código \`${message.content}\` para o privado do <@968686499409313804>`,
 					}));
 
 				return;
 			}
 			return message.channel.createMessage({
 				content: `<:sir_derp:1145737198868647936> Olá, <@${message.author.id}>!\nParece que você está tentando vincular sua conta do discord com o Minecraft, por favor, envie o código \`${message.content}\` para o privado do <@968686499409313804>`,
-				messageReference: { messageID: message.id }
+				messageReference: { messageID: message.id },
+				components: [component]
 			});
 
 		}
