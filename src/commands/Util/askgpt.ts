@@ -60,7 +60,7 @@ export default class askGPT extends Command {
                 .replace('{member_name}', ctx.member.nick || ctx.member.user.globalName)
                 .replace('{member_role}', this.client.getHighestRole(ctx.guild, ctx.member.id))
                 .replace('{channel_id}', ctx.channel.id)
-                .replace('{channel_category}', ctx.channel.parent.name)
+                .replace('{channel_category}', ctx.channel.parent?.name || "Sem categoria")
                 .replace('{staffs}', staffs)
                 .replace('{useful_links}', usefulLinks)
                 .replace('{timestamp}', timestamp)
