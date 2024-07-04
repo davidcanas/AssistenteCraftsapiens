@@ -60,7 +60,7 @@ export default class askGPT extends Command {
                 .replace('{member_name}', ctx.member.nick || ctx.member.user.globalName)
                 .replace('{member_role}', this.client.getHighestRole(ctx.guild, ctx.member.id))
                 .replace('{channel_id}', ctx.channel.id)
-                .replace('{channel_category}', ctx.channel.parent?.name || "Sem categoria")
+                .replace('{channel_category}', ctx.channel.parent?.name || 'Sem categoria')
                 .replace('{staffs}', staffs)
                 .replace('{useful_links}', usefulLinks)
                 .replace('{timestamp}', timestamp)
@@ -90,7 +90,7 @@ export default class askGPT extends Command {
         
         if (json.choices[0].message.content.includes('timeout_member')) {
             ctx.member.edit({ communicationDisabledUntil: new Date(Date.now() + 3600000).toISOString() });
-            json.choices[0].message.content.replace("[timeout_member]", " ") 
+            json.choices[0].message.content.replace('[timeout_member]', ' ');
         }
         
         const embed = new this.client.embed()

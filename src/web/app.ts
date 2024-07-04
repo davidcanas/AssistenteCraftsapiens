@@ -61,6 +61,18 @@ app.get('/', isLogged, (req, res) => {
     });
 });
 
+app.get('/api/isLogged', async (req, res) => {
+  if(req.isAuthenticated()) {
+    const db = await client.db.staff.findOne({ id: req.user.id });
+    if (!db) {
+      return res.status(401).send({ logged: true, isStaff: false});
+    }
+
+    res.status(200).send({ logged: true, isStaff: true, user: req.user.username, id: req.user.id, avatar: client.users.get(req.user.id).avatarURL(), nick: db.nick});
+  } else {
+    res.status(200).send({ logged: false });
+  }
+});
 
 app.get('/stats/survival', isLogged, async (req, res) => {
   
