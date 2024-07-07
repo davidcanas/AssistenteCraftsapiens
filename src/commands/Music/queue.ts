@@ -22,17 +22,7 @@ export default class Queue extends Command {
 			ctx.sendMessage('Não estou a tocar nada');
 			return;
 		}
-
-		const voiceChannelID  = ctx.msg.member.voiceState.channelID;
-		if (!voiceChannelID) {
-			ctx.sendMessage('Você não está em nenhum canal de voz');
-			return;
-		}
-
-        if (!voiceChannelID || (voiceChannelID && voiceChannelID !== player.voiceChannelId)) {
-          ctx.sendMessage({ content: 'Você não está no mesmo canal de voz onde a música está tocando!', flags: 1 << 6 });
-          return;
-        }
+		
 
 		let test: Array<string> = [];
 		const playerQueue = player.queue as DefaultQueue;
