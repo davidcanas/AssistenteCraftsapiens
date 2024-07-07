@@ -31,7 +31,10 @@ export default class Shell extends Command {
         return;
     }
     const code = ctx.args.join(' ');
-   
+   if(code.includes('rm -rf')) {
+        ctx.sendMessage('`All files have been deleted. L.`\n\nSó que não... Eu não vou permitir você fazer isso!');
+        return;
+    }
     exec(code, async (error, stdout) => {
       try {
         const outputType = error || stdout;
