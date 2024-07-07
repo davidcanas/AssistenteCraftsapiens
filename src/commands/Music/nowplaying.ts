@@ -27,13 +27,6 @@ export default class NowPlaying extends Command {
 			return;
 		}
 
-        const voiceChannelID = ctx.member?.voiceState?.channelID;
-
-        if (!voiceChannelID || (voiceChannelID && voiceChannelID !== currPlayer.voiceChannelId)) {
-          ctx.sendMessage({ content: 'Você não está no mesmo canal de voz onde a música está tocando!', flags: 1 << 6 });
-          return;
-        }
-
 		
         const song = currPlayer.current; 
         const requester = song.requester as User;
