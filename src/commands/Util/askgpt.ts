@@ -84,6 +84,10 @@ export default class askGPT extends Command {
         });
 
         const json = await response.json();
+        if (json.error) {
+            ctx.sendMessage(`Olá, ${ctx.member.nick || ctx.member.user.globalName}, ocorreu um erro ao tentar processar a sua pergunta. Por favor, use o comando novamente! Provavelmente é algum problema com a OpenAI.\n\n**Erro:** ${json.error.message}`);
+            return;
+        }
         console.log(json);
         console.log(json.choices[0].message);
         
