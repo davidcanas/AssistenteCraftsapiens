@@ -20,6 +20,8 @@
     "ejs": "^3.1.10",
     "express": "^4.19.2",
     "express-session": "^1.18.0",
+    "genius-lyrics": "^4.4.7",
+    "genius-lyrics-api": "^3.2.1",
     "he": "^1.2.0",
     "highlight.js": "^11.9.0",
     "html-minifier": "^4.0.0",
