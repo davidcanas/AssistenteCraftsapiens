@@ -15,7 +15,7 @@ router.get('/', async (req, res) => {
 });
 
 router.get('/iframe', async (req, res) => {
-    const serverData = await client.fetch('http://172.210.83.141:3005/').then(res => res.json());
+    const serverData = await client.fetch('http://172.17.0.1:2053/up/world/Earth/').then(res => res.json());
 
     const cityName = req.query.cityName.replace(/\s+/g, '_');
 
