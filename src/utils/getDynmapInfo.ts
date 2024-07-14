@@ -126,7 +126,7 @@ export function findCityInfo(serverData: ServerData, cityName: string): CityInfo
 }
 
 export async function getDynmapPlayers() {
-	const req = await fetch('http://172.210.83.141:3005/');
+	const req = await fetch('http://172.17.0.1:2053/up/world/Earth/');
 	const result = await req.json();
 
 	const playerArray = [];
@@ -154,7 +154,7 @@ export async function getDynmapPlayers() {
 
 export async function getDynmapPlayersVanilla() {
 	const req = await fetch(
-		'http://172.210.83.141:3005/'
+		'http://172.17.0.1:2053/up/world/Earth/'
 	);
 	const result = await req.json();
     
