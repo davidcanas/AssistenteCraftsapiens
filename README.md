@@ -6,7 +6,7 @@
 <p>Um projeto de código-aberto criado para auxiliar os jogadores no discord da craftsapiens. </p>
 
 [![wakatime](https://wakatime.com/badge/github/davidcanas/AssistenteCraftsapiens.svg)](https://wakatime.com/badge/github/davidcanas/AssistenteCraftsapiens)
-[![DeepScan grade](https://deepscan.io/api/teams/24076/projects/27644/branches/886079/badge/grade.svg)](https://deepscan.io/dashboard#view=project&tid=24076&pid=27644&bid=886079)
+[![DeepScan grade](https://deepscan.io/api/teams/24076/projects/27644/branches/886079/badge/grade.svg)](https://deepscan.io/)
 
 <h4><a href="https://is.gd/craftsapiens"> Discord </a> <span> · </span> <a href="https://craftsapiens.com.br"> Website </a> <span> · </span> <a href="https://github.com/davidcanas/assistentecraftsapiens/issues"> Issues </a> </h4>
 
