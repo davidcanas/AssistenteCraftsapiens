@@ -51,7 +51,7 @@ export default class Speedup extends Command {
 			ctx.sendMessage('O efeito speedup foi ativado');
 			currPlayer.speedup = true;
 			return;
-		} else if(currPlayer.speedup) {
+		} else {
 			currPlayer.filters.clear();
 			ctx.sendMessage('O efeito speedup foi desativado!');
 			currPlayer.speedup = false;
