@@ -58,6 +58,4 @@ export default class Speedup extends Command {
 			return;
 
 		}
-
-		ctx.sendMessage({content: 'Ocorreu um problema'});
 	}}
