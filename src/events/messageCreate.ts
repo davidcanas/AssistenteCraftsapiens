@@ -17,23 +17,22 @@ export default class MessageCreate {
 
 		if (message.author.bot) return;
 
-		const regex = /\b(?!19[89]\d|20[0-2]\d|2030)\d{4}\b/;
-		
-		if (regex.test(message.content)) {
-                 const component = {
-				type: 1,
-				components: [
-					{
-						type: 2,
-						style: 2,
-						customID: 'confirm_read',
-						label: 'Ok, obrigado!',
-						emoji: {
-							id: '1145724790271910031',
-							name: 'pepereading'
+		if (!this.client.getDiscordByNick(message.member.nick) && message.content.match(/^\d{4}$/)) {
+
+			const component = {
+					type: 1,
+					components: [
+						{
+							type: 2,
+							style: 2,
+							customID: 'confirm_read',
+							label: 'Ok, obrigado!',
+							emoji: {
+								id: '1145724790271910031',
+								name: 'pepereading'
+							}
 						}
-					}
-				]
+					]
 			};
 
 			if(!message.channel) {

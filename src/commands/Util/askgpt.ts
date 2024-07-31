@@ -27,7 +27,7 @@ export default class askGPT extends Command {
         
         await ctx.defer();
         
-        if(!ctx.args[0]) {
+        if (!ctx.args[0]) {
             ctx.args[0] = '[mencionou]';
         }
 
@@ -36,9 +36,10 @@ export default class askGPT extends Command {
 
         const linksUteis = [
             { name: 'Site oficial da craftsapiens', value: 'https://craftsapiens.com.br' },
-            { name: 'Loja da craftsapiens (apenas dá para comprar premium,vip, ou sapiens)', value: 'https://craftsapiens.lojasquare.net' },
+            { name: 'Loja da craftsapiens (apenas dá para comprar premium,vip,sapiens, ou tokens de guerra)', value: 'https://craftsapiens.lojasquare.net' },
             { name: 'Mapa', value: 'http://jogar.craftsapiens.com.br:50024/mapa' },
-            { name: 'Código do Assistente (github)', value: 'https://github.com/davidcanas/AssistenteCraftsapiens' }
+            { name: 'Código do Assistente (github)', value: 'https://github.com/davidcanas/AssistenteCraftsapiens' },
+            {name: 'Textura do Slimefun do Survival ', value: 'https://bit.ly/craftsapiens-textura'}
         ];
         const usefulLinks = linksUteis.map(link => `${link.name} - ${link.value}`).join(', ');
 
@@ -66,15 +67,35 @@ export default class askGPT extends Command {
                 .replace('{timestamp}', timestamp)
         }));
 
+        
+
         messages.push({role: 'system', content: townyDocsMessages.join('\n')});
-        console.log(ctx.args.join(' '));
-        messages.push({ role: 'user', content: ctx.args.join(' ') });
+
+        const inputText = ctx.args.join(' ');
+
+        function normalizeString(str) {
+            return str.toLowerCase()
+                      .normalize('NFD')
+                      .replace(/[\u0300-\u036f]/g, '');
+        }
+        
+        /*@ts-expect-error IDGAF*/
+        const detectedCities = this.client.cache.towns.filter(town => normalizeString(inputText).includes(normalizeString(town.name)));
+        
+
+        if (detectedCities.length > 0) {
+            const townInfo = detectedCities.map(town => `${town.name}:\nPrefeito: ${town.mayor}\nCoordenadas: X: ${town.coords.x} Z: ${town.coords.z}\nNação: ${town.nation}\nHabitantes: ${town.residents.length} (${town.residents.join(',')})\nEm ruínas: ${town.ruined}\n-`).join('\n');
+            messages.push({ role: 'system', content: `Cidades que foram mencionadas pelo jogador\nCaso seja necessário, você pode comparar distâncias diretamente (sem mostrar cálculos) a partir das coordenadas\n(No caso dos habitantes são apenas mostrados os 30 primeiros):\n${townInfo}` });
+        }
+
+        console.log(inputText);
+        messages.push({ role: 'user', content: inputText });
         
         const data = {
             'model': 'gpt-4o',
             'messages': messages,
             'max_tokens': 600,
-            'temperature': 0.62
+            'temperature': 0.61
         };
 
         const response = await fetch(process.env.GPT_URL, {
@@ -90,7 +111,6 @@ export default class askGPT extends Command {
         }
         console.log(json);
         console.log(json.choices[0].message);
-        
         
         if (json.choices[0].message.content.includes('timeout_member')) {
             ctx.member.edit({ communicationDisabledUntil: new Date(Date.now() + 3600000).toISOString() });
