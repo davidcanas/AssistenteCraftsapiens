@@ -73,8 +73,8 @@ export default class askGPT extends Command {
         const data = {
             'model': 'gpt-4o',
             'messages': messages,
-            'max_tokens': 500,
-            'temperature': 0.6
+            'max_tokens': 600,
+            'temperature': 0.62
         };
 
         const response = await fetch(process.env.GPT_URL, {
