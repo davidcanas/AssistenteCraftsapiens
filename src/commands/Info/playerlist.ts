@@ -71,7 +71,7 @@ export default class PlayerList extends Command {
 
 		ctx2d.fillStyle = '#888';
 		ctx2d.font = '20px Sans';
-		const totalText = `Total: ${players.length} jogadores online`;
+		const totalText = `Total: ${players.length} jogadores online (Com o /mapa ativo)`;
 		ctx2d.fillText(totalText, (width - ctx2d.measureText(totalText).width) / 2, height - padding);
 
 
