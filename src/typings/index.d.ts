@@ -27,10 +27,16 @@ interface CommandSettings {
 }
 
 interface CityInfo {
-  city: string;
+  name: string;
   mayor: string;
   nation: string;
   members: string[];
+  coords: {
+  x?: number;
+  y?: number;
+  z?: number;
+  };
+  ruined?: boolean;
 }
 
 interface Command extends CommandSettings {
@@ -41,13 +47,13 @@ interface Command extends CommandSettings {
 interface Utils {
   levDistance: (src: string, target: string) => number;
   dynmap: {
-   findPlayerCity: (serverData: ServerData, playerName: string) => CityInfo | undefined;
-   findCityInfo: (serverData: ServerData, cityName: string) => CityInfo | undefined;
-   getAllRegisteredCities: (serverData: ServerData) => string[];
-   getAllRegisteredPlayers: (serverData: ServerData) => string[];
-   getDynmapPlayers: () => Promise<string[]>;
-   //getDynmapPlayersVanilla: () => Promise<object[] | string[]>;
-   getOnlinePlayerInfo: (serverData: ServerData, playerName: string) => Player | undefined;
+    findPlayerCity: (serverData: ServerData, playerName: string) => CityInfo | undefined;
+    findCityInfo: (serverData: ServerData, cityName: string) => CityInfo | undefined;
+    getAllRegisteredCities: (serverData: ServerData) => string[];
+    getAllRegisteredPlayers: (serverData: ServerData) => string[];
+    getDynmapPlayers: () => Promise<string[]>;
+    //getDynmapPlayersVanilla: () => Promise<object[] | string[]>;
+    getOnlinePlayerInfo: (serverData: ServerData, playerName: string) => Player | undefined;
   }
 }
 
@@ -62,7 +68,7 @@ interface InteractionResolved {
   messages: Record<
     string,
     {
-      content: string; 
+      content: string;
     }
   >;
 }
