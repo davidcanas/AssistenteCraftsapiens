@@ -220,7 +220,7 @@ export default class DGClient extends Client {
 			});
 		}
 		this.application.bulkEditGuildCommands('892472046729179136', cmds);
-		console.log('Os slashs foram atualizados');
+		console.log('Os slash commands foram atualizados');
 	}
 	connectLavaLink(): void {
 		const nodes: NodeOptions[] = [
@@ -339,7 +339,7 @@ export default class DGClient extends Client {
 }
 
  async updateTownyCache() {
-	const data = await fetch('http://177.3.74.79:2053/up/world/Earth/').then(r => r.json());
+	const data = await fetch('http://172.17.0.1:2053/up/world/Earth/').then(r => r.json());
 
 	this.cache.towns = await getAllRegisteredCities(data);
 
