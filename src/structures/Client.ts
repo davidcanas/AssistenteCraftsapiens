@@ -15,7 +15,6 @@ import { CityInfo, Command, Utils } from '../typings/index';
 import global from '../models/globalDB';
 import users from '../models/userDB';
 import staff from '../models/staffDB';
-import ticket from '../models/ticketsDB';
 
 import Embed from './Embed';
 
@@ -25,12 +24,6 @@ import Music from './Music';
 
 import levenshteinDistance from '../utils/levenshteinDistance';
 import { getOnlinePlayerInfo, findCityInfo, findPlayerCity, getAllRegisteredCities, getAllRegisteredPlayers, getDynmapPlayers } from '../utils/getDynmapInfo';
-
-import {
-	ComponentCollector,
-	MessageCollector,
-	ReactionCollector,
-} from './Collector';
 
 import fetch from 'node-fetch';
 
@@ -43,10 +36,9 @@ export default class DGClient extends Client {
     global: typeof global;
 	users: typeof users;
 	staff: typeof staff;
-	ticket: typeof ticket;
   };
 	cache: {
-		towns: string[],
+		towns: CityInfo[],
 	};
 	utils: Utils;
 	fetch: typeof fetch;
@@ -54,9 +46,6 @@ export default class DGClient extends Client {
 	owner: User;
 	guildID: string;
 	allowedUsers: Array<string>;
-	messageCollectors: Array<MessageCollector>;
-	componentCollectors: Array<ComponentCollector>;
-	reactionCollectors: Array<ReactionCollector>;
 	ignoreRoles: string[];
 
 	constructor(token: string) {
@@ -79,8 +68,7 @@ export default class DGClient extends Client {
 		this.db = {
 			global: global,
 			users: users,
-			staff: staff,
-			ticket: ticket,
+			staff: staff
 		};
 		this.cache = {
 			towns: [],
@@ -98,9 +86,6 @@ export default class DGClient extends Client {
 		};
 		this.fetch = fetch;
 		this.embed = Embed;
-		this.messageCollectors = [];
-		this.componentCollectors = [];
-		this.reactionCollectors = [];
 		this.owner = this.users.get('733963304610824252');
 		this.guildID = '892472046729179136';
 		this.allowedUsers = ['733963304610824252', '402190502172295168', '828745580125225031', '286573832913813516'];
