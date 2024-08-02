@@ -5,6 +5,7 @@ import fetch from 'node-fetch';
 import fs from 'fs';
 import path from 'path';
 
+
 export default class askGPT extends Command {
     constructor(client: Client) {
         super(client, {
@@ -24,10 +25,9 @@ export default class askGPT extends Command {
     }
 
     async execute(ctx: CommandContext): Promise<void> {
-        
         await ctx.defer();
-        
-        if(!ctx.args[0]) {
+
+        if (!ctx.args[0]) {
             ctx.args[0] = '[mencionou]';
         }
 
@@ -38,7 +38,8 @@ export default class askGPT extends Command {
             { name: 'Site oficial da craftsapiens', value: 'https://craftsapiens.com.br' },
             { name: 'Loja da craftsapiens (apenas dá para comprar premium,vip, ou sapiens)', value: 'https://craftsapiens.lojasquare.net' },
             { name: 'Mapa', value: 'http://jogar.craftsapiens.com.br:50024/mapa' },
-            { name: 'Código do Assistente (github)', value: 'https://github.com/davidcanas/AssistenteCraftsapiens' }
+            { name: 'Código do Assistente (github)', value: 'https://github.com/davidcanas/AssistenteCraftsapiens' },
+            {name: 'Textura do Slimefun (opcional, Java)', value: 'https://bit.ly/craftsapiens-textura'}
         ];
         const usefulLinks = linksUteis.map(link => `${link.name} - ${link.value}`).join(', ');
 
@@ -65,16 +66,59 @@ export default class askGPT extends Command {
                 .replace('{useful_links}', usefulLinks)
                 .replace('{timestamp}', timestamp)
         }));
-
-        messages.push({role: 'system', content: townyDocsMessages.join('\n')});
-        console.log(ctx.args.join(' '));
+        messages.push({role: 'system', content: `Atualmente o Survival Geopolítico tem ${this.client.cache.towns.length} cidades ativas e ${this.client.cache.towns.filter(a => a.ruined).length} cidades em ruinas (no mundo geopolitico) `});
+        messages.push({ role: 'system', content: townyDocsMessages.join('\n') });
         messages.push({ role: 'user', content: ctx.args.join(' ') });
+
+        const inputText = ctx.args.join(' ');
+
+        function normalizeString(str: string) {
+            return str.toLowerCase()
+                      .normalize('NFD')
+                      .replace(/[\u0300-\u036f]/g, '');
+        }
+
+        const detectedCities = this.client.cache.towns.filter(town => normalizeString(inputText).includes(normalizeString(town.name)));
         
+        const mentionedResidents = this.client.cache.towns.reduce((acc, town) => {
+            
+
+            town.members.forEach(resident => {
+                if (normalizeString(inputText).includes(normalizeString(resident))) {
+                    acc.push({ resident, town });
+                }
+        
+            });
+
+            if (normalizeString(inputText).includes(normalizeString(town.mayor))) {
+
+                if (!acc.some((item) => item.resident === town.mayor)) { 
+                acc.push({ mayor: town.mayor, town });
+                }
+            }
+
+
+            return acc;
+        }, []);
+
+        if (detectedCities.length > 0) {
+            
+            const townInfo = detectedCities.map(town => `${town.name}:\nPrefeito: ${town.mayor}\nCoordenadas: X: ${town.coords.x} Z: ${town.coords.z}\nNação: ${town.nation}\nHabitantes: ${town.members.length} (${town.members.join(', ')})\nEm ruínas: ${town.ruined}\n-`).join('\n');
+            console.log(townInfo);
+            messages.push({ role: 'system', content: `Cidades mencionadas pelo jogador (ao calcular distâncias, omita os cálculos, diga diretamente o resultado):\n${townInfo}` });
+        }
+
+        if (mentionedResidents.length > 0) {
+            const residentInfo = mentionedResidents.map(({ resident, town }) => `${resident} é residente de ${town.name}:\nPrefeito: ${town.mayor}\nCoordenadas: X: ${town.coords.x} Z: ${town.coords.z}\nNação: ${town.nation}\nHabitantes: ${town.members.length} (${town.members.join(', ')})\nEm ruínas: ${town.ruined}\n-`).join('\n');
+            console.log(residentInfo);
+            messages.push({ role: 'system', content: `Jogadores (habitantes) mencionados pelo jogador:\n${residentInfo}` });
+        }
+
         const data = {
             'model': 'gpt-4o',
             'messages': messages,
-            'max_tokens': 500,
-            'temperature': 0.6
+            'max_tokens': 700,
+            'temperature': 0.57
         };
 
         const response = await fetch(process.env.GPT_URL, {
@@ -88,15 +132,12 @@ export default class askGPT extends Command {
             ctx.sendMessage(`Olá, ${ctx.member.nick || ctx.member.user.globalName}, ocorreu um erro ao tentar processar a sua pergunta. Por favor, use o comando novamente! Provavelmente é algum problema com a OpenAI.\n\n**Erro:** ${json.error.message}`);
             return;
         }
-        console.log(json);
-        console.log(json.choices[0].message);
-        
-        
+
         if (json.choices[0].message.content.includes('timeout_member')) {
             ctx.member.edit({ communicationDisabledUntil: new Date(Date.now() + 3600000).toISOString() });
-            json.choices[0].message.content.replace('[timeout_member]', ' ');
+            json.choices[0].message.content = json.choices[0].message.content.replace('[timeout_member]', ' ');
         }
-        
+
         const embed = new this.client.embed()
             .setColor('RANDOM')
             .setDescription(json.choices[0].message.content);
