@@ -51,6 +51,17 @@ export default class Botinfo extends Command {
 							disabled: false,
 							customID: 'changelog',
 						},
+						{
+							type: 2,
+							style: 5,
+							label: 'Github',
+							emoji: {
+								id: '1268924658904731693',
+								name: 'github'
+							},
+							disabled: false,
+							url: 'https://github.com/davidcanas/AssistenteCraftsapiens'
+						},
 					],
 				},
 			],
