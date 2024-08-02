@@ -37,9 +37,23 @@ export default class InteractionCreate {
 			);
 			if (!cmd) throw new Error('<!> Command not found');
 
-			if (cmd.category === 'Music') {
-				const db = await this.client.db.global.findOne({ id: interaction.guild.id });
+			const db = await this.client.db.global.findOne({ id: interaction.guild.id });
+            if (db.blacklistedUsers.includes(interaction.user.id)) {
+				const embed = new this.client.embed()
+					.setDescription(':x: **Você foi proibido por um administrador de usar comandos**\nMotivo: `Utilização indevida do sistema`')
+					.setColor('16711680');
 
+				interaction.createMessage({
+					embeds: [embed],
+					flags: 1 << 6
+				});
+
+				return;
+
+			}
+			
+			if (cmd.category === 'Music') {
+				
 				if (db.music.blacklistedUsers.includes(interaction.user.id)) {
 					const embed = new this.client.embed()
 						.setDescription(':x: **Você foi proibido por um administrador de usar comandos de Música**\nMotivo: `Utilização indevida do sistema`')
@@ -68,18 +82,14 @@ export default class InteractionCreate {
 				}
 			}
 
-			const ctx = new CommandContext(this.client, interaction);
+            db.helped++;
 
+			const ctx = new CommandContext(this.client, interaction);
+       
 			cmd.execute(ctx);
 		}
 		if (!(interaction instanceof CommandInteraction)) {
 			if (interaction instanceof ComponentInteraction) {
-				for (const collector of this.client.componentCollectors) {
-					if (collector.message.id === interaction.message.id) {
-						collector.collect(interaction);
-						break;
-					}
-				}
 
 				if (interaction.data.customID === 'silenciar') {
 					const autor = interaction.message.mentions.users[0];
