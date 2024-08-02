@@ -12,6 +12,7 @@ interface globalDB extends Document {
   };
   helped: number;
   urlsDeleted: number;
+  blacklistedUsers: string[];
   ignoredChannels: string[];
   ignoredUsers: string[];
   usersInCooldown: string[];
@@ -25,6 +26,11 @@ const globalDB: Schema = new Schema(
 			required: true,
 			type: String,
 		},
+		blacklistedUsers: {
+			type: Array,
+			default: [],
+		},
+		
 		classes: {
 			enabled: {
 				type: Boolean,
