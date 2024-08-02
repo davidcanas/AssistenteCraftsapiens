@@ -28,5 +28,7 @@ export default class ready {
 
 		this.client.updateSlash();
 		this.client.connectLavaLink();
+		
+		await this.client.updateTownyCache();
 	}
 }

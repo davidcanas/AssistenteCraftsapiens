@@ -41,16 +41,56 @@ interface CityInfo {
 	z?: number;
 }
 
-export function getAllRegisteredCities(serverData: ServerData): string[] {
-	const cityMarkers: CityMarker[] = serverData.updates.filter(update => update.type === 'component' && update.ctype === 'markers') as CityMarker[];
-	const registeredCities: string[] = [];
+export function getAllRegisteredCities(serverData) {
+    console.log('triggered');
+    
+    const cityMarkers = serverData.updates.filter(
+        update => update.type === 'component' && update.ctype === 'markers'
+    );
+    
+    const registeredCities = [];
+    const cityNamesSet = new Set();
 
-	cityMarkers.forEach((cityMarker: CityMarker) => {
-		registeredCities.push(cityMarker.label.replace(/_/g, ' '));
-	});
+    cityMarkers.forEach(cityMarker => {
+        const cityName = cityMarker.label.replace(/_/g, ' ');
+        
+        if (!cityNamesSet.has(cityName)) {
+            cityNamesSet.add(cityName);
+            if (cityMarker.desc) {
 
-	return Array.from(new Set(registeredCities));
+                const mayorMatch = cityMarker.desc.match(/Mayor\s+<span[^>]*>(.*?)<\/span>/);
+                const mayor = mayorMatch && mayorMatch[1] ? mayorMatch[1] : 'NPC';
+
+                const nationNameMatch = cityMarker.desc.match(/nation:\s*([^<]*)/);
+                const nationName = nationNameMatch && nationNameMatch[1] ? nationNameMatch[1] : 'N/A';
+
+                const associateListMatch = cityMarker.desc.match(/Associates\s+<span[^>]*>(.*?)<\/span>/);
+                const residents = associateListMatch && associateListMatch[1] ? associateListMatch[1].split(', ') : [];
+
+                const ruinedMatch = cityMarker.desc.match(/ruined:\s*true/);
+                const isRuined = ruinedMatch ? true : false;
+
+                registeredCities.push({
+                    name: cityName,
+                    mayor: mayor,
+                    residents: residents,
+                    nation: nationName,
+                    ruined: isRuined,
+					coords: {
+						x: cityMarker.x,
+                        y: cityMarker.y,
+                        z: cityMarker.z 
+					}
+                });
+            }
+        }
+    });
+
+    return registeredCities;
 }
+
+
+
 
 export function getAllRegisteredPlayers(serverData: ServerData): string[] {
 	const registeredPlayers: string[] = [];

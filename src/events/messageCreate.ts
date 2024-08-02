@@ -5,17 +5,37 @@ import { Message } from 'oceanic.js';
 import CommandContext from '../structures/CommandContext';
 
 export default class MessageCreate {
-	client: Client;
+    client: Client;
+    userMessages: Map<string, { timestamps: number[]}>;
 
-	constructor(client: Client) {
-		this.client = client;
-	}
+    constructor(client: Client) {
+        this.client = client;
+        this.userMessages = new Map();
+    }
 
-	async run(message: Message) {
-		const prefix = '-';
+    async run(message: Message) {
+        const prefix = '-';
 
+        if (message.author.bot) return;
 
-		if (message.author.bot) return;
+        const userId = message.author.id;
+        const now = Date.now();
+
+        if (!this.userMessages.has(userId)) {
+            this.userMessages.set(userId, {timestamps: []});
+        }
+
+        const userData = this.userMessages.get(userId);
+
+        userData.timestamps = userData.timestamps.filter(timestamp => now - timestamp < 3000);
+
+        if (userData.timestamps.length >= 3) {
+            message.member.edit({ communicationDisabledUntil: new Date(Date.now() + 20000).toISOString() });
+			message.delete();
+            return;
+        }
+        userData.timestamps.push(now);
+
 
 		if (!this.client.getDiscordByNick(message.member.nick) && message.content.match(/^\d{4}$/)) {
 
@@ -52,12 +72,6 @@ export default class MessageCreate {
 
 		}
 		if (message.channel.type === 1) return;
-
-		for (const collector of this.client.messageCollectors) {
-			if (collector.channel.id === message.channel.id) {
-				collector.collect(message);
-			}
-		}
 
 		async function checkForLinks(db, phrase: string) {
 			const words = phrase.split(' ');
@@ -184,15 +198,10 @@ export default class MessageCreate {
 			'amanhã',
 			'amanha'
 		];
-		// Ignora o Helton ou qualquer mensagem no canal de avisos
-		if (message.author.id === '828745580125225031' || message.channel.id === '1010026917208002591') {
-			console.log('Ignorando canal de avisos e/ou Helton acionando sistema');
-			return;
-		}
 
 		if (!message.content.startsWith(prefix) &&
 			message.content.toLowerCase().includes('aula') &&
-      arrayHoje.some((v) => message.content.toLowerCase().includes(v))
+    arrayHoje.some((v) => message.content.toLowerCase().includes(v))
 		) {
 			if (this.client.ignoreRoles.some((v) => message.member.roles.includes(v))) {
 				console.log('\u001b[33m', 'Ignorando tentativa de staff acionar sistema em ' + message.channel.name + ' !');
@@ -483,7 +492,7 @@ export default class MessageCreate {
 				return;
 			}
 			}
-
+            db.helped++;
 			const ctx = new CommandContext(this.client, message, args);
 
 			command.execute(ctx);
