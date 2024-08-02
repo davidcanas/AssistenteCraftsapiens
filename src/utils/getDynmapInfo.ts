@@ -1,92 +1,95 @@
 import staffDB from '../models/staffDB';
 
 interface Player {
-    world?: string;
-    armor?: number;
-    online?: boolean;
-    name?: string;
-    x?: number;
-    y?: number;
-    z?: number;
-    health?: number;
-    sort?: number;
-    type?: string;
-    account?: string;
+	world?: string;
+	armor?: number;
+	online?: boolean;
+	name?: string;
+	x?: number;
+	y?: number;
+	z?: number;
+	health?: number;
+	sort?: number;
+	type?: string;
+	account?: string;
 }
 
 interface Marker {
-    desc: string;
+	desc: string;
 }
 
 interface CityMarker extends Marker {
-    id: string;
-    label: string;
+	id: string;
+	label: string;
 	x: number;
 	y: number;
 	z: number;
 }
 
 interface ServerData {
-    players: Player[];
-    updates: any[];
+	players: Player[];
+	updates: any[];
 }
 
 interface CityInfo {
-    city: string;
-    mayor: string;
-    nation: string;
-    members: string[];
-	x?: number;
-	y?: number;
-	z?: number;
+	name: string;
+	mayor: string;
+	nation: string;
+	members: string[];
+	coords: {
+		x?: number;
+		y?: number;
+		z?: number;
+	};
+	ruined?: boolean;
 }
 
 export function getAllRegisteredCities(serverData) {
-    console.log('triggered');
-    
-    const cityMarkers = serverData.updates.filter(
-        update => update.type === 'component' && update.ctype === 'markers'
-    );
-    
-    const registeredCities = [];
-    const cityNamesSet = new Set();
+	console.log('triggered');
 
-    cityMarkers.forEach(cityMarker => {
-        const cityName = cityMarker.label.replace(/_/g, ' ');
-        
-        if (!cityNamesSet.has(cityName)) {
-            cityNamesSet.add(cityName);
-            if (cityMarker.desc) {
+	const cityMarkers = serverData.updates.filter(
+		update => update.type === 'component' && update.ctype === 'markers' && update.id.includes('__home')
+	);
 
-                const mayorMatch = cityMarker.desc.match(/Mayor\s+<span[^>]*>(.*?)<\/span>/);
-                const mayor = mayorMatch && mayorMatch[1] ? mayorMatch[1] : 'NPC';
+	const registeredCities = [];
+	const cityNamesSet = new Set();
 
-                const nationNameMatch = cityMarker.desc.match(/nation:\s*([^<]*)/);
-                const nationName = nationNameMatch && nationNameMatch[1] ? nationNameMatch[1] : 'N/A';
+	cityMarkers.forEach(cityMarker => {
+		const cityName = cityMarker.label.replace(/_/g, ' ');
 
-                const associateListMatch = cityMarker.desc.match(/Associates\s+<span[^>]*>(.*?)<\/span>/);
-                const residents = associateListMatch && associateListMatch[1] ? associateListMatch[1].split(', ') : [];
+		if (!cityNamesSet.has(cityName)) {
+			cityNamesSet.add(cityName);
+			if (cityMarker.desc) {
 
-                const ruinedMatch = cityMarker.desc.match(/ruined:\s*true/);
-                const isRuined = ruinedMatch ? true : false;
+				const mayorMatch = cityMarker.desc.match(/Mayor\s+<span[^>]*>(.*?)<\/span>/);
+				const mayor = mayorMatch && mayorMatch[1] ? mayorMatch[1] : 'NPC';
 
-                registeredCities.push({
-                    name: cityName,
-                    mayor: mayor,
-                    residents: residents,
-                    nation: nationName,
-                    ruined: isRuined,
+				const nationNameMatch = cityMarker.desc.match(/nation:\s*([^<]*)/);
+				const nationName = nationNameMatch && nationNameMatch[1] ? nationNameMatch[1] : 'N/A';
+
+				const associateListMatch = cityMarker.desc.match(/Associates\s+<span[^>]*>(.*?)<\/span>/);
+				const residents = associateListMatch && associateListMatch[1] ? associateListMatch[1].split(', ') : [];
+
+				const ruinedMatch = cityMarker.desc.match(/ruined:\s*true/);
+				const isRuined = ruinedMatch ? true : false;
+
+				registeredCities.push({
+					name: cityName,
+					mayor: mayor,
+					members: residents,
+					nation: nationName,
+					ruined: isRuined,
 					coords: {
 						x: cityMarker.x,
-                        y: cityMarker.y,
-                        z: cityMarker.z 
+						y: cityMarker.y,
+						z: cityMarker.z
 					}
-                });
-            }
-        }
-    });
+				});
+			}
+		}
+	});
 
-    return registeredCities;
+	return registeredCities;
 }
 
 
@@ -127,7 +130,21 @@ export function findPlayerCity(serverData: ServerData, playerName: string): City
 					const nationMatch = cityMarker.desc.match(/nation:\s+([^\s<]*)/);
 					const nation = nationMatch && nationMatch[1] ? nationMatch[1] : 'N/A';
 
-					return { city: cityMarker.label.replace(/_/g, ' '), mayor, nation, members: associates };
+					const ruinedMatch = cityMarker.desc.match(/ruined:\s*true/);
+					const isRuined = ruinedMatch ? true : false;
+
+					return {
+						name: cityMarker.label.replace(/_/g, ' '),
+						mayor: mayor,
+						nation: nation,
+						members: associates,
+						ruined: isRuined,
+						coords: {
+							x: cityMarker.x,
+							y: cityMarker.y,
+							z: cityMarker.z
+						}
+					};
 				}
 			}
 		}
@@ -143,20 +160,26 @@ export function findCityInfo(serverData: ServerData, cityName: string): CityInfo
 		const associateListMatch = cityMarker.desc.match(/Associates\s+<span[^>]*>(.*?)<\/span>/);
 		const mayorMatch = cityMarker.desc.match(/Mayor\s+<span[^>]*>(.*?)<\/span>/);
 		const nationMatch = cityMarker.desc.match(/nation:\s+([^\s<]*)/);
-        
+
 		if (associateListMatch && associateListMatch[1] && mayorMatch && mayorMatch[1]) {
 			const associates = associateListMatch[1].split(', ');
 			const mayor = mayorMatch[1];
 			const nation = nationMatch[1];
 
+			const ruinedMatch = cityMarker.desc.match(/ruined:\s*true/);
+			const isRuined = ruinedMatch ? true : false;
+
 			return {
-				city: cityMarker.label.replace(/_/g, ' '), 
-				mayor, 
-				nation, 
-				members: associates,  
-				x: cityMarker.x,
-                y: cityMarker.y,
-                z: cityMarker.z 
+				name: cityMarker.label.replace(/_/g, ' '),
+				mayor: mayor,
+				nation: nation,
+				members: associates,
+				coords: {
+					x: cityMarker.x,
+					y: cityMarker.y,
+					z: cityMarker.z,
+				},
+				ruined: isRuined
 			};
 		}
 	}
@@ -172,9 +195,9 @@ export async function getDynmapPlayers() {
 	const playerArray = [];
 
 	for (const player of result.players) {
-		
+
 		const db = await staffDB.findOne({ nick: player.name });
-        
+
 		if (db) {
 			player.name = `[${db.role}] ${player.name}`;
 			playerArray.push({ name: player.name, health: player.health, order: 1 });
@@ -197,10 +220,10 @@ export async function getDynmapPlayersVanilla() {
 		'http://172.17.0.1:2053/up/world/Earth/'
 	);
 	const result = await req.json();
-    
+
 	const playerArray: object[] = [];
-     
-    const db = await staffDB.find({});
+
+	const db = await staffDB.find({});
 
 	result.players.forEach((player: any) => {
 
@@ -240,7 +263,7 @@ export function getOnlinePlayerInfo(serverData: ServerData, playerName: string):
 	} else {
 
 		return { name: playerName, online: false };
-    
+
 	}
 }
 
