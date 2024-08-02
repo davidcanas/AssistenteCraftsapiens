@@ -15,6 +15,7 @@ import { CityInfo, Command, Utils } from '../typings/index';
 import global from '../models/globalDB';
 import users from '../models/userDB';
 import staff from '../models/staffDB';
+import ticket from '../models/ticketsDB';
 
 import Embed from './Embed';
 
@@ -42,7 +43,11 @@ export default class DGClient extends Client {
     global: typeof global;
 	users: typeof users;
 	staff: typeof staff;
+	ticket: typeof ticket;
   };
+	cache: {
+		towns: string[],
+	};
 	utils: Utils;
 	fetch: typeof fetch;
 	embed: typeof Embed;
@@ -75,6 +80,10 @@ export default class DGClient extends Client {
 			global: global,
 			users: users,
 			staff: staff,
+			ticket: ticket,
+		};
+		this.cache = {
+			towns: [],
 		};
 		this.utils = {
 			levDistance: levenshteinDistance,
@@ -343,5 +352,15 @@ export default class DGClient extends Client {
 
 	return member;
 }
+
+ async updateTownyCache() {
+	const data = await fetch('http://177.3.74.79:2053/up/world/Earth/').then(r => r.json());
+
+	this.cache.towns = await getAllRegisteredCities(data);
+
+	console.log('Cache de cidades atualizado.');
+
+ }
+
 
 }
