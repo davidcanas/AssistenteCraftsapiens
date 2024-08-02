@@ -478,7 +478,7 @@ export default class MessageCreate {
 				.setDescription('**Para usar o sistema de música da Craftsapiens, você precisa de ter a sua conta discord vinculada com o minecraft!**')
 				.addField('Como vincular?', '> Para vincular sua conta use o comando `/discord link` no minecraft da Craftsapiens!')
 				.setColor('16711680')
-				.setFooter('Qualquer duvida, contacte um STAFF | Essa mensagem se autodestruirá em 1 minuto.');
+				.setFooter('Qualquer duvida, contacte um STAFF | Essa mensagem se autodestruirá em 1 minuto!');
 
 				const msg = await message.channel.createMessage({
 					embeds: [embed],
