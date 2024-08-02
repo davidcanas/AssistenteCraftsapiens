@@ -1,4 +1,4 @@
-import Client from '../structures/Client';
+import Client from "../structures/Client";
 
 export default class ready {
 	client: Client;
@@ -9,14 +9,14 @@ export default class ready {
 
 	async run() {
 		const activities = [
-			'✨ | Pronto para ajudar na craftsapiens!',
-			'👀 | jogar.craftsapiens.com.br',
+			"✨ | Pronto para ajudar na craftsapiens!",
+			"👀 | jogar.craftsapiens.com.br",
 			`🙍‍♂️ | Interagindo com ${this.client.users.size} jogadores!`,
 		];
 
 		let i = 0;
 		setInterval(async () => {
-			this.client.editStatus('online', [
+			this.client.editStatus("online", [
 				{
 					name: `${activities[i++ % activities.length]}`,
 					type: 2,
@@ -24,7 +24,7 @@ export default class ready {
 			]);
 		}, 15000);
 
-		console.log('O client foi conectado com sucesso');
+		console.log("O client foi conectado com sucesso");
 
 		this.client.updateSlash();
 		this.client.connectLavaLink();

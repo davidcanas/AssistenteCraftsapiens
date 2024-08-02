@@ -1,6 +1,6 @@
-import Client from '../structures/Client';
+import Client from "../structures/Client";
 
-import { JSONMessage, Message } from 'oceanic.js';
+import { JSONMessage, Message } from "oceanic.js";
 
 export default class MessageUpdate {
 	client: Client;
@@ -13,6 +13,6 @@ export default class MessageUpdate {
 		if (!oldMessage || !message || oldMessage.content === message.content)
 			return;
 
-		this.client.emit('messageCreate', message);
+		this.client.emit("messageCreate", message);
 	}
 }

@@ -1,16 +1,16 @@
-import Command from '../../structures/Command';
-import Client from '../../structures/Client';
-import CommandContext from '../../structures/CommandContext';
-import { ConnectionState } from 'vulkava';
-import { User } from 'oceanic.js';
+import Command from "../../structures/Command";
+import Client from "../../structures/Client";
+import CommandContext from "../../structures/CommandContext";
+import { ConnectionState } from "vulkava";
+import { User } from "oceanic.js";
 
 export default class NowPlaying extends Command {
 	constructor(client: Client) {
 		super(client, {
-			name: 'np',
-			description: 'Veja a musica que está sendo tocada nesse momento',
-			category: 'Music',
-			aliases: ['nowplaying'],
+			name: "np",
+			description: "Veja a musica que está sendo tocada nesse momento",
+			category: "Music",
+			aliases: ["nowplaying"],
 			options: [
 			], 
 		});
@@ -23,7 +23,7 @@ export default class NowPlaying extends Command {
 		
 
 		if (!currPlayer || currPlayer.state === ConnectionState.DISCONNECTED) {
-			ctx.sendMessage('Não estou a tocar nada nesse momento.');
+			ctx.sendMessage("Não estou a tocar nada nesse momento.");
 			return;
 		}
 
@@ -32,13 +32,13 @@ export default class NowPlaying extends Command {
         const requester = song.requester as User;
         const progressBar = ctx.progressBar((currPlayer.position/1000), (song.duration/1000), 20);
         const embed = new this.client.embed()
-            .setTitle('🎵 Tocando agora:')
+            .setTitle("🎵 Tocando agora:")
             .setDescription(`\`\`\`\n${progressBar}\n[${ctx.MsToHour(currPlayer.position)}]            [${ctx.MsToHour(song.duration)}]\n\`\`\``)
-            .addField('🎶 Título:', `\`${song.title}\``)
-            .addField('⏲️ Duração:', `\`${ctx.MsToHour(song.duration)}\``)
-            .addField('👤 Pedido por:', `<@${requester.id}>`)
+            .addField("🎶 Título:", `\`${song.title}\``)
+            .addField("⏲️ Duração:", `\`${ctx.MsToHour(song.duration)}\``)
+            .addField("👤 Pedido por:", `<@${requester.id}>`)
             .setThumbnail(song.thumbnail)
-            .setColor('RANDOM');
+            .setColor("RANDOM");
         
         ctx.sendMessage({ embeds: [embed]});
 	}

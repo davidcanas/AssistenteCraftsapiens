@@ -1,5 +1,5 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-import { AutocompleteInteraction } from 'oceanic.js';
+ 
+import { AutocompleteInteraction } from "oceanic.js";
 
 interface Player {
   world?: string;
@@ -20,7 +20,7 @@ interface CommandSettings {
   description: string;
   aliases?: Array<string>;
   usage?: string;
-  category: 'Info' | 'DG' | 'Util' | 'Music';
+  category: "Info" | "DG" | "Util" | "Music";
   default_member_permissions?: number;
   autocomplete?: boolean;
   options: Array<object>;
@@ -116,7 +116,7 @@ interface IEditInteractionData {
   file?: MessageFile;
 }
 
-declare module 'vulkava' {
+declare module "vulkava" {
   export interface Player {
     olderMessageID?: string;
     speedup?: boolean;

@@ -1,4 +1,4 @@
-import { Schema, model, Document } from 'mongoose';
+import { Schema, model, Document } from "mongoose";
 
 interface staffDB extends Document {
     nick: string;
@@ -35,4 +35,4 @@ const staffDB: Schema = new Schema(
     },
 );
 
-export default model<staffDB>('Staff', staffDB);
+export default model<staffDB>("Staff", staffDB);

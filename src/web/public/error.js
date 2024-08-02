@@ -1,16 +1,16 @@
 const messages = [
-    ['Efe.', 'Oops.', 'Ihh rapaz...', 'E agora?.', 'Ups...', 'Hm...', 'Ah não..', 'Vish!'],
-    ['Eu acho que', 'Infelizmente', 'Aparentemente,', 'Parece que', 'Uma pena,', 'Que estranho,'],
-    ['a página especificada não foi encontrada.', 'meu programador provavelmente me abortou.', 'algo de errado não está certo.', '...eu nunca existi?', 'você se perdeu?', 'eu não estou aqui?', 'eu não sou o que você procura?', '*crise existencial*'],
-    ['Desculpa :/', 'Uma pena!', 'Desculpe.', 'É triste.', 'Aff..', 'Poxa, e agora?', ]
+    ["Efe.", "Oops.", "Ihh rapaz...", "E agora?.", "Ups...", "Hm...", "Ah não..", "Vish!"],
+    ["Eu acho que", "Infelizmente", "Aparentemente,", "Parece que", "Uma pena,", "Que estranho,"],
+    ["a página especificada não foi encontrada.", "meu programador provavelmente me abortou.", "algo de errado não está certo.", "...eu nunca existi?", "você se perdeu?", "eu não estou aqui?", "eu não sou o que você procura?", "*crise existencial*"],
+    ["Desculpa :/", "Uma pena!", "Desculpe.", "É triste.", "Aff..", "Poxa, e agora?", ]
   ];
   
 
   const messageElements = [
-    document.querySelector('#js-whoops'),
-    document.querySelector('#js-appears'),
-    document.querySelector('#js-error'),
-    document.querySelector('#js-apology')
+    document.querySelector("#js-whoops"),
+    document.querySelector("#js-appears"),
+    document.querySelector("#js-error"),
+    document.querySelector("#js-apology")
   ];
   
 
@@ -19,7 +19,7 @@ const messages = [
 
   let messageTimer = 4000;
 
-  document.addEventListener('DOMContentLoaded', (event) => {
+  document.addEventListener("DOMContentLoaded", (event) => {
     setupMessages();
     setInterval(() => {
       swapMessage();
@@ -42,7 +42,7 @@ const messages = [
     let toSwapIndex = getNewSwapIndex();
     let newMessage  = getNewMessage(toSwapIndex);
     // Animate the disappearing, setting width, and reappearing
-    messageElements[toSwapIndex].style.lineHeight = '0';
+    messageElements[toSwapIndex].style.lineHeight = "0";
     // once line height is done transitioning, set element width & message
     setTimeout(() => {
       // make sure the element has a width set for transitions
@@ -54,7 +54,7 @@ const messages = [
     }, 200);
     // once width is done, transition the lineheight back to 1 so we can view the message
     setTimeout(() => {
-      messageElements[toSwapIndex].style.lineHeight = '1.2';
+      messageElements[toSwapIndex].style.lineHeight = "1.2";
     }, 400);
   }
   

@@ -1,54 +1,54 @@
-import Command from '../../structures/Command';
-import Client from '../../structures/Client';
-import CommandContext from '../../structures/CommandContext';
+import Command from "../../structures/Command";
+import Client from "../../structures/Client";
+import CommandContext from "../../structures/CommandContext";
 
 export default class blacklistMusic extends Command {
 	constructor(client: Client) {
 		super(client, {
-			name: 'bl',
-			description: '[STAFF] Adiciona um usuário/canal na blacklist do sistema de musica',
-			category: 'DG',
-			aliases: ['blacklist_music', 'bl_music', 'blacklistmusic', 'blmusic'],
+			name: "bl",
+			description: "[STAFF] Adiciona um usuário/canal na blacklist do sistema de musica",
+			category: "DG",
+			aliases: ["blacklist_music", "bl_music", "blacklistmusic", "blmusic"],
 			options: [
 				{
-					name: 'listar',
-					description: 'Lista os usuários/canais na blacklist de comandos de música',
+					name: "listar",
+					description: "Lista os usuários/canais na blacklist de comandos de música",
 					type: 1
 				},
 				{
-					name: 'add',
-					description: 'Banir um jogador ou canal de usar comandos de música',
+					name: "add",
+					description: "Banir um jogador ou canal de usar comandos de música",
 					type: 1,
 					options: [
 						{
 							type: 6,
-							name: 'user',
-							description: 'Usuário que deseja banir de usar comandos de música',
+							name: "user",
+							description: "Usuário que deseja banir de usar comandos de música",
 							required: false
 						},
 						{
 							type: 7,
-							name: 'channel',
-							description: 'Canal que deseja banir de usar comandos de música',
+							name: "channel",
+							description: "Canal que deseja banir de usar comandos de música",
 							required: false
 						}
 					]
 				},
 				{
-					name: 'remove',
-					description: 'Remove um jogador ou canal da blacklist de comandos de musica',
+					name: "remove",
+					description: "Remove um jogador ou canal da blacklist de comandos de musica",
 					type: 1,
 					options: [
 						{
 							type: 6,
-							name: 'user',
-							description: 'Usuário que deseja desbanir de usar comandos de música',
+							name: "user",
+							description: "Usuário que deseja desbanir de usar comandos de música",
 							required: false
 						},
 						{
 							type: 7,
-							name: 'channel',
-							description: 'Canal que deseja desbanir de usar comandos de música',
+							name: "channel",
+							description: "Canal que deseja desbanir de usar comandos de música",
 							required: false
 						}
 					]
@@ -61,7 +61,7 @@ export default class blacklistMusic extends Command {
 
 		if (!this.client.allowedUsers.includes(ctx.author.id)) {
 			ctx.sendMessage({
-				content: 'Você não tem acesso a esse comando!',
+				content: "Você não tem acesso a esse comando!",
 				flags: 1 << 6
 			});
 			return;
@@ -71,9 +71,9 @@ export default class blacklistMusic extends Command {
 
 		if (!db) return;
 
-		if (ctx.args[0] === 'listar') {
-			let users = '';
-			let channels = '';
+		if (ctx.args[0] === "listar") {
+			let users = "";
+			let channels = "";
 
 			for (const user of db.music.blacklistedUsers) {
 				users += `<@${this.client.users.get(user)?.id}>\n`;
@@ -94,16 +94,16 @@ export default class blacklistMusic extends Command {
 		const target = ctx.args[1];
 
 
-		if (action === 'add' || action === 'remove') {
+		if (action === "add" || action === "remove") {
 			const user = this.client.users.get(target);
-			const channel = this.client.guilds.get('892472046729179136').channels.get(target);
+			const channel = this.client.guilds.get("892472046729179136").channels.get(target);
         
 			if (user && user.username) {
 				
-				if (action === 'add') {
+				if (action === "add") {
 					if (db.music.blacklistedUsers.includes(target)) {
 						ctx.sendMessage({
-							content: 'Esse usuário já está na blacklist!',
+							content: "Esse usuário já está na blacklist!",
 							flags: 1 << 6
 						});
 					} else {
@@ -117,7 +117,7 @@ export default class blacklistMusic extends Command {
 				} else {
 					if (!db.music.blacklistedUsers.includes(target)) {
 						ctx.sendMessage({
-							content: 'Esse usuário não está na blacklist!',
+							content: "Esse usuário não está na blacklist!",
 							flags: 1 << 6
 						});
 					} else {
@@ -130,10 +130,10 @@ export default class blacklistMusic extends Command {
 					}
 				}
 			} else if (channel && channel.type === 2) { 
-				if (action === 'add') {
+				if (action === "add") {
 					if (db.music.restrictedChannels.includes(target)) {
 						ctx.sendMessage({
-							content: 'Esse canal já está na blacklist!',
+							content: "Esse canal já está na blacklist!",
 							flags: 1 << 6
 						});
 					} else {
@@ -147,7 +147,7 @@ export default class blacklistMusic extends Command {
 				} else {
 					if (!db.music.restrictedChannels.includes(target)) {
 						ctx.sendMessage({
-							content: 'Esse canal não está na blacklist!',
+							content: "Esse canal não está na blacklist!",
 							flags: 1 << 6
 						});
 					} else {
@@ -161,7 +161,7 @@ export default class blacklistMusic extends Command {
 				}
 			} else {
 				ctx.sendMessage({
-					content: 'Você deve especificar um usuário ou um canal de voz válido!',
+					content: "Você deve especificar um usuário ou um canal de voz válido!",
 					flags: 1 << 6
 				});
 			}

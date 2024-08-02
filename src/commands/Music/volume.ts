@@ -1,20 +1,20 @@
-import Command from '../../structures/Command';
-import Client from '../../structures/Client';
-import CommandContext from '../../structures/CommandContext';
-import { ConnectionState } from 'vulkava';
+import Command from "../../structures/Command";
+import Client from "../../structures/Client";
+import CommandContext from "../../structures/CommandContext";
+import { ConnectionState } from "vulkava";
 
 export default class Volume extends Command {
 	constructor(client: Client) {
 		super(client, {
-			name: 'volume',
-			description: 'Altera o volume da musica [0-500]',
-			category: 'Music',
-			aliases: ['vol'],
+			name: "volume",
+			description: "Altera o volume da musica [0-500]",
+			category: "Music",
+			aliases: ["vol"],
 			options: [
 				{
-					name: 'volume',
+					name: "volume",
 					type: 3,
-					description: 'O volume a definir [0-500]',
+					description: "O volume a definir [0-500]",
 					required: true,
 				},
 			], //lol
@@ -28,19 +28,19 @@ export default class Volume extends Command {
 		const volume = Number(ctx.args[0]);
 
 		if (!currPlayer || currPlayer.state === ConnectionState.DISCONNECTED) {
-			ctx.sendMessage('Não estou a tocar nada nesse momento.');
+			ctx.sendMessage("Não estou a tocar nada nesse momento.");
 			return;
 		}
 
 		const voiceChannelID = ctx.member?.voiceState?.channelID;
 
         if (!voiceChannelID || (voiceChannelID && voiceChannelID !== currPlayer.voiceChannelId)) {
-          ctx.sendMessage({ content: 'Você não está no mesmo canal de voz onde a música está tocando!', flags: 1 << 6 });
+          ctx.sendMessage({ content: "Você não está no mesmo canal de voz onde a música está tocando!", flags: 1 << 6 });
           return;
         }
 
 		if (isNaN(volume) || volume < 0 || volume > 500) {
-			ctx.sendMessage('O volume deve ser um numero entre 0 e 500');
+			ctx.sendMessage("O volume deve ser um numero entre 0 e 500");
 			return;
 		}
 

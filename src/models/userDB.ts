@@ -1,4 +1,4 @@
-import { Schema, model, Document } from 'mongoose';
+import { Schema, model, Document } from "mongoose";
 
 interface userDB extends Document {
     nick: string;
@@ -23,4 +23,4 @@ const userDB: Schema = new Schema(
     },
 );
 
-export default model<userDB>('user', userDB);
+export default model<userDB>("user", userDB);

@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
-import fs from 'fs';
+import fs from "fs";
 import {
 	Client,
 	ClientOptions,
@@ -8,26 +8,26 @@ import {
 	User,
 	ClientEvents,
 	Member,
-} from 'oceanic.js';
+} from "oceanic.js";
 
-import { CityInfo, Command, Utils } from '../typings/index';
+import { CityInfo, Command, Utils } from "../typings/index";
 
-import global from '../models/globalDB';
-import users from '../models/userDB';
-import staff from '../models/staffDB';
+import global from "../models/globalDB";
+import users from "../models/userDB";
+import staff from "../models/staffDB";
 
-import Embed from './Embed';
+import Embed from "./Embed";
 
-import { NodeOptions } from 'vulkava';
+import { NodeOptions } from "vulkava";
 
-import Music from './Music';
+import Music from "./Music";
 
-import levenshteinDistance from '../utils/levenshteinDistance';
-import { getOnlinePlayerInfo, findCityInfo, findPlayerCity, getAllRegisteredCities, getAllRegisteredPlayers, getDynmapPlayers } from '../utils/getDynmapInfo';
+import levenshteinDistance from "../utils/levenshteinDistance";
+import { getOnlinePlayerInfo, findCityInfo, findPlayerCity, getAllRegisteredCities, getAllRegisteredPlayers, getDynmapPlayers } from "../utils/getDynmapInfo";
 
-import fetch from 'node-fetch';
+import fetch from "node-fetch";
 
-import path from 'path';
+import path from "path";
 
 export default class DGClient extends Client {
 	commands: Array<Command>;
@@ -51,11 +51,11 @@ export default class DGClient extends Client {
 	constructor(token: string) {
 		const clientOptions: ClientOptions = {
 			auth: token,
-			defaultImageFormat: 'png',
+			defaultImageFormat: "png",
 			gateway: {
 				getAllUsers: true,
 				intents: [
-					'ALL'
+					"ALL"
 				],
 			},
 			collectionLimits: {
@@ -86,14 +86,14 @@ export default class DGClient extends Client {
 		};
 		this.fetch = fetch;
 		this.embed = Embed;
-		this.owner = this.users.get('733963304610824252');
-		this.guildID = '892472046729179136';
-		this.allowedUsers = ['733963304610824252', '402190502172295168', '828745580125225031', '286573832913813516'];
+		this.owner = this.users.get("733963304610824252");
+		this.guildID = "892472046729179136";
+		this.allowedUsers = ["733963304610824252", "402190502172295168", "828745580125225031", "286573832913813516"];
 		this.ignoreRoles = [
-			'939956623441555558',
-			'917900552225054750',
-			'901251917991256124',
-			'90126307702514078',
+			"939956623441555558",
+			"917900552225054750",
+			"901251917991256124",
+			"90126307702514078",
 		];
 	}
 	async findUser(param: string, guild: Guild | null): Promise<User | null> {
@@ -171,16 +171,16 @@ export default class DGClient extends Client {
 
 	loadCommands(): void {
 		for (const dir of fs.readdirSync(
-			path.resolve(__dirname, '..', 'commands'),
+			path.resolve(__dirname, "..", "commands"),
 		)) {
-			if (dir.endsWith('.ts') || dir.endsWith('.js')) {
+			if (dir.endsWith(".ts") || dir.endsWith(".js")) {
 				const cmd = require(`../commands/${dir}`).default;
 				this.commands.push(new cmd(this));
 			} else {
 				for (const file of fs.readdirSync(
-					path.resolve(__dirname, '..', 'commands', dir),
+					path.resolve(__dirname, "..", "commands", dir),
 				)) {
-					if (file.endsWith('.ts') || file.endsWith('.js')) {
+					if (file.endsWith(".ts") || file.endsWith(".js")) {
 						const command = require(`../commands/${dir}/${file}`).default;
 						this.commands.push(new command(this));
 					}
@@ -188,18 +188,18 @@ export default class DGClient extends Client {
 			}
 		}
 
-		console.log('Os comandos foram carregados.');
+		console.log("Os comandos foram carregados.");
 	}
 	loadEvents(): void {
 		for (const file of fs.readdirSync(
-			path.resolve(__dirname, '..', 'events'),
+			path.resolve(__dirname, "..", "events"),
 		)) {
-			if (file.endsWith('.ts') || file.endsWith('.js')) {
+			if (file.endsWith(".ts") || file.endsWith(".js")) {
 				const event = new (require(`../events/${file}`).default)(this);
-				const eventName = file.split('.')[0] as keyof ClientEvents;
+				const eventName = file.split(".")[0] as keyof ClientEvents;
 
-				if (eventName === 'ready') {
-					super.once('ready', (...args) => event.run(...args));
+				if (eventName === "ready") {
+					super.once("ready", (...args) => event.run(...args));
 				} else {
 					super.on(eventName, (...args) => event.run(...args));
 				}
@@ -219,13 +219,13 @@ export default class DGClient extends Client {
 				autocomplete: command.autocomplete || false,
 			});
 		}
-		this.application.bulkEditGuildCommands('892472046729179136', cmds);
-		console.log('Os slash commands foram atualizados');
+		this.application.bulkEditGuildCommands("892472046729179136", cmds);
+		console.log("Os slash commands foram atualizados");
 	}
 	connectLavaLink(): void {
 		const nodes: NodeOptions[] = [
 			{
-				id: 'Craftsapiens Lavalink Node',
+				id: "Craftsapiens Lavalink Node",
 				hostname: process.env.LAVALINKURL as string,
 				port: 50011,
 				password: process.env.LAVALINKPASSWORD as string,
@@ -238,7 +238,7 @@ export default class DGClient extends Client {
 		this.music = new Music(this, nodes);
 
 		this.music.init();
-		super.on('packet', (packet) => this.music.handleVoiceUpdate(packet));
+		super.on("packet", (packet) => this.music.handleVoiceUpdate(packet));
 	}
 
 	async getPlayerInfo(player: string) {
@@ -249,7 +249,7 @@ export default class DGClient extends Client {
 				`https://api.mojang.com/users/profiles/minecraft/${player}`
 			);
 			const findInDynmapData = await fetch(
-				'http://172.17.0.1:2053/up/world/Earth/'
+				"http://172.17.0.1:2053/up/world/Earth/"
 			).then((r) => r.json());
 
 			const findInMojang = await findInMojangRequest.json();
@@ -276,7 +276,7 @@ export default class DGClient extends Client {
 				playerObj.discord = db.id;
 			} else {
 				playerObj.isStaff = false;
-				playerObj.discord = await this.guilds.get('892472046729179136')?.members.find(m => m?.nick && m.nick?.toLowerCase() == playerObj.nick?.toLowerCase() && m.roles.includes('1152666174157488258'))?.user.id || null;
+				playerObj.discord = await this.guilds.get("892472046729179136")?.members.find(m => m?.nick && m.nick?.toLowerCase() == playerObj.nick?.toLowerCase() && m.roles.includes("1152666174157488258"))?.user.id || null;
 			}
 			const city = findPlayerCity(findInDynmapData, playerObj.nick);
 			
@@ -300,7 +300,7 @@ export default class DGClient extends Client {
 		}
 	}
 	async getCronograma() {
-		const canal = this.guilds.get('892472046729179136').channels.get('939937615325560912'); 
+		const canal = this.guilds.get("892472046729179136").channels.get("939937615325560912"); 
 		if (canal.type !== Constants.ChannelTypes.GUILD_ANNOUNCEMENT) return null;
 		const channelmessages = await canal.getMessages();
 		const cronograma = channelmessages.find(m => m.attachments.size > 0).attachments.first();
@@ -311,7 +311,7 @@ export default class DGClient extends Client {
 	}
 	getHighestRole(guild, user: string): string {
 		const member = guild?.members.find(m => m.user.id == user || m.nick == user);
-		if (!member) return '';
+		if (!member) return "";
 		const roles = member.roles.map(r => guild?.roles.get(r));
 		const highestRole = roles.reduce((a, b) => a.position > b.position ? a : b);
 		return highestRole.name;
@@ -319,31 +319,31 @@ export default class DGClient extends Client {
 
 	nFormatter(num, digits) {
 		const lookup = [
-          { value: 1, symbol: '' },
-          { value: 1e3, symbol: 'k' },
-          { value: 1e6, symbol: 'M' },
-          { value: 1e9, symbol: 'G' },
-          { value: 1e12, symbol: 'T' },
-          { value: 1e15, symbol: 'P' },
-          { value: 1e18, symbol: 'E' }
+          { value: 1, symbol: "" },
+          { value: 1e3, symbol: "k" },
+          { value: 1e6, symbol: "M" },
+          { value: 1e9, symbol: "G" },
+          { value: 1e12, symbol: "T" },
+          { value: 1e15, symbol: "P" },
+          { value: 1e18, symbol: "E" }
 		];
 		const regexp = /\.0+$|(?<=\.[0-9]*[1-9])0+$/;
 		const item = lookup.findLast(item => num >= item.value);
-		return item ? (num / item.value).toFixed(digits).replace(regexp, '').concat(item.symbol) : '0';
+		return item ? (num / item.value).toFixed(digits).replace(regexp, "").concat(item.symbol) : "0";
    }
    
     getDiscordByNick(nick): Member | null {
-	const member = this.guilds.get('892472046729179136')?.members.find(m => m?.nick && m.nick?.toLowerCase() == nick?.toLowerCase() && m.roles.includes('1152666174157488258')) || null;
+	const member = this.guilds.get("892472046729179136")?.members.find(m => m?.nick && m.nick?.toLowerCase() == nick?.toLowerCase() && m.roles.includes("1152666174157488258")) || null;
 
 	return member;
 }
 
  async updateTownyCache() {
-	const data = await fetch('http://172.17.0.1:2053/up/world/Earth/').then(r => r.json());
+	const data = await fetch("http://172.17.0.1:2053/up/world/Earth/").then(r => r.json());
 
 	this.cache.towns = await getAllRegisteredCities(data);
 
-	console.log('Cache de cidades atualizado.');
+	console.log("Cache de cidades atualizado.");
 
  }
 

@@ -1,12 +1,12 @@
-import Client from './Client';
-import { CommandSettings } from '../typings';
+import Client from "./Client";
+import { CommandSettings } from "../typings";
 
 export default class Command implements CommandSettings {
 	client: Client;
 	description: string;
 	name: string;
 	aliases?: Array<string>;
-	category: 'Info' | 'DG' | 'Util' | 'Music';
+	category: "Info" | "DG" | "Util" | "Music";
 	options: Array<object>;
 	default_member_permissions?: number;
 	autocomplete?: boolean;
@@ -15,8 +15,8 @@ export default class Command implements CommandSettings {
 		this.client = client;
 		this.name = options.name;
 		this.description =
-      options.category + ' | ' + options.description ||
-      options.category + ' | ' + 'Nenhuma descrição especificada';
+      options.category + " | " + options.description ||
+      options.category + " | " + "Nenhuma descrição especificada";
 		this.aliases = options.aliases;
 		this.category = options.category;
 		this.options = options.options;

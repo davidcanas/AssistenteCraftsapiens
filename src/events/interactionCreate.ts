@@ -1,12 +1,12 @@
-import Client from '../structures/Client';
+import Client from "../structures/Client";
 import {
 	Interaction,
 	CommandInteraction,
 	ComponentInteraction,
 	AutocompleteInteraction,
 	InteractionOptionsWithValue
-} from 'oceanic.js';
-import CommandContext from '../structures/CommandContext';
+} from "oceanic.js";
+import CommandContext from "../structures/CommandContext";
 
 export default class InteractionCreate {
 	client: Client;
@@ -21,7 +21,7 @@ export default class InteractionCreate {
 			if (!interaction.member) return;
 			const cmd = this.client.commands.find(c => c.name === interaction.data.name);
 
-			if (!cmd) throw new Error('Command not found');
+			if (!cmd) throw new Error("Command not found");
 
 			const options = interaction.data.options.raw as InteractionOptionsWithValue[];
 
@@ -35,13 +35,13 @@ export default class InteractionCreate {
 			const cmd = this.client.commands.find(
 				(c) => c.name === interaction.data.name,
 			);
-			if (!cmd) throw new Error('<!> Command not found');
+			if (!cmd) throw new Error("<!> Command not found");
 
 			const db = await this.client.db.global.findOne({ id: interaction.guild.id });
             if (db.blacklistedUsers.includes(interaction.user.id)) {
 				const embed = new this.client.embed()
-					.setDescription(':x: **Você foi proibido por um administrador de usar comandos**\nMotivo: `Utilização indevida do sistema`')
-					.setColor('16711680');
+					.setDescription(":x: **Você foi proibido por um administrador de usar comandos**\nMotivo: `Utilização indevida do sistema`")
+					.setColor("16711680");
 
 				interaction.createMessage({
 					embeds: [embed],
@@ -52,12 +52,12 @@ export default class InteractionCreate {
 
 			}
 			
-			if (cmd.category === 'Music') {
+			if (cmd.category === "Music") {
 				
 				if (db.music.blacklistedUsers.includes(interaction.user.id)) {
 					const embed = new this.client.embed()
-						.setDescription(':x: **Você foi proibido por um administrador de usar comandos de Música**\nMotivo: `Utilização indevida do sistema`')
-						.setColor('16711680');
+						.setDescription(":x: **Você foi proibido por um administrador de usar comandos de Música**\nMotivo: `Utilização indevida do sistema`")
+						.setColor("16711680");
 
 					interaction.createMessage({
 						embeds: [embed],
@@ -68,10 +68,10 @@ export default class InteractionCreate {
 				}
 				if (!this.client.getDiscordByNick(interaction.member.nick)) {
 					const embed = new this.client.embed()
-						.setDescription('**Para usar o sistema de música da Craftsapiens, você precisa de ter a sua conta discord vinculada com o minecraft!**')
-						.addField('Como vincular?', '> Para vincular sua conta use o comando `/discord link` no minecraft da Craftsapiens!')
-						.setColor('16711680')
-						.setFooter('Qualquer duvida, contacte um STAFF');
+						.setDescription("**Para usar o sistema de música da Craftsapiens, você precisa de ter a sua conta discord vinculada com o minecraft!**")
+						.addField("Como vincular?", "> Para vincular sua conta use o comando `/discord link` no minecraft da Craftsapiens!")
+						.setColor("16711680")
+						.setFooter("Qualquer duvida, contacte um STAFF");
 
 					interaction.createMessage({
 						embeds: [embed],
@@ -91,14 +91,14 @@ export default class InteractionCreate {
 		if (!(interaction instanceof CommandInteraction)) {
 			if (interaction instanceof ComponentInteraction) {
 
-				if (interaction.data.customID === 'silenciar') {
+				if (interaction.data.customID === "silenciar") {
 					const autor = interaction.message.mentions.users[0];
 					if (interaction.member.id !== autor.id) {
 						interaction.createMessage({
 							content:
-								'Esse botão é de @' +
+								"Esse botão é de @" +
 								autor.username +
-								' , apenas ele pode silenciar!',
+								" , apenas ele pode silenciar!",
 							flags: 1 << 6
 						});
 						return;
@@ -107,16 +107,16 @@ export default class InteractionCreate {
 					const db = await this.client.db.global.findOne({ id: interaction.guild.id });
 					db.ignoredUsers.push(interaction.member.id);
 					await db.save();
-					interaction.createMessage({ content: 'Agora você não receberá mais informações sobre as aulas quando perguntar sobre aulas.\nPara ativar novamente use o comando `/silenciar aviso_aulas`', flags: 1 << 6 });
+					interaction.createMessage({ content: "Agora você não receberá mais informações sobre as aulas quando perguntar sobre aulas.\nPara ativar novamente use o comando `/silenciar aviso_aulas`", flags: 1 << 6 });
 				}
 
-				if (interaction.data.customID === 'delmsgeval') {
-					if (interaction.member?.id !== '733963304610824252') return;
+				if (interaction.data.customID === "delmsgeval") {
+					if (interaction.member?.id !== "733963304610824252") return;
 					interaction.channel.messages.get(interaction.message.id).delete();
 				}
 
-				if (interaction.data.customID === 'changelog') {
-					const baseurl = 'https://api.github.com/repos/davidcanas/AssistenteCraftsapiens/releases/latest';
+				if (interaction.data.customID === "changelog") {
+					const baseurl = "https://api.github.com/repos/davidcanas/AssistenteCraftsapiens/releases/latest";
 					const res = await this.client.fetch(baseurl);
 					const json = await res.json();
 					
@@ -124,9 +124,9 @@ export default class InteractionCreate {
 					if (interaction.member.id !== autor.id) {
 						interaction.createMessage({
 							content:
-								'Esse botão é de @' +
+								"Esse botão é de @" +
 								autor.username +
-								' , apenas ele pode clicar',
+								" , apenas ele pode clicar",
 							flags: 1 << 6
 						});
 						return;
@@ -136,14 +136,14 @@ export default class InteractionCreate {
 						components: [],
 					});
 				}
-				if (interaction.data.customID === 'confirm') {
+				if (interaction.data.customID === "confirm") {
 					const dbremove = await this.client.db.global.findOne({ id: interaction.guild.id });
 					const autor = interaction.message.mentions.users[0];
 
 					if (
-						interaction.member.roles.includes('959259258829021255') ||
-						interaction.member.roles.includes('917900552225054750') ||
-						interaction.member.roles.includes('901251917991256124')
+						interaction.member.roles.includes("959259258829021255") ||
+						interaction.member.roles.includes("917900552225054750") ||
+						interaction.member.roles.includes("901251917991256124")
 					) {
 						interaction.message.channel.deleteMessage(
 							interaction.message.messageReference.messageID
@@ -155,13 +155,13 @@ export default class InteractionCreate {
 						dbremove.save();
 
 						console.log(
-							'\u001b[33m', '| Removendo @' +
+							"\u001b[33m", "| Removendo @" +
 							autor.username +
-						' da lista de usuários que acionaram o sistema!'
+						" da lista de usuários que acionaram o sistema!"
 						);
 						return interaction.createMessage({
 							content:
-								'**[ADMIN]** Você acaba de usar poderes de fontes suspeitas e apagou essa mensagem com sucesso!',
+								"**[ADMIN]** Você acaba de usar poderes de fontes suspeitas e apagou essa mensagem com sucesso!",
 							flags: 1 << 6
 						});
 					}
@@ -169,15 +169,15 @@ export default class InteractionCreate {
 					if (interaction.member.id !== autor.id) {
 						return interaction.createMessage({
 							content:
-								'Esse botão é de @' +
+								"Esse botão é de @" +
 								autor.username +
-								' , apenas ele pode confirmar a leitura!',
+								" , apenas ele pode confirmar a leitura!",
 							flags: 1 << 6
 						});
 					}
 
 					interaction.createMessage({
-						content: 'Obrigado por confirmar a sua leitura :D.',
+						content: "Obrigado por confirmar a sua leitura :D.",
 						flags: 1 << 6
 					});
 
@@ -189,22 +189,22 @@ export default class InteractionCreate {
 					dbremove.save();
 
 					console.log(
-						'\u001b[33m', '| Removendo @' +
+						"\u001b[33m", "| Removendo @" +
 						autor.username +
-					' da lista de usuários que acionaram o sistema!'
+					" da lista de usuários que acionaram o sistema!"
 					);
 				}
 
-			if (interaction.data.customID === 'confirm_read') {
-				const autor = interaction.message.mentions.users.find((u) => u.id !== '968686499409313804');
+			if (interaction.data.customID === "confirm_read") {
+				const autor = interaction.message.mentions.users.find((u) => u.id !== "968686499409313804");
 				const sender = interaction.member.id || interaction.user.id;
 
 				if (sender !== autor.id) {
 					return interaction.createMessage({
 						content:
-							'Esse botão é de @' +
+							"Esse botão é de @" +
 							autor.username +
-							' , apenas ele pode usar!',
+							" , apenas ele pode usar!",
 						flags: 1 << 6
 					});
 				}

@@ -1,14 +1,14 @@
-import Command from '../../structures/Command';
-import Client from '../../structures/Client';
-import CommandContext from '../../structures/CommandContext';
+import Command from "../../structures/Command";
+import Client from "../../structures/Client";
+import CommandContext from "../../structures/CommandContext";
 
 export default class cronograma extends Command {
 	constructor(client: Client) {
 		super(client, {
-			name: 'cronograma',
-			description: 'Obtenha o cronograma de aulas mais recente da Craftsapiens',
-			category: 'Info',
-			aliases: ['cornograma'],
+			name: "cronograma",
+			description: "Obtenha o cronograma de aulas mais recente da Craftsapiens",
+			category: "Info",
+			aliases: ["cornograma"],
 			options: [],
 		});
 	}
@@ -17,12 +17,12 @@ export default class cronograma extends Command {
 		
         const cronograma = await this.client.getCronograma();
         const embed = new this.client.embed()
-        .setTitle('📆 Cronograma de aulas') 
-        .setDescription('Aqui está o cronograma de aulas mais recente da Craftsapiens!')
+        .setTitle("📆 Cronograma de aulas") 
+        .setDescription("Aqui está o cronograma de aulas mais recente da Craftsapiens!")
         .setImage(cronograma?.url)
-        .setColor('RANDOM')
+        .setColor("RANDOM")
         .setTimestamp()
-        .setFooter('Craftsapiens', this.client.user.avatarURL());
+        .setFooter("Craftsapiens", this.client.user.avatarURL());
 
         ctx.sendMessage({
             embeds: [embed],
