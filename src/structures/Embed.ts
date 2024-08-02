@@ -3,7 +3,7 @@ import {
 	EmbedFooterOptions,
 	EmbedImageOptions,
 	EmbedAuthorOptions,
-} from 'oceanic.js';
+} from "oceanic.js";
 
 export default class Embed {
 	author?: EmbedAuthorOptions;
@@ -34,7 +34,7 @@ export default class Embed {
 	}
 
 	setColor(color: number | string): this {
-		if (color === 'RANDOM') {
+		if (color === "RANDOM") {
 			this.color = ~~(Math.random() * (0xffffff + 1));
 		} else {
 			this.color = Number(color);

@@ -1,4 +1,4 @@
-import Client from '../structures/Client';
+import Client from "../structures/Client";
 
 export default class Error {
 	client: Client;
@@ -8,6 +8,6 @@ export default class Error {
 	}
 
 	run(err: Error): void {
-		console.error('Erro ' + err);
+		console.error("Erro " + err);
 	}
 }

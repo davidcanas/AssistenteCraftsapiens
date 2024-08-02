@@ -1,14 +1,14 @@
-import express from 'express';
-import Strategy from './lib/Strategy';
-import session from 'express-session';
-import passport from 'passport';
-import client from '../main';
-import isLogged from './helpers/isLogged';
-import path from 'path';
-import dash from './routes/dash';
-import punicoes from './routes/punicoes';
-import mapa from './routes/mapa';
-import { getDynmapPlayersVanilla } from '../utils/getDynmapInfo';
+import express from "express";
+import Strategy from "./lib/Strategy";
+import session from "express-session";
+import passport from "passport";
+import client from "../main";
+import isLogged from "./helpers/isLogged";
+import path from "path";
+import dash from "./routes/dash";
+import punicoes from "./routes/punicoes";
+import mapa from "./routes/mapa";
+import { getDynmapPlayersVanilla } from "../utils/getDynmapInfo";
 
 const app = express();
 const port = process.env.PORT;
@@ -20,9 +20,9 @@ app.use(session({
     saveUninitialized: false
   }));
 
-app.use(express.static(path.join(__dirname, 'public')));
-app.set('view engine', 'ejs');
-app.set('views', path.join(__dirname, 'views'));
+app.use(express.static(path.join(__dirname, "public")));
+app.set("view engine", "ejs");
+app.set("views", path.join(__dirname, "views"));
 passport.serializeUser(function(user, done) {
     done(null, user);
   });
@@ -30,11 +30,11 @@ passport.serializeUser(function(user, done) {
   passport.deserializeUser(function(obj, done) {
     done(null, obj);
   });
-  const scopes = ['identify', 'guilds'];
+  const scopes = ["identify", "guilds"];
   passport.use(new Strategy({
-    clientID: '734297444744953907',
+    clientID: "734297444744953907",
     clientSecret: process.env.SECRET,
-    callbackURL: 'http://' + process.env.LOCAL_IP + ':' + port + '/callback',
+    callbackURL: "http://" + process.env.LOCAL_IP + ":" + port + "/callback",
 
     scope: scopes
   }, function(accessToken, refreshToken, profile, done) {
@@ -46,22 +46,22 @@ passport.serializeUser(function(user, done) {
   app.use(passport.initialize());
   app.use(passport.session());
 
-  app.use('/dash', dash);
-  app.use('/punicoes', punicoes);
-  app.use('/mapa', mapa);
+  app.use("/dash", dash);
+  app.use("/punicoes", punicoes);
+  app.use("/mapa", mapa);
 
-app.get('/', isLogged, (req, res) => {
-	res.status(200).render('index', { 
+app.get("/", isLogged, (req, res) => {
+	res.status(200).render("index", { 
     user: req.user,
-    member: client.guilds.get('892472046729179136').members.get(req.user.id),
+    member: client.guilds.get("892472046729179136").members.get(req.user.id),
     avatar: client.users.get(req.user.id).avatarURL(),
-    guild: client.guilds.get('892472046729179136'),
+    guild: client.guilds.get("892472046729179136"),
     highestRole: client.getHighestRole,
     
     });
 });
 
-app.get('/api/isLogged', async (req, res) => {
+app.get("/api/isLogged", async (req, res) => {
   if(req.isAuthenticated()) {
     const db = await client.db.staff.findOne({ id: req.user.id });
     if (!db) {
@@ -74,34 +74,34 @@ app.get('/api/isLogged', async (req, res) => {
   }
 });
 
-app.get('/stats/survival', isLogged, async (req, res) => {
+app.get("/stats/survival", isLogged, async (req, res) => {
   
   const playerList = await getDynmapPlayersVanilla();
 
-	res.status(200).render('stats_survival', { 
+	res.status(200).render("stats_survival", { 
     user: req.user,
-    member: client.guilds.get('892472046729179136').members.get(req.user.id),
+    member: client.guilds.get("892472046729179136").members.get(req.user.id),
     avatar: client.users.get(req.user.id).avatarURL(),
-    guild: client.guilds.get('892472046729179136'),
+    guild: client.guilds.get("892472046729179136"),
     highestRole: client.getHighestRole,
     playerList,
     getPlayerInfo: await client.getPlayerInfo
     
     });
 });
-app.get('/login', passport.authenticate('discord', { scope: scopes }), function() { });
-app.get('/callback', passport.authenticate('discord', { failureRedirect: '/' }), function(req, res) { res.redirect('/'); });
+app.get("/login", passport.authenticate("discord", { scope: scopes }), function() { });
+app.get("/callback", passport.authenticate("discord", { failureRedirect: "/" }), function(req, res) { res.redirect("/"); });
 
-app.get('/logout', function(req, res, next) {
+app.get("/logout", function(req, res, next) {
   req.logout(function(err) {
     if (err) { return next(err); }
-    res.redirect('/');
+    res.redirect("/");
   });
 });
 
 
-app.get('*', (req, res) => {
-    res.status(404).render('errors/404');
+app.get("*", (req, res) => {
+    res.status(404).render("errors/404");
 });
 
 app.listen(port, () => {

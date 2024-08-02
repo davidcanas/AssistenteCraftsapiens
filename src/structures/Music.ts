@@ -1,7 +1,7 @@
-import Client from './Client';
-import CommandContext from './CommandContext';
-import { TextChannel, VoiceChannel } from 'oceanic.js';
-import { NodeOptions, Vulkava, Player, Node } from 'vulkava';
+import Client from "./Client";
+import CommandContext from "./CommandContext";
+import { TextChannel, VoiceChannel } from "oceanic.js";
+import { NodeOptions, Vulkava, Player, Node } from "vulkava";
 
 export default class Music extends Vulkava {
 	client: Client;
@@ -17,7 +17,7 @@ export default class Music extends Vulkava {
 		});
 
 		this.client = client;
-		this.on('nodeConnect', async (node): Promise<void> => {
+		this.on("nodeConnect", async (node): Promise<void> => {
 			console.log(`O node ${node.identifier} foi conectado!`);
 
 			for (const player of [...this.players.values()]
@@ -31,20 +31,20 @@ export default class Music extends Vulkava {
 
 		this.pingNodes();
 
-		this.on('error', (node, error): void => {
+		this.on("error", (node, error): void => {
 			console.log(
 				`Ocorreu um erro no node ${node.identifier}, erro: ${error.message}`
 			);
 
-			if (error.message.startsWith('Unable to connect after'))
+			if (error.message.startsWith("Unable to connect after"))
 				this.reconnect(node);
 		});
 
-		this.on('nodeDisconnect', (node): void => {
+		this.on("nodeDisconnect", (node): void => {
 			console.log(`O node do lavalink ${node.identifier} desconectou.`);
 		});
 
-		this.on('trackStart', async (player, track): Promise<void> => {
+		this.on("trackStart", async (player, track): Promise<void> => {
 			if (!player.textChannelId) return;
 
 			const channel = this.client.getChannel(player.textChannelId);
@@ -54,27 +54,27 @@ export default class Music extends Vulkava {
 			}
 
 			const embed = new this.client.embed()
-				.setTitle('Tocando')
-				.addField('Nome:', '`' + track.title + '`')
-				.addField('Autor da música:', '`' + track.author + '`')
+				.setTitle("Tocando")
+				.addField("Nome:", "`" + track.title + "`")
+				.addField("Autor da música:", "`" + track.author + "`")
 				.setURL(track.uri)
 				.setThumbnail(track.thumbnail!)
-				.setColor('RANDOM')
+				.setColor("RANDOM")
 				.setTimestamp();
 
 			player.olderMessageID = await channel.createMessage({ embeds: [embed] }).then((m) => m.id);
 		});
 
-		this.on('trackStuck', (player): void => {
+		this.on("trackStuck", (player): void => {
 			if (player.textChannelId) {
 				const ch = this.client.getChannel(player.textChannelId) as TextChannel;
-				ch.createMessage({ content: '**Ocorreu um erro a tocar essa música, a mesma foi pulada**' });
+				ch.createMessage({ content: "**Ocorreu um erro a tocar essa música, a mesma foi pulada**" });
 
 				player.skip();
 			}
 		});
         
-		this.on('queueEnd', (player): void => {
+		this.on("queueEnd", (player): void => {
 			if (player.textChannelId) {
 				const channel = this.client.getChannel(player.textChannelId);
 				if (channel.type !== 0) return;
@@ -83,7 +83,7 @@ export default class Music extends Vulkava {
 				}
 				if (channel.type !== 0) return;
 				player.destroy();
-				channel.createMessage({ content: 'A lista de músicas acabou.' });
+				channel.createMessage({ content: "A lista de músicas acabou." });
 			}
 		});
 	}
@@ -95,7 +95,7 @@ export default class Music extends Vulkava {
           
 		if (!voiceChannelID) {
 			ctx.sendMessage({
-				content: 'Você precisa de estar em um canal de voz para usar este comando.',
+				content: "Você precisa de estar em um canal de voz para usar este comando.",
 				flags: 1 << 6,
 			});
 			return false;
@@ -103,7 +103,7 @@ export default class Music extends Vulkava {
         
 		if (db.music.restrictedChannels.includes(voiceChannelID)) {
 			ctx.sendMessage({
-				content: 'Você não pode usar comandos de música neste canal de voz.',
+				content: "Você não pode usar comandos de música neste canal de voz.",
 				flags: 1 << 6,
 			});
 			return false;
@@ -114,25 +114,25 @@ export default class Music extends Vulkava {
 
 		const permissions = voiceChannel.permissionsOf(this.client.user.id);
 
-		if (!permissions.has('VIEW_CHANNEL')) {
+		if (!permissions.has("VIEW_CHANNEL")) {
 			ctx.sendMessage({
-				content: 'Necessito da permissão de para visualizar o seu canal de voz.',
+				content: "Necessito da permissão de para visualizar o seu canal de voz.",
 				flags: 1 << 6,
 			});
 			return false;
 		}
 
-		if (!permissions.has('CONNECT')) {
+		if (!permissions.has("CONNECT")) {
 			ctx.sendMessage({
-				content: 'Eu não consigo entrar no teu canal de voz',
+				content: "Eu não consigo entrar no teu canal de voz",
 				flags: 1 << 6,
 			});
 			return false;
 		}
 
-		if (!permissions.has('SPEAK')) {
+		if (!permissions.has("SPEAK")) {
 			ctx.sendMessage({
-				content: 'Eu não consigo reproduzir musica no teu canal de voz',
+				content: "Eu não consigo reproduzir musica no teu canal de voz",
 				flags: 1 << 6,
 			});
 			return false;
@@ -140,7 +140,7 @@ export default class Music extends Vulkava {
 
 		if (player && voiceChannelID !== player.voiceChannelId) {
 			ctx.sendMessage({
-				content: 'Tu precisas de estar no mesmo canal de voz que eu!',
+				content: "Tu precisas de estar no mesmo canal de voz que eu!",
 				flags: 1 << 6,
 			});
 			return false;
@@ -155,7 +155,7 @@ export default class Music extends Vulkava {
 
 	private pingNodes() {
 		for (const node of this.nodes.values()) {
-			if (node.options.hostname.includes('heroku')) {
+			if (node.options.hostname.includes("heroku")) {
 				setInterval(() => {
 					this.client.fetch(`http://${node.options.hostname}/version`, {
 						headers: {

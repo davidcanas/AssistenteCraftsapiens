@@ -1,4 +1,4 @@
-import Client from './Client';
+import Client from "./Client";
 
 import {
 	CreateMessageOptions,
@@ -12,7 +12,7 @@ import {
 	Message,
 	InteractionOptionsWithValue,
 	CommandInteraction,
-} from 'oceanic.js';
+} from "oceanic.js";
 
 export enum Type {
 	MESSAGE,
@@ -137,7 +137,7 @@ export default class CommandContext {
 
 		delete content.fetchReply;
 
-		if (content.content === undefined) content.content = '';
+		if (content.content === undefined) content.content = "";
 
 		if (this.interactionOrMessage instanceof Message) {
 			content.messageReference = {
@@ -162,21 +162,21 @@ export default class CommandContext {
 	}
 
 	private formatContent(content: Content | string): Content {
-		if (typeof content === 'string') return { content };
+		if (typeof content === "string") return { content };
 		return content;
 	}
 
 	errorEmbed(title: string) {
 		const embed = new this.client.embed()
-			.setTitle('❌ Ocorreu um erro')
+			.setTitle("❌ Ocorreu um erro")
 			.setDescription(title)
-			.setColor('ff0000');
-		this.sendMessage({ content: '', embeds: [embed], flags: 1 << 6 });
+			.setColor("ff0000");
+		this.sendMessage({ content: "", embeds: [embed], flags: 1 << 6 });
 	}
 
 	MsToDate(time) {
-		if (!time) return 'No time provided';
-		if (isNaN(time)) return 'The time provided is not a number ! ';
+		if (!time) return "No time provided";
+		if (isNaN(time)) return "The time provided is not a number ! ";
 		time = Math.round(time / 1000);
 
 		const s = time % 60,
@@ -195,13 +195,13 @@ export default class CommandContext {
 		h = ~~(time / 60 / 60);
 
 		return h === 0
-		? `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`
-		: `${String(Math.abs(h) % 24).padStart(2, '0')}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+		? `${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`
+		: `${String(Math.abs(h) % 24).padStart(2, "0")}:${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`;
 	}
     progressBar(current, total, barSize) {
 		const progress = Math.round((barSize*current)/total);
  
-		return '━'.repeat(progress > 0 ? progress-1 : progress) + '🔘' + '━'.repeat(barSize-progress);
+		return "━".repeat(progress > 0 ? progress-1 : progress) + "🔘" + "━".repeat(barSize-progress);
 		// 
 		}
 

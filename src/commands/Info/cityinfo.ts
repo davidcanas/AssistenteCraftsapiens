@@ -1,21 +1,21 @@
-import Command from '../../structures/Command';
-import Client from '../../structures/Client';
-import CommandContext from '../../structures/CommandContext';
-import { AutocompleteInteraction } from 'oceanic.js';
+import Command from "../../structures/Command";
+import Client from "../../structures/Client";
+import CommandContext from "../../structures/CommandContext";
+import { AutocompleteInteraction } from "oceanic.js";
 
 export default class cityinfo extends Command {
 	constructor(client: Client) {
 		super(client, {
-			name: 'cityinfo',
-			description: 'Obtenha informações de uma cidade do survival da craftsapiens',
-			category: 'Info',
-			aliases: ['cinfo'],
+			name: "cityinfo",
+			description: "Obtenha informações de uma cidade do survival da craftsapiens",
+			category: "Info",
+			aliases: ["cinfo"],
 			autocomplete: true,
 			options: [
 				{
 					type: 3,
-					name: 'cidade',
-					description: 'Nome da cidade',
+					name: "cidade",
+					description: "Nome da cidade",
 					focused: true,
 					autocomplete: true,
 				}
@@ -28,26 +28,26 @@ export default class cityinfo extends Command {
 		try {
 			ctx.defer();
 			if (!ctx.args[0]) {
-				ctx.sendMessage('Você precisa especificar um jogador!');
+				ctx.sendMessage("Você precisa especificar um jogador!");
 				return;
 			}
-			const req = await this.client.fetch('http://172.17.0.1:2053/up/world/Earth/').then(a => a.json());
+			const req = await this.client.fetch("http://172.17.0.1:2053/up/world/Earth/").then(a => a.json());
 			const cityinfo = this.client.utils.dynmap.findCityInfo(req, ctx.args[0]);
 			const mayorinfo = await this.client.getPlayerInfo(cityinfo?.mayor);
-			let habitantes_n = '1';
+			let habitantes_n = "1";
 			if (cityinfo?.members.length >= 36) {
-				habitantes_n = 'mais de 36';
+				habitantes_n = "mais de 36";
 			} else {
               habitantes_n = cityinfo?.members.length.toString();
 			}
 
 			const embed = new this.client.embed()
-				.setTitle(`<:craftsapiens:905025137869463552> Informações da cidade ${cityinfo?.city}`)
-				.addField('👑 Prefeito', cityinfo?.mayor, true)
-				.addField('🗺️ Nação', `${cityinfo?.nation || 'N/A'}`, true)
-				.addField('👤 Habitantes (' + habitantes_n + ')', `\`${cityinfo?.members.join(', ') || 'N/A'}\``, false)
-				.setFooter('Assistente | Craftsapiens')
-				.setColor('RANDOM')
+				.setTitle(`<:craftsapiens:905025137869463552> Informações da cidade ${cityinfo?.name}`)
+				.addField("👑 Prefeito", cityinfo?.mayor, true)
+				.addField("🗺️ Nação", `${cityinfo?.nation || "N/A"}`, true)
+				.addField("👤 Habitantes (" + habitantes_n + ")", `\`${cityinfo?.members.join(", ") || "N/A"}\``, false)
+				.setFooter("Assistente | Craftsapiens")
+				.setColor("RANDOM")
 				.setThumbnail(`https://mineskin.eu/armor/bust/${cityinfo?.mayor}/100.png`);
 			if (mayorinfo.isStaff) {
 				embed.setDescription(`✨ O prefeito da cidade é \`${mayorinfo?.staff}\` da Craftsapiens!`);
@@ -66,7 +66,7 @@ export default class cityinfo extends Command {
 		}
 
 		const allCities = await this.client.utils.dynmap.getAllRegisteredCities(
-			await this.client.fetch('http://172.17.0.1:2053/up/world/Earth/').then(a => a.json())
+			await this.client.fetch("http://172.17.0.1:2053/up/world/Earth/").then(a => a.json())
 		);
 
 

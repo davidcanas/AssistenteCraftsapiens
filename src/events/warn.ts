@@ -1,4 +1,4 @@
-import Client from '../structures/Client';
+import Client from "../structures/Client";
 
 export default class OnWarn {
 	client: Client;
@@ -8,6 +8,6 @@ export default class OnWarn {
 	}
 
 	run(warn: string): void {
-		console.warn('[WARN]', warn);
+		console.warn("[WARN]", warn);
 	}
 }

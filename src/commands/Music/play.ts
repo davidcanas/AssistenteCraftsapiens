@@ -1,19 +1,19 @@
-import Command from '../../structures/Command';
-import Client from '../../structures/Client';
-import CommandContext from '../../structures/CommandContext';
-import { ConnectionState, Player } from 'vulkava';
-import { VoiceChannel } from 'oceanic.js';
+import Command from "../../structures/Command";
+import Client from "../../structures/Client";
+import CommandContext from "../../structures/CommandContext";
+import { ConnectionState, Player } from "vulkava";
+import { VoiceChannel } from "oceanic.js";
 
 export default class play extends Command {
 	constructor(client: Client) {
 		super(client, {
-			name: 'play',
-			description: 'Toca uma música ',
-			category: 'Music',
-			aliases: ['p', 'tocar'],
+			name: "play",
+			description: "Toca uma música ",
+			category: "Music",
+			aliases: ["p", "tocar"],
 			options: [{
-				name: 'music',
-				description: 'A música a tocar',
+				name: "music",
+				description: "A música a tocar",
 				type: 3,
 				required: true,
 			}],
@@ -24,7 +24,7 @@ export default class play extends Command {
 		if (ctx.channel.type !== 0 || !ctx.guild) return;
 		
         if(!ctx.args[0]) {
-			ctx.sendMessage('Você precisa escolher uma música para tocar!');
+			ctx.sendMessage("Você precisa escolher uma música para tocar!");
 			return;
 		}
        
@@ -48,12 +48,12 @@ export default class play extends Command {
 		};
 
 		try {
-			const res = await this.client.music.search(ctx.args.join(' '));
+			const res = await this.client.music.search(ctx.args.join(" "));
 
-			if (res.loadType === 'LOAD_FAILED') {
+			if (res.loadType === "LOAD_FAILED") {
 				ctx.sendMessage(`Erro: \`${res.exception?.message}\``);
-			} else if (res.loadType === 'NO_MATCHES') {
-				ctx.sendMessage('Não encontrei essa musica.');
+			} else if (res.loadType === "NO_MATCHES") {
+				ctx.sendMessage("Não encontrei essa musica.");
 			} else {
 				const player = currPlayer || createPlayer();
 
@@ -61,12 +61,12 @@ export default class play extends Command {
 					if (
 						!voiceChannel
 							.permissionsOf(this.client.user.id)
-							.has('MANAGE_CHANNELS') &&
+							.has("MANAGE_CHANNELS") &&
             voiceChannel.userLimit &&
             voiceChannel.voiceMembers.size >= voiceChannel.userLimit
 					) {
 						ctx.sendMessage({
-							content: 'Não consigo entrar no canal de voz',
+							content: "Não consigo entrar no canal de voz",
 							flags: 1 << 6,
 						});
 						player.destroy();
@@ -76,7 +76,7 @@ export default class play extends Command {
 				}
 
 				player.textChannelId = ctx.channel.id;
-				if (res.loadType === 'PLAYLIST_LOADED') {
+				if (res.loadType === "PLAYLIST_LOADED") {
 					const playlist = res.playlistInfo;
 
 					for (const track of res.tracks) {
@@ -87,12 +87,12 @@ export default class play extends Command {
 					if (!player.playing) player.play();
 
 					const embed = new this.client.embed()
-						.setColor('RANDOM')
-						.setTitle('Carreguei uma playlist')
-						.addField('Nome:', '`' + playlist.name + '`')
-						.addField('Total de musicas:', '`' + res.tracks.length + '`')
+						.setColor("RANDOM")
+						.setTitle("Carreguei uma playlist")
+						.addField("Nome:", "`" + playlist.name + "`")
+						.addField("Total de musicas:", "`" + res.tracks.length + "`")
 						.setTimestamp()
-						.setFooter('Suporte | Assistente Craftsapiens', ctx.author.defaultAvatarURL());
+						.setFooter("Suporte | Assistente Craftsapiens", ctx.author.defaultAvatarURL());
 
 					const urlRegex =
             /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_+.~#?&//=]*)/;

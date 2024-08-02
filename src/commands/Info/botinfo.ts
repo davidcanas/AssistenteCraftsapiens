@@ -1,14 +1,14 @@
-import Command from '../../structures/Command';
-import Client from '../../structures/Client';
-import CommandContext from '../../structures/CommandContext';
+import Command from "../../structures/Command";
+import Client from "../../structures/Client";
+import CommandContext from "../../structures/CommandContext";
 
 export default class Botinfo extends Command {
 	constructor(client: Client) {
 		super(client, {
-			name: 'botinfo',
-			description: 'Informações sobre o estado do Assistente',
-			category: 'Info',
-			aliases: ['bi'],
+			name: "botinfo",
+			description: "Informações sobre o estado do Assistente",
+			category: "Info",
+			aliases: ["bi"],
 			options: [],
 		});
 	}
@@ -35,7 +35,7 @@ export default class Botinfo extends Command {
 			).toFixed(2)}%\n⏱️ | ${ctx.MsToDate(
 				this.client.uptime,
 			)}\n<:peepo:1185985409075904602> | Já ajudei \`${db.helped}\` vezes\n💪 | Já foram censurados \`${db.urlsDeleted}\` links!`)
-            .setColor('RANDOM');
+            .setColor("RANDOM");
 
 		ctx.sendMessage({
 			content: `<@${ctx.author.id}>`,
@@ -47,20 +47,20 @@ export default class Botinfo extends Command {
 						{
 							type: 2,
 							style: 4,
-							label: '✨ Changelog',
+							label: "✨ Changelog",
 							disabled: false,
-							customID: 'changelog',
+							customID: "changelog",
 						},
 						{
 							type: 2,
 							style: 5,
-							label: 'Github',
+							label: "Github",
 							emoji: {
-								id: '1268924658904731693',
-								name: 'github'
+								id: "1268924658904731693",
+								name: "github"
 							},
 							disabled: false,
-							url: 'https://github.com/davidcanas/AssistenteCraftsapiens'
+							url: "https://github.com/davidcanas/AssistenteCraftsapiens"
 						},
 					],
 				},

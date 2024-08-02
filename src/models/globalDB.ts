@@ -1,4 +1,4 @@
-import { Schema, model, Document } from 'mongoose';
+import { Schema, model, Document } from "mongoose";
 
 interface globalDB extends Document {
   id: string;
@@ -38,7 +38,7 @@ const globalDB: Schema = new Schema(
 			},
 			reason: {
 				type: String,
-				default: 'Motivo não especificado',
+				default: "Motivo não especificado",
 			},
 		},
 
@@ -96,4 +96,4 @@ const globalDB: Schema = new Schema(
 	},
 );
 
-export default model<globalDB>('Global', globalDB);
+export default model<globalDB>("Global", globalDB);

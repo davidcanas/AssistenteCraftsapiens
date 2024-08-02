@@ -1,4 +1,4 @@
-import staffDB from '../models/staffDB';
+import staffDB from "../models/staffDB";
 
 interface Player {
 	world?: string;
@@ -45,30 +45,30 @@ interface CityInfo {
 }
 
 export function getAllRegisteredCities(serverData) {
-	console.log('triggered');
+	console.log("triggered");
 
 	const cityMarkers = serverData.updates.filter(
-		update => update.type === 'component' && update.ctype === 'markers' && update.id.includes('__home')
+		update => update.type === "component" && update.ctype === "markers" && update.id.includes("__home")
 	);
 
 	const registeredCities = [];
 	const cityNamesSet = new Set();
 
 	cityMarkers.forEach(cityMarker => {
-		const cityName = cityMarker.label.replace(/_/g, ' ');
+		const cityName = cityMarker.label.replace(/_/g, " ");
 
 		if (!cityNamesSet.has(cityName)) {
 			cityNamesSet.add(cityName);
 			if (cityMarker.desc) {
 
 				const mayorMatch = cityMarker.desc.match(/Mayor\s+<span[^>]*>(.*?)<\/span>/);
-				const mayor = mayorMatch && mayorMatch[1] ? mayorMatch[1] : 'NPC';
+				const mayor = mayorMatch && mayorMatch[1] ? mayorMatch[1] : "NPC";
 
 				const nationNameMatch = cityMarker.desc.match(/nation:\s*([^<]*)/);
-				const nationName = nationNameMatch && nationNameMatch[1] ? nationNameMatch[1] : 'N/A';
+				const nationName = nationNameMatch && nationNameMatch[1] ? nationNameMatch[1] : "N/A";
 
 				const associateListMatch = cityMarker.desc.match(/Associates\s+<span[^>]*>(.*?)<\/span>/);
-				const residents = associateListMatch && associateListMatch[1] ? associateListMatch[1].split(', ') : [];
+				const residents = associateListMatch && associateListMatch[1] ? associateListMatch[1].split(", ") : [];
 
 				const ruinedMatch = cityMarker.desc.match(/ruined:\s*true/);
 				const isRuined = ruinedMatch ? true : false;
@@ -97,14 +97,14 @@ export function getAllRegisteredCities(serverData) {
 
 export function getAllRegisteredPlayers(serverData: ServerData): string[] {
 	const registeredPlayers: string[] = [];
-	const cityMarkers: CityMarker[] = serverData.updates.filter(update => update.type === 'component' && update.ctype === 'markers') as CityMarker[];
+	const cityMarkers: CityMarker[] = serverData.updates.filter(update => update.type === "component" && update.ctype === "markers") as CityMarker[];
 
 	cityMarkers.forEach((cityMarker: CityMarker) => {
 		if (cityMarker.desc) {
 			const associateListMatch = cityMarker.desc.match(/Associates\s+<span[^>]*>(.*?)<\/span>/);
 
 			if (associateListMatch && associateListMatch[1]) {
-				const associates = associateListMatch[1].split(', ');
+				const associates = associateListMatch[1].split(", ");
 				registeredPlayers.push(...associates);
 			}
 		}
@@ -114,27 +114,27 @@ export function getAllRegisteredPlayers(serverData: ServerData): string[] {
 }
 
 export function findPlayerCity(serverData: ServerData, playerName: string): CityInfo | undefined {
-	const cityMarkers: CityMarker[] = serverData.updates.filter(update => update.type === 'component' && update.ctype === 'markers') as CityMarker[];
+	const cityMarkers: CityMarker[] = serverData.updates.filter(update => update.type === "component" && update.ctype === "markers") as CityMarker[];
 
 	for (const cityMarker of cityMarkers) {
 		if (cityMarker.desc) {
 			const associateListMatch = cityMarker.desc.match(/Associates\s+<span[^>]*>(.*?)<\/span>/);
 
 			if (associateListMatch && associateListMatch[1]) {
-				const associates = associateListMatch[1].split(', ');
+				const associates = associateListMatch[1].split(", ");
 
 				if (associates.includes(playerName)) {
 					const mayorMatch = cityMarker.desc.match(/Mayor\s+<span[^>]*>(.*?)<\/span>/);
-					const mayor = mayorMatch && mayorMatch[1] ? mayorMatch[1] : 'N/A';
+					const mayor = mayorMatch && mayorMatch[1] ? mayorMatch[1] : "N/A";
 
 					const nationMatch = cityMarker.desc.match(/nation:\s+([^\s<]*)/);
-					const nation = nationMatch && nationMatch[1] ? nationMatch[1] : 'N/A';
+					const nation = nationMatch && nationMatch[1] ? nationMatch[1] : "N/A";
 
 					const ruinedMatch = cityMarker.desc.match(/ruined:\s*true/);
 					const isRuined = ruinedMatch ? true : false;
 
 					return {
-						name: cityMarker.label.replace(/_/g, ' '),
+						name: cityMarker.label.replace(/_/g, " "),
 						mayor: mayor,
 						nation: nation,
 						members: associates,
@@ -154,7 +154,7 @@ export function findPlayerCity(serverData: ServerData, playerName: string): City
 }
 
 export function findCityInfo(serverData: ServerData, cityName: string): CityInfo | undefined {
-	const cityMarker = serverData.updates.find(update => update.type === 'component' && update.ctype === 'markers' && update.label.toLowerCase() === cityName.toLowerCase().replace(/ /g, '_') && update.id.toLowerCase() === cityName.toLowerCase() + '__home') as CityMarker;
+	const cityMarker = serverData.updates.find(update => update.type === "component" && update.ctype === "markers" && update.label.toLowerCase() === cityName.toLowerCase().replace(/ /g, "_") && update.id.toLowerCase() === cityName.toLowerCase() + "__home") as CityMarker;
 
 	if (cityMarker && cityMarker.desc) {
 		const associateListMatch = cityMarker.desc.match(/Associates\s+<span[^>]*>(.*?)<\/span>/);
@@ -162,7 +162,7 @@ export function findCityInfo(serverData: ServerData, cityName: string): CityInfo
 		const nationMatch = cityMarker.desc.match(/nation:\s+([^\s<]*)/);
 
 		if (associateListMatch && associateListMatch[1] && mayorMatch && mayorMatch[1]) {
-			const associates = associateListMatch[1].split(', ');
+			const associates = associateListMatch[1].split(", ");
 			const mayor = mayorMatch[1];
 			const nation = nationMatch[1];
 
@@ -170,7 +170,7 @@ export function findCityInfo(serverData: ServerData, cityName: string): CityInfo
 			const isRuined = ruinedMatch ? true : false;
 
 			return {
-				name: cityMarker.label.replace(/_/g, ' '),
+				name: cityMarker.label.replace(/_/g, " "),
 				mayor: mayor,
 				nation: nation,
 				members: associates,
@@ -189,7 +189,7 @@ export function findCityInfo(serverData: ServerData, cityName: string): CityInfo
 }
 
 export async function getDynmapPlayers() {
-	const req = await fetch('http://172.17.0.1:2053/up/world/Earth/');
+	const req = await fetch("http://172.17.0.1:2053/up/world/Earth/");
 	const result = await req.json();
 
 	const playerArray = [];
@@ -208,7 +208,7 @@ export async function getDynmapPlayers() {
 
 	playerArray.sort((a, b) => a.order - b.order);
 
-	if (playerArray.length === 0) return ['Ninguém online no momento.'];
+	if (playerArray.length === 0) return ["Ninguém online no momento."];
 
 	const p = playerArray.map((p: any) => `${p.name} (${p.health} ❤️)`);
 	return p;
@@ -217,7 +217,7 @@ export async function getDynmapPlayers() {
 
 export async function getDynmapPlayersVanilla() {
 	const req = await fetch(
-		'http://172.17.0.1:2053/up/world/Earth/'
+		"http://172.17.0.1:2053/up/world/Earth/"
 	);
 	const result = await req.json();
 
@@ -238,7 +238,7 @@ export async function getDynmapPlayersVanilla() {
 
 	// @ts-expect-error - sort needs to be fixed
 	playerArray.sort((a, b) => a.order - b.order);
-	if (playerArray.length == 0) return ['Ninguém online no momento.'];
+	if (playerArray.length == 0) return ["Ninguém online no momento."];
 
 
 	return playerArray;
