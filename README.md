@@ -15,4 +15,4 @@
 
 ## Licença
 
-> Assistente Craftsapiens © 2024 por Craftsapiens está licenciado sob CC BY-NC-ND 4.0. Para ver uma cópia desta licença, [clique aqui](http://creativecommons.org/licenses/by-nc-nd/4.0/).
+> Assistente Craftsapiens © 2024 por davidcanas para Craftsapiens está licenciado sob CC BY-NC-ND 4.0. Para ver uma cópia desta licença, [clique aqui](http://creativecommons.org/licenses/by-nc-nd/4.0/).
