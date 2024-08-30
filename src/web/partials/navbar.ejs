@@ -1,48 +1,64 @@
 <style>
     .tag {
-    font-weight: bold;
-    font-size: 15px;
-    padding: 2px 6px;
-    border-radius: 4px;
-    
-}
+        font-weight: bold;
+        font-size: 15px;
+        padding: 2px 6px;
+        border-radius: 4px;
 
-.tag::first-letter {
-    text-transform: capitalize;
-}
-.admin {
-    color: #AA0000; /* &4 */
-}
+    }
 
-.dev {
-    color: #55FFFF; /* &b */
-}
-.reitor {
-    color: #5555FF; /* &3 */
-}
+    .tag::first-letter {
+        text-transform: capitalize;
+    }
 
-.moderador {
-    color: #FF5555; /* &c */
-}
+    .admin {
+        color: #AA0000;
+        /* &4 */
+    }
 
-.ajuda {
-    color: #FFAA00; /* &6 */
-}
-.premium {
-    color: #55AA55; /* &2 */
-}
+    .dev {
+        color: #55FFFF;
+        /* &b */
+    }
 
-.vip {
-    color: #FFFF55; /* &e */
-}
+    .reitor {
+        color: #5555FF;
+        /* &3 */
+    }
 
-.booster {
-    color: #FF55FF; /* &d */
-}
+    .moderador {
+        color: #FF5555;
+        /* &c */
+    }
 
-.alunos {
-    color: #0f0330; /* &9 */
-}
+    .ajuda {
+        color: #FFAA00;
+        /* &6 */
+    }
+
+    .premium {
+        color: #55AA55;
+        /* &2 */
+    }
+
+    .vip {
+        color: #FFFF55;
+        /* &e */
+    }
+
+    .booster {
+        color: #FF55FF;
+        /* &d */
+    }
+
+    .alunos {
+        color: #0f0330;
+        /* &9 */
+    }
+
+    .monitoria {
+        color: #FE7310
+    }
 </style>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
@@ -51,15 +67,13 @@
 <meta name="description" content="negócio maluco do dg kkk" />
 <link rel="icon" type="image/png" href="https://i.imgur.com/H6irxn1.jpg">
 <script src="https://kit.fontawesome.com/7785636dc6.js" crossorigin="anonymous"></script>
-  <script
-			  src="https://code.jquery.com/jquery-3.6.0.js"
-			  integrity="sha256-H+K7U5CnXl1h5ywQfKtSj8PCmoN9aaq30gDh27Xc0jk="
-			  crossorigin="anonymous"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.js" integrity="sha256-H+K7U5CnXl1h5ywQfKtSj8PCmoN9aaq30gDh27Xc0jk="
+    crossorigin="anonymous"></script>
 <nav class="navbar navbar-expand-sm bg-transparent navbar-dark" style="font-size: 15px;">
 
     <div class="container-fluid">
-        <a class="navbar-brand" href="#"><img src="https://i.imgur.com/H6irxn1.jpg" style="cursor: not-allowed;border-radius: 50%;"
-                width=40 large=40></img></a>
+        <a class="navbar-brand" href="#"><img src="https://i.imgur.com/H6irxn1.jpg"
+                style="cursor: not-allowed;border-radius: 50%;" width=40 large=40></img></a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#collapsibleNavbar">
             <span class="navbar-toggler-icon"></span>
         </button>
@@ -68,29 +82,43 @@
                 <li class="nav-item text-center">
                     <a class="nav-link" href="/"><i class="fa-solid fa-house"></i> Inicio</a>
                 </li>
-                <li class="nav-item text-center ">
-                    <a class="nav-link" href="/dash"><i class="fas fa-cogs"></i> Dashboard</a>
-                </li>
+                <!-- /mapa url -->
                 <li class="nav-item text-center">
-                    <a class="nav-link" href="/punicoes/"><i class="fa-solid fa-ban"></i> Punições</a>
+                    <a class="nav-link" href="/mapa"><i class="fa-solid fa-map"></i> Mapa</a>
                 </li>
+
                 <li class="nav-item text-center">
                     <a class="nav-link" href="/stats/survival"><i class="fa-solid fa-chart-line"></i> Status</a>
                 </li>
-              
-                        <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+
+                <!-- TOP CALL USERS-->
+                <li class="nav-item text-center">
+                    <a class="nav-link" href="/topcall"><i class="fa-solid fa-trophy"></i> Top Call</a>
+                </li>
+
+                <% if (user) { %>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
                             <img src="<%=avatar%>" width=25 style="border-radius: 50%;">
-                            <span class="tag <%=highestRole(guild,member.nick).toLowerCase()%>">[<%=highestRole(guild, member.nick)%>]</span><%=member.nick%>
-                            </a>
-                            <ul class="dropdown-menu">
-                            
-                              <li><a class="dropdown-item" href="/logout"><i class="fa-solid fa-right-from-bracket"></i> Sair da conta</a></li>
-                              
-                               
-                            </ul>
+                            <span class="tag <%=highestRole(guild,member.nick).toLowerCase()%>">[<%=highestRole(guild,
+                                    member.nick)%>]</span>
+                            <%=member.nick%>
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="/dash"><i class="fas fa-cogs"></i> Dashboard</li>
+                            <li><a class="dropdown-item" href="/logout"><i class="fa-solid fa-right-from-bracket"></i>
+                                    Sair da conta</a></li>
+
+
+                        </ul>
+                    </li>
+                    <% } else { %>
+                        <li class="nav-item text-center">
+                            <a class="nav-link" href="/login"><i class="fa-solid fa-sign-in"></i> Entrar</a>
                         </li>
-                        
+                        <% } %>
+
+
             </ul>
         </div>
     </div>

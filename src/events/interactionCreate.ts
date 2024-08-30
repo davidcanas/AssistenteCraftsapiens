@@ -154,11 +154,6 @@ export default class InteractionCreate {
 						dbremove.usersInCooldown.splice(dbremove.usersInCooldown.indexOf(autor.id), 1);
 						dbremove.save();
 
-						console.log(
-							"\u001b[33m", "| Removendo @" +
-							autor.username +
-						" da lista de usuários que acionaram o sistema!"
-						);
 						return interaction.createMessage({
 							content:
 								"**[ADMIN]** Você acaba de usar poderes de fontes suspeitas e apagou essa mensagem com sucesso!",
@@ -187,12 +182,6 @@ export default class InteractionCreate {
 					interaction.message.delete();
 					dbremove.usersInCooldown.splice(dbremove.usersInCooldown.indexOf(autor.id), 1);
 					dbremove.save();
-
-					console.log(
-						"\u001b[33m", "| Removendo @" +
-						autor.username +
-					" da lista de usuários que acionaram o sistema!"
-					);
 				}
 
 			if (interaction.data.customID === "confirm_read") {

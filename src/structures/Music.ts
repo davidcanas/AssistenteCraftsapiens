@@ -18,7 +18,7 @@ export default class Music extends Vulkava {
 
 		this.client = client;
 		this.on("nodeConnect", async (node): Promise<void> => {
-			console.log(`O node ${node.identifier} foi conectado!`);
+			console.log(`\x1b[33m[LAVALINK] O node ${node.identifier} foi conectado!`);
 
 			for (const player of [...this.players.values()]
 				.filter((p) => p.node === node)
@@ -41,7 +41,7 @@ export default class Music extends Vulkava {
 		});
 
 		this.on("nodeDisconnect", (node): void => {
-			console.log(`O node do lavalink ${node.identifier} desconectou.`);
+			console.log(`\x1b[33m[LAVALINK] O node do lavalink ${node.identifier} desconectou.`);
 		});
 
 		this.on("trackStart", async (player, track): Promise<void> => {

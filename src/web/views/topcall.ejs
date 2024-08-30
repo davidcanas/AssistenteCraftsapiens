@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Top 5 em Call</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+  <style>
+    body {
+      background-color: #282b30;
+      color: #fff;
+    }
+    .player-card {
+      background-color: #333;
+      border-radius: 10px;
+      padding: 8px;
+      margin-bottom: 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      transition: background-color 0.3s ease;
+    }
+    .player-card:hover {
+      background-color: #555;
+    }
+    .player-card h4 {
+      color: #fff;
+      margin-bottom: 0;
+      font-size: 14px;
+      display: flex;
+      align-items: center;
+    }
+    .player-card p {
+      margin-bottom: 0;
+      font-size: 14px;
+      display: flex;
+      align-items: center;
+    }
+    .players-list {
+      max-height: 60vh;
+      overflow-y: auto;
+    }
+    .players-title {
+      font-size: 20px;
+      font-weight: bold;
+      color: #fff;
+    }
+  </style>
+   <%- include('../partials/navbar.ejs') %>
+</head>
+<body>
+  <% include('../partials/navbar.ejs') %>
+  <div class="container-fluid p-5 bg-primary text-white text-center">
+    <h1>🏆 Top 5 Membros com Mais Tempo em Call</h1>
+    <p>Veja quem são os membros que mais passaram tempo em chamadas de voz.</p>
+  </div>
+  
+  <div class="container mt-4">
+    <div class="row">
+        <h3 class="players-title mb-3"><i class="fas fa-user-clock"></i> Top 5 Membros</h3>
+        <div class="players-list">
+          <% topUsers.forEach(function(user, index) { %>
+            <% if (user.totalTimeInCall === 0) return; %>
+            <div class="player-card">
+              
+                    <% if (!highestRole(guild, user.nick) || highestRole(guild, user.nick) == "Alunos") { %>
+                      <h4><%= user.nick %></h4>
+                    <% } else { %>
+                    <h4><span class="tag <%=highestRole(guild, user.nick).toLowerCase()%>">[<%=highestRole(guild, user.nick)%>]</span> <%= user.nick %></h4>
+                    <% } %>
+                    <p>
+                        <% 
+                          const hours = Math.floor(user.totalTimeInCall / 3600);
+                          const minutes = Math.floor((user.totalTimeInCall % 3600) / 60);
+                          const seconds = Math.round(user.totalTimeInCall % 60);
+        
+                          const timeParts = [];
+                          if (hours > 0) timeParts.push(`${hours} hora(s)`);
+                          if (minutes > 0) timeParts.push(`${minutes} minuto(s)`);
+                          if (seconds > 0) timeParts.push(`${seconds} segundos`);
+        
+                          const formattedTime = timeParts.join(" ");
+                        %>
+                        <%= formattedTime %>
+                      </p>
+            </div>
+          <% }); %>
+        </div>
+    </div>
+  </div>
+</body>
+</html>

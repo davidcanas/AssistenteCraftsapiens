@@ -45,7 +45,6 @@ interface CityInfo {
 }
 
 export function getAllRegisteredCities(serverData) {
-	console.log("triggered");
 
 	const cityMarkers = serverData.updates.filter(
 		update => update.type === "component" && update.ctype === "markers" && update.id.includes("__home")

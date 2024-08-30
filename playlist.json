@@ -1,0 +1,24 @@
+{
+    "jazz": [
+     {
+        "title": "Jazz Chillout Playlist",
+        "artist": "Various Artists",
+        "url": "https://open.spotify.com/playlist/66XF0sumnRWVXAZxAO7RKV?si=cddcad39d9c046fc"
+     }
+    ],
+
+    "lofi": [
+       {
+        "title": "Lofi - música para estudar/relaxar",
+        "artist": "Lofi Girl",
+        "url": "https://open.spotify.com/playlist/0vvXsWCC9xrXsKd4FyS8kM?si=79578f5afd7f4e24"
+       }
+    ],
+    "classical": [
+      {
+        "title": "Classical Music",
+        "artist": "Classical Bangers",
+        "url": "https://open.spotify.com/playlist/27Zm1P410dPfedsdoO9fqm?si=0ce11074cdd3419b"
+      }
+    ]
+}

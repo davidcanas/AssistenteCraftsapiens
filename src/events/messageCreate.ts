@@ -39,7 +39,7 @@ export default class MessageCreate {
         userData.timestamps.push(now);
 
 
-		if (!this.client.getDiscordByNick(message.member.nick) && message.content.match(/^\d{4}$/)) {
+		if (message.member && message.member.nick && !this.client.getDiscordByNick(message.member.nick) && message.content.match(/^\d{4}$/)) {
 
 			const component = {
 					type: 1,
@@ -99,7 +99,6 @@ export default class MessageCreate {
 				message.delete();
 				db.urlsDeleted++;
 				db.save();
-				console.log("Mensagem de " + message.author.username + " foi deletada por conter links.");
 				return;
 				}
 			}
@@ -153,13 +152,11 @@ export default class MessageCreate {
 
 			if (!message.content.startsWith(prefix) && possibilidades.some((v) => message.content.toLowerCase().includes(v))) {
 				if (this.client.ignoreRoles.some((v) => message.member.roles.includes(v))) {
-					console.log("\u001b[33m", "Ignorando tentativa de staff acionar sistema em " + message.channel.name + " !");
 					return;
 				}
 				const dbcheck = await this.client.db.global.findOne({ id: message.channel.guild.id });
 
 				if (dbcheck && dbcheck.ignoredChannels.includes(message.channel.id)) {
-					console.log("\u001b[33m", "Ignorando tentativa de acionar sistema em " + message.channel.name + " !");
 					return;
 				}
 
@@ -206,20 +203,14 @@ export default class MessageCreate {
     arrayHoje.some((v) => message.content.toLowerCase().includes(v))
 		) {
 			if (this.client.ignoreRoles.some((v) => message.member.roles.includes(v))) {
-				console.log("\u001b[33m", "Ignorando tentativa de staff acionar sistema em " + message.channel.name + " !");
 				return;
 			}
 			const dbcheck = await this.client.db.global.findOne({ id: message.channel.guild.id });
-			if (
-				dbcheck && dbcheck.usersInCooldown.includes(message.author.id)
-			) {
-				console.log(
-					"\u001b[33m", "Ignorando tentativa de" + message.author.tag + "acionar sistema em " +
-          message.channel.name +
-        " !"
-				);
+			
+			if (dbcheck && dbcheck.usersInCooldown.includes(message.author.id)) {
 				return;
 			}
+
 			if (dbcheck && dbcheck.ignoredUsers.includes(message.author.id)) return;
     
 			const hoje = new Date();
@@ -347,7 +338,6 @@ export default class MessageCreate {
 
 			const fun = verificarDiaUtil(this.client);
 			message.createReaction(reactEmoji);
-			console.log(dataAtual);
 
 			const cronograma = await this.client.getCronograma();
 
@@ -409,9 +399,6 @@ export default class MessageCreate {
 					dbcheck.save();
 					if (message) message.delete();
 					if (msg) msg.delete();
-					console.log(
-						"\u001b[33m", "Devido a 5 minutos sem resposta " + message.author.username + " foi removido da lista de usuários que acionaram o sistema, e a mensagem foi deletada."
-					);
 				}
 				, 300000);
 			}
