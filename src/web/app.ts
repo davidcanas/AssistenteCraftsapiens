@@ -85,7 +85,6 @@ app.get("/stats/survival", async (req, res) => {
     guild: client.guilds.get("892472046729179136"),
     highestRole: client.getHighestRole,
     playerList,
-    getPlayerInfo: await client.getPlayerInfo
     
     });
 });

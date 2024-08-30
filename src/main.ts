@@ -5,12 +5,12 @@ import database from "mongoose";
 
 process.on("uncaughtException", (error) => {
 	console.log("Uma exception não tratada foi encontrada!");
-	console.error(`[ERROR] ${error}`);
+	console.error(error);
 });
 
 process.on("unhandledRejection", (error) => {
 	console.log("Uma promise foi rejeitada sem tratamento!");
-	console.error(`[ERROR] ${error}`);
+	console.error(error);
 });
 
 database
