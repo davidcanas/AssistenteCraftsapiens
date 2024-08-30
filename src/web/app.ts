@@ -81,7 +81,7 @@ app.get("/stats/survival", async (req, res) => {
 	res.status(200).render("stats_survival", { 
     user: req.user,
     member: client.guilds.get("892472046729179136").members.get(req.user?.id),
-    avatar: client.users.get(req.user.id).avatarURL(),
+    avatar: client.users.get(req.user?.id)?.avatarURL(),
     guild: client.guilds.get("892472046729179136"),
     highestRole: client.getHighestRole,
     playerList,
