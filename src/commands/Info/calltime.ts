@@ -51,7 +51,7 @@ export default class CallTimeCommand extends Command {
 
         const embed = new this.client.embed()
             .setTitle("🕒 Tempo em calls de estudo")
-            .setDescription(`Seu tempo total de permanência em calls de estudo é: **${formattedTime}**\nVocê está na posição **#${userPosition}** no ranking.`)
+            .setDescription(`Seu tempo total de permanência em calls de estudo é: **${formattedTime}**\nVocê está na posição **#${userPosition}** no ranking.\n\n<:purplearrow:1145719018121089045> Use </topcalltime:1279029830779797629> para ver o ranking.`)
             .setColor("5763719");
 
         ctx.sendMessage({

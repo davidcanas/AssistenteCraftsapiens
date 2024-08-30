@@ -54,7 +54,7 @@
 <body>
   <% include('../partials/navbar.ejs') %>
   <div class="container-fluid p-5 bg-primary text-white text-center">
-    <h1>🏆 Top 5 Membros com Mais Tempo em Call</h1>
+    <h1>🏆 Top membros com mais Tempo em Call</h1>
     <p>Veja quem são os membros que mais passaram tempo em chamadas de voz.</p>
   </div>
   
@@ -69,7 +69,7 @@
                     <% if (!highestRole(guild, user.nick) || highestRole(guild, user.nick) == "Alunos") { %>
                       <h4><%= user.nick %></h4>
                     <% } else { %>
-                    <h4><span class="tag <%=highestRole(guild, user.nick).toLowerCase()%>">[<%=highestRole(guild, user.nick)%>]</span> <%= user.nick %></h4>
+                    <h4><%=index+1%>º | <span class="tag <%=highestRole(guild, user.nick).toLowerCase()%>">[<%=highestRole(guild, user.nick)%>]</span> <%= user.nick %></h4>
                     <% } %>
                     <p>
                         <% 

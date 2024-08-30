@@ -92,7 +92,7 @@ app.get("/stats/survival", async (req, res) => {
 
 app.get("/topcall", async (req, res) => {
   const db = client.db;
-  const topUsers = await db.users.find({}).sort({ totalTimeInCall: -1 }).limit(5).exec();
+  const topUsers = await db.users.find({}).sort({ totalTimeInCall: -1 }).exec();
   res.render("topcall", { 
     user: req.user,
     member: client.guilds.get("892472046729179136").members.get(req.user?.id),

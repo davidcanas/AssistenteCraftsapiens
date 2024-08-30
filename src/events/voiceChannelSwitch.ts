@@ -11,6 +11,8 @@ export default class voiceChannelSwitch {
     async run(member: Member, oldChannel: VoiceChannel | StageChannel | Uncached, newChannel: VoiceChannel | StageChannel | Uncached) {
 
         if (oldChannel.id === newChannel.id) return;
+  
+        if (member.bot) return;
 
         this.client.emit("voiceChannelLeave", member, oldChannel);
 

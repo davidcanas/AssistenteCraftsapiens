@@ -14,6 +14,8 @@ export default class voiceChannelLeave {
 
         if (!studyChannels.includes(channel.id)) return;
 
+        if(member.bot) return;
+
         const user = await this.client.db.users.findOne({ id: member.id });
 
         if (!user || !user.voiceSessions || user.voiceSessions.length === 0) return;

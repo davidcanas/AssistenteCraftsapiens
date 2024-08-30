@@ -6,7 +6,7 @@ export default class TopCallTimeCommand extends Command {
     constructor(client: Client) {
         super(client, {
             name: "topcalltime",
-            description: "Veja os 5 membros com mais tempo em chamadas de voz.",
+            description: "Veja os 10 membros com mais tempo em call de estudo.",
             category: "Info",
             aliases: ["topvoicetime", "topcallduration"],
             options: [],
@@ -17,7 +17,7 @@ export default class TopCallTimeCommand extends Command {
 
         const topUsers = await this.client.db.users.find({})
             .sort({ totalTimeInCall: -1 }) 
-            .limit(5) 
+            .limit(10) 
             .exec(); 
         if (topUsers.length === 0) {
             ctx.sendMessage({
@@ -26,7 +26,6 @@ export default class TopCallTimeCommand extends Command {
             return;
         }
 
-        // Construir a lista de top 5 usuários
        const description = topUsers.map((user, index) => {
             const hours = Math.floor(user.totalTimeInCall / 3600);
             const minutes = Math.floor((user.totalTimeInCall % 3600) / 60);
@@ -35,17 +34,32 @@ export default class TopCallTimeCommand extends Command {
             if (hours === 0 && minutes === 0 && seconds === 0) return;
             const formattedTime = `${Math.round(hours).toString().padStart(2, "0")}h:${Math.round(minutes).toString().padStart(2, "0")}min:${Math.round(seconds).toString().padStart(2, "0")}s`;
 
-            return `**${index + 1}. ${user.nick || user.id}** - ${formattedTime}`;
+            return `**${index + 1}. <@${user.id}>** - ${formattedTime}`;
         }).join("\n");
 
-        // Cria e envia a mensagem com a lista formatada
         const embed = new this.client.embed()
-            .setTitle("🏆 TOP | Call Estudos")
+            .setTitle("🏆 TOP 10 | Call Estudos")
             .setDescription(description)
             .setColor("5763719");
 
         ctx.sendMessage({
-            embeds: [embed]
+            embeds: [embed],
+            components: [
+                {
+                    type: 1,
+                    components: [
+                        {
+                            type: 2,
+                            style: 5,
+                            label: "Ver ranking completo",
+                            url: "http://jogar.craftsapiens.com.br:50024/topcall",
+                            emoji: {
+                                name: "🏆",
+                            },  
+                        },
+                    ],
+                },
+            ],
         });
     }
 }
