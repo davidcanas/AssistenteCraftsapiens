@@ -104,13 +104,11 @@ export default class askGPT extends Command {
         if (detectedCities.length > 0) {
             
             const townInfo = detectedCities.map(town => `${town.name}:\nPrefeito: ${town.mayor}\nCoordenadas: X: ${town.coords.x} Z: ${town.coords.z}\nNação: ${town.nation}\nHabitantes: ${town.members.length} (${town.members.join(", ")})\nEm ruínas: ${town.ruined}\n-`).join("\n");
-            console.log(townInfo);
             messages.push({ role: "system", content: `Cidades mencionadas pelo jogador (ao calcular distâncias, omita os cálculos, diga diretamente o resultado):\n${townInfo}` });
         }
 
         if (mentionedResidents.length > 0) {
             const residentInfo = mentionedResidents.map(({ resident, town }) => `${resident} é residente de ${town.name}:\nPrefeito: ${town.mayor}\nCoordenadas: X: ${town.coords.x} Z: ${town.coords.z}\nNação: ${town.nation}\nHabitantes: ${town.members.length} (${town.members.join(", ")})\nEm ruínas: ${town.ruined}\n-`).join("\n");
-            console.log(residentInfo);
             messages.push({ role: "system", content: `Jogadores (habitantes) mencionados pelo jogador:\n${residentInfo}` });
         }
 

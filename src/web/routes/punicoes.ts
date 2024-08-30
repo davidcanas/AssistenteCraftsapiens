@@ -46,8 +46,6 @@ router.get("/delete/:ID", async (req, res) => {
   const users = await client.db.users.findOne({ nick: req.params.ID.split("_")[0]});
 
   if (!users) return res.send("Usuário não encontrado!");
-  console.log(users.punicoes);
-  console.log(req.params.ID);
   
   // @ts-expect-error - punicao.id is not explicit in the type
   users.punicoes = users.punicoes.filter((punicao) => punicao.id !== req.params.ID);

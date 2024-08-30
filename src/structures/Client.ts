@@ -28,15 +28,21 @@ import { getOnlinePlayerInfo, findCityInfo, findPlayerCity, getAllRegisteredCiti
 import fetch from "node-fetch";
 
 import path from "path";
+import ninaBot from "../submodules/nina/ninaBot";
+import adaBot from "../submodules/ada/adaBot";
+import luyBot from "../submodules/luy/luyBot";
 
 export default class DGClient extends Client {
 	commands: Array<Command>;
 	music: Music;
+	nina: Client;
+	ada: Client;
+	luy: Client;
 	db: {
-    global: typeof global;
-	users: typeof users;
-	staff: typeof staff;
-  };
+		global: typeof global;
+		users: typeof users;
+		staff: typeof staff;
+	};
 	cache: {
 		towns: CityInfo[],
 	};
@@ -70,6 +76,11 @@ export default class DGClient extends Client {
 			users: users,
 			staff: staff
 		};
+
+		this.nina = ninaBot;
+		this.ada = adaBot;
+		this.luy = luyBot;
+
 		this.cache = {
 			towns: [],
 		};
@@ -95,6 +106,7 @@ export default class DGClient extends Client {
 			"901251917991256124",
 			"90126307702514078",
 		];
+
 	}
 	async findUser(param: string, guild: Guild | null): Promise<User | null> {
 		let user: User | null | undefined;
@@ -104,7 +116,7 @@ export default class DGClient extends Client {
 		if (matched) {
 			try {
 				user =
-          this.users.get(matched[1]) || (await this.rest.users.get(matched[1]));
+					this.users.get(matched[1]) || (await this.rest.users.get(matched[1]));
 			} catch { /* vazio*/ }
 		} else if (/\d{17,18}/.test(param)) {
 			try {
@@ -136,10 +148,10 @@ export default class DGClient extends Client {
 			for (const m of guild.members.values()) {
 				if (
 					(m.nick &&
-            (m.nick === param ||
-              m.nick.toLowerCase() === param.toLowerCase())) ||
-          m.username === param ||
-          m.username.toLowerCase() === param.toLowerCase()
+						(m.nick === param ||
+							m.nick.toLowerCase() === param.toLowerCase())) ||
+					m.username === param ||
+					m.username.toLowerCase() === param.toLowerCase()
 				) {
 					user = m.user;
 					break;
@@ -147,7 +159,7 @@ export default class DGClient extends Client {
 
 				if (
 					(m.nick && m.nick.startsWith(lowerCaseParam)) ||
-          m.username.toLowerCase().startsWith(lowerCaseParam)
+					m.username.toLowerCase().startsWith(lowerCaseParam)
 				) {
 					user = m.user;
 					startsWith = true;
@@ -156,8 +168,8 @@ export default class DGClient extends Client {
 
 				if (
 					!startsWith &&
-          ((m.nick && m.nick.toLowerCase().includes(lowerCaseParam)) ||
-            m.username.toLowerCase().includes(lowerCaseParam))
+					((m.nick && m.nick.toLowerCase().includes(lowerCaseParam)) ||
+						m.username.toLowerCase().includes(lowerCaseParam))
 				) {
 					user = m.user;
 				}
@@ -188,7 +200,7 @@ export default class DGClient extends Client {
 			}
 		}
 
-		console.log("Os comandos foram carregados.");
+		console.log("\x1b[32m[CLIENT] Os comandos foram carregados.");
 	}
 	loadEvents(): void {
 		for (const file of fs.readdirSync(
@@ -220,7 +232,7 @@ export default class DGClient extends Client {
 			});
 		}
 		this.application.bulkEditGuildCommands("892472046729179136", cmds);
-		console.log("Os slash commands foram atualizados");
+		console.log("\x1b[32m[CLIENT] Os slash commands foram atualizados");
 	}
 	connectLavaLink(): void {
 		const nodes: NodeOptions[] = [
@@ -278,8 +290,12 @@ export default class DGClient extends Client {
 				playerObj.isStaff = false;
 				playerObj.discord = await this.guilds.get("892472046729179136")?.members.find(m => m?.nick && m.nick?.toLowerCase() == playerObj.nick?.toLowerCase() && m.roles.includes("1152666174157488258"))?.user.id || null;
 			}
-			const city = findPlayerCity(findInDynmapData, playerObj.nick);
-			
+
+			const playerLower = player.toLowerCase();
+			const city = this.cache.towns.find((city) =>
+				city.members.some(member => member.toLowerCase() === playerLower)
+			);
+
 			if (city) {
 				playerObj.city = city;
 			}
@@ -300,7 +316,7 @@ export default class DGClient extends Client {
 		}
 	}
 	async getCronograma() {
-		const canal = this.guilds.get("892472046729179136").channels.get("939937615325560912"); 
+		const canal = this.guilds.get("892472046729179136").channels.get("939937615325560912");
 		if (canal.type !== Constants.ChannelTypes.GUILD_ANNOUNCEMENT) return null;
 		const channelmessages = await canal.getMessages();
 		const cronograma = channelmessages.find(m => m.attachments.size > 0).attachments.first();
@@ -319,33 +335,33 @@ export default class DGClient extends Client {
 
 	nFormatter(num, digits) {
 		const lookup = [
-          { value: 1, symbol: "" },
-          { value: 1e3, symbol: "k" },
-          { value: 1e6, symbol: "M" },
-          { value: 1e9, symbol: "G" },
-          { value: 1e12, symbol: "T" },
-          { value: 1e15, symbol: "P" },
-          { value: 1e18, symbol: "E" }
+			{ value: 1, symbol: "" },
+			{ value: 1e3, symbol: "k" },
+			{ value: 1e6, symbol: "M" },
+			{ value: 1e9, symbol: "G" },
+			{ value: 1e12, symbol: "T" },
+			{ value: 1e15, symbol: "P" },
+			{ value: 1e18, symbol: "E" }
 		];
 		const regexp = /\.0+$|(?<=\.[0-9]*[1-9])0+$/;
 		const item = lookup.findLast(item => num >= item.value);
 		return item ? (num / item.value).toFixed(digits).replace(regexp, "").concat(item.symbol) : "0";
-   }
-   
-    getDiscordByNick(nick): Member | null {
-	const member = this.guilds.get("892472046729179136")?.members.find(m => m?.nick && m.nick?.toLowerCase() == nick?.toLowerCase() && m.roles.includes("1152666174157488258")) || null;
+	}
 
-	return member;
-}
+	getDiscordByNick(nick): Member | null {
+		const member = this.guilds.get("892472046729179136")?.members.find(m => m?.nick && m.nick?.toLowerCase() == nick?.toLowerCase() && m.roles.includes("1152666174157488258")) || null;
 
- async updateTownyCache() {
-	const data = await fetch("http://172.17.0.1:2053/up/world/Earth/").then(r => r.json());
+		return member;
+	}
 
-	this.cache.towns = await getAllRegisteredCities(data);
+	async updateTownyCache() {
+		const data = await fetch("http://172.17.0.1:2053/up/world/Earth/").then(r => r.json());
 
-	console.log("Cache de cidades atualizado.");
+		this.cache.towns = await getAllRegisteredCities(data);
 
- }
+		console.log("\x1b[32m[CLIENT] Cache de cidades atualizado.");
+
+	}
 
 
 }

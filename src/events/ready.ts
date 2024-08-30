@@ -24,7 +24,7 @@ export default class ready {
 			]);
 		}, 15000);
 
-		console.log("O client foi conectado com sucesso");
+		console.log("\x1b[32m[CLIENT] O client foi conectado com sucesso");
 
 		this.client.updateSlash();
 		this.client.connectLavaLink();

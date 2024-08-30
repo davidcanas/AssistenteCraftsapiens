@@ -31,8 +31,8 @@ export default class cityinfo extends Command {
 				ctx.sendMessage("Você precisa especificar um jogador!");
 				return;
 			}
-			const req = await this.client.fetch("http://172.17.0.1:2053/up/world/Earth/").then(a => a.json());
-			const cityinfo = this.client.utils.dynmap.findCityInfo(req, ctx.args[0]);
+
+			const cityinfo = this.client.cache.towns.find((city) => city.name.toLowerCase() === ctx.args[0].toLowerCase());
 			const mayorinfo = await this.client.getPlayerInfo(cityinfo?.mayor);
 			let habitantes_n = "1";
 			if (cityinfo?.members.length >= 36) {
@@ -65,13 +65,11 @@ export default class cityinfo extends Command {
 			return;
 		}
 
-		const allCities = await this.client.utils.dynmap.getAllRegisteredCities(
-			await this.client.fetch("http://172.17.0.1:2053/up/world/Earth/").then(a => a.json())
-		);
+		const allCities = await this.client.cache.towns
 
 
 		const similarCities = allCities.filter(player =>
-			this.client.utils.levDistance(player, value) <= 1
+			this.client.utils.levDistance(player.name, value) <= 1
 		);
 
 
@@ -81,8 +79,8 @@ export default class cityinfo extends Command {
 		for (const chunk of chunkedCities) {
 
 			arr.push(...chunk.map(player => ({
-				name: player,
-				value: player,
+				name: player.name,
+				value: player.name,
 			})));
 		}
 

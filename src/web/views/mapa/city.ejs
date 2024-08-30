@@ -1,10 +1,9 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Mapa | Craftsapiens </title>
+    <title>Mapa | Craftsapiens</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-
     <style>
         html, body {
             margin: 0;
@@ -29,22 +28,95 @@
             background-color: rgba(0, 0, 0, 0.5);
             padding: 10px;
         }
-
         .search-box input[type="submit"] {
             background-color: #007bff;
             border: none;
             color: white;
         }
-
         .search-box input[type="submit"]:hover {
             background-color: #0056b3;
         }
-
+        .github-button, .info-button {
+            position: absolute;
+            top: 10px;
+            z-index: 10;
+            background-color: #333;
+            border: none;
+            border-radius: 3px;
+            padding: 8px;
+            cursor: pointer;
+            color: white;
+        }
+        .github-button {
+            left: 10px;
+            background-color: #fff;
+        }
+        .info-button {
+            right: 10px;
+        }
+        .info-button a {
+            color: white;
+            text-decoration: none;
+            font-size: 16px;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 20;
+            justify-content: center;
+            align-items: center;
+        }
+        .modal-content {
+            background: white;
+            padding: 20px;
+            border-radius: 5px;
+            width: 300px;
+            text-align: center;
+        }
+        .modal-content button {
+            background-color: #007bff;
+            border: none;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .modal-content button:hover {
+            background-color: #0056b3;
+        }
     </style>
 </head>
 <body>
+    <button class="github-button">
+        <a href="https://github.com/davidcanas/assistentecraftsapiens" target="_blank" title="GitHub">
+            <i class="fab fa-github"></i>
+        </a>
+    </button>
+
+    <button class="info-button">
+        <i class="fas fa-info-circle" title="Informações"></i>
+    </button>
+
+    <div class="modal" id="infoModal">
+        <div class="modal-content">
+            <h2><i class="fas fa-info-circle" title="Informações"></i> Informações</h2>
+            <p>
+                Esse é o mapa do servidor Survival da Craftsapiens. Para procurar uma cidade, digite o nome dela no campo de busca e clique em "Procurar".
+                <br>
+                <code>
+                Criado com <i class="fas fa-heart" style="color: red;"></i> por <a href="https://github.com/davidcanas" target="_blank">DG0837</a>.
+            </code>
+            </p>
+            <button onclick="closeModal()">Fechar</button>
+        </div>
+    </div>
+
     <div class="search-box">
-        
         <form action="">
             <input type="text" id="cityName" name="cityName" placeholder="Cidade">
             <input type="submit" value="Procurar">
@@ -54,20 +126,26 @@
     <iframe src="about:blank" id="cityIframe"></iframe>
 
     <script>
-     
         function updateIframe() {
             var cityName = document.getElementById('cityName').value;
             var iframeSrc = `http://177.3.74.79:50024/mapa/iframe?cityName=${encodeURIComponent(cityName)}`;
             document.getElementById('cityIframe').src = iframeSrc;
         }
 
-        
         document.querySelector('form').addEventListener('submit', function(event) {
             event.preventDefault();
             updateIframe();
         });
 
         updateIframe();
+
+        document.querySelector('.info-button').addEventListener('click', function() {
+            document.getElementById('infoModal').style.display = 'flex';
+        });
+
+        function closeModal() {
+            document.getElementById('infoModal').style.display = 'none';
+        }
     </script>
 </body>
 </html>

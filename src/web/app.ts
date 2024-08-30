@@ -74,7 +74,7 @@ app.get("/api/isLogged", async (req, res) => {
   }
 });
 
-app.get("/stats/survival", isLogged, async (req, res) => {
+app.get("/stats/survival", async (req, res) => {
   
   const playerList = await getDynmapPlayersVanilla();
 
@@ -89,6 +89,20 @@ app.get("/stats/survival", isLogged, async (req, res) => {
     
     });
 });
+
+app.get("/topcall", async (req, res) => {
+  const db = client.db;
+  const topUsers = await db.users.find({}).sort({ totalTimeInCall: -1 }).limit(5).exec();
+  res.render("topcall", { 
+    user: req.user,
+    member: client.guilds.get("892472046729179136").members.get(req.user?.id),
+    avatar: client.users.get(req.user?.id)?.avatarURL(),
+    guild: client.guilds.get("892472046729179136"),
+    highestRole: client.getHighestRole,
+    topUsers 
+  });
+});
+
 app.get("/login", passport.authenticate("discord", { scope: scopes }), function() { });
 app.get("/callback", passport.authenticate("discord", { failureRedirect: "/" }), function(req, res) { res.redirect("/"); });
 
@@ -105,5 +119,5 @@ app.get("*", (req, res) => {
 });
 
 app.listen(port, () => {
-    console.log(`=> Dashboard online em: http://${process.env.LOCAL_IP}:${port}`);
+    console.log(`\x1b[32m[CLIENT] Dashboard online em: http://${process.env.LOCAL_IP}:${port}`);
 });
