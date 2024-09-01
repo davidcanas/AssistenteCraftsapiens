@@ -115,7 +115,7 @@ app.get("/logout", function(req, res, next) {
 
 
 app.get("*", (req, res) => {
-    res.status(404).render("errors/404");
+    res.status(404).render("errors/404", {user: req.user});
 });
 
 app.listen(port, () => {
