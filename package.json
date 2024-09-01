@@ -28,7 +28,7 @@
     "mathjs": "^11.9.1",
     "mongoose": "^8.0.3",
     "node-fetch": "^2.6.7",
-    "oceanic.js": "^1.11.2-dev.22ac8dc",
+    "oceanic.js": "^1.11.3-dev.7104364",
     "passport": "^0.7.0",
     "passport-oauth2": "^1.8.0",
     "prettier": "3.3.3",
