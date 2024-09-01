@@ -57,6 +57,7 @@
       background-color: #0056b3; 
     }
   </style>
+     <%- include('../partials/navbar.ejs') %>
 </head>
 
 <body>
@@ -69,6 +70,7 @@
       <br>
       <a href="/login" class="login-button">Fazer Login</a>
         <% } else { %>
+
       <h2 class="error-message">Você não tem permissão para acessar esta página.</h2>
       <p class="error-description">Talvez... Você não devesse estar tentando acessar essa página..</p>
       <% } %>

@@ -9,6 +9,7 @@ import dash from "./routes/dash";
 import punicoes from "./routes/punicoes";
 import mapa from "./routes/mapa";
 import { getDynmapPlayersVanilla } from "../utils/getDynmapInfo";
+import isAdmin from "./helpers/isAdmin";
 
 const app = express();
 const port = process.env.PORT;
@@ -50,7 +51,7 @@ passport.serializeUser(function(user, done) {
   app.use("/punicoes", punicoes);
   app.use("/mapa", mapa);
 
-app.get("/", isLogged, (req, res) => {
+app.get("/", isAdmin, (req, res) => {
 	res.status(200).render("index", { 
     user: req.user,
     member: client.guilds.get("892472046729179136").members.get(req.user.id),
@@ -89,7 +90,7 @@ app.get("/stats/survival", async (req, res) => {
     });
 });
 
-app.get("/topcall", async (req, res) => {
+app.get("/stats/topcall", async (req, res) => {
   const db = client.db;
   const topUsers = await db.users.find({}).sort({ totalTimeInCall: -1 }).exec();
   res.render("topcall", { 

@@ -52,7 +52,7 @@ export default class TopCallTimeCommand extends Command {
                             type: 2,
                             style: 5,
                             label: "Ver ranking completo",
-                            url: "http://jogar.craftsapiens.com.br:50024/topcall",
+                            url: "http://jogar.craftsapiens.com.br:50024/stats/topcall",
                             emoji: {
                                 name: "🏆",
                             },  
