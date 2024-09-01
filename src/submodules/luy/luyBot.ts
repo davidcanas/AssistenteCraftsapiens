@@ -33,6 +33,8 @@ async function playPlaylist() {
     });
 
     (player.queue as DefaultQueue).shuffle();
+    player.setQueueLoop(true);
+
     if (!player.playing) player.play();
     console.log(`Tocando playlist: ${res.playlistInfo.name}`);
   } catch (error) {
@@ -49,7 +51,8 @@ luyBot.on("interactionCreate", async (interaction) => {
   }
 
   const track = player.current;
-  const progressBar = luyBot.progressBar(player.position / 1000, track.duration / 1000, 20);
+  const progressBar = luyBot.progressBar((player.position/1000), (track.duration/1000), 20);
+
   const embed = {
     title: "🎧 LO-FI | Tocando agora:",
     description: `\`\`\`\n${progressBar}\n[${luyBot.MsToHour(player.position)}]            [${luyBot.MsToHour(track.duration)}]\n\`\`\``,

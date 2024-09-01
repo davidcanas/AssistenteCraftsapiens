@@ -33,6 +33,8 @@ async function playPlaylist() {
     });
 
     (player.queue as DefaultQueue).shuffle();
+    player.setQueueLoop(true);
+
     if (!player.playing) player.play();
     console.log(`Tocando playlist: ${res.playlistInfo.name}`);
   } catch (error) {
@@ -49,7 +51,7 @@ adaBot.on("interactionCreate", async (interaction) => {
   }
 
   const track = player.current;
-  const progressBar = adaBot.progressBar(player.position / 1000, track.duration / 1000, 20);
+  const progressBar = adaBot.progressBar((player.position/1000), (track.duration/1000), 20);
   const embed = {
     title: "🎻 Clássica | Tocando agora:",
     description: `\`\`\`\n${progressBar}\n[${adaBot.MsToHour(player.position)}]            [${adaBot.MsToHour(track.duration)}]\n\`\`\``,
