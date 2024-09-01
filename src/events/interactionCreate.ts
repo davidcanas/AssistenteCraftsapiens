@@ -115,27 +115,6 @@ export default class InteractionCreate {
 					interaction.channel.messages.get(interaction.message.id).delete();
 				}
 
-				if (interaction.data.customID === "changelog") {
-					const baseurl = "https://api.github.com/repos/davidcanas/AssistenteCraftsapiens/releases/latest";
-					const res = await this.client.fetch(baseurl);
-					const json = await res.json();
-					
-					const autor = interaction.message.mentions.users[0];
-					if (interaction.member.id !== autor.id) {
-						interaction.createMessage({
-							content:
-								"Esse botão é de @" +
-								autor.username +
-								" , apenas ele pode clicar",
-							flags: 1 << 6
-						});
-						return;
-					}
-					interaction.channel.messages.get(interaction.message.id).edit({
-						content: `[[Changelog]](<https://github.com/davidcanas/AssistenteCraftsapiens/releases/latest>) [[Github]](<https://github.com/davidcanas/AssistenteCraftsapiens>)\n\n${json.body}`,
-						components: [],
-					});
-				}
 				if (interaction.data.customID === "confirm") {
 					const dbremove = await this.client.db.global.findOne({ id: interaction.guild.id });
 					const autor = interaction.message.mentions.users[0];

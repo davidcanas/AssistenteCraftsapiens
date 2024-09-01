@@ -46,10 +46,9 @@ export default class Botinfo extends Command {
 					components: [
 						{
 							type: 2,
-							style: 4,
-							label: "✨ Changelog",
-							disabled: false,
-							customID: "changelog",
+							style: 5,
+							url: "https://github.com/davidcanas/AssistenteCraftsapiens/releases/latest",
+							label: "✨ Changelog"
 						},
 						{
 							type: 2,
