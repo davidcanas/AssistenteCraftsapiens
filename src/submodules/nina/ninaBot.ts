@@ -15,6 +15,9 @@ ninaBot.on("ready", async () => {
 });
 
 async function playPlaylist() {
+  const currPlayer = ninaBot.music.players.get("892472046729179136");
+  if (currPlayer.playing) return;
+  
   try {
     const player = ninaBot.music.createPlayer({
       guildId: "892472046729179136",
@@ -52,7 +55,7 @@ ninaBot.on("interactionCreate", async (interaction) => {
 
   const track = player.current;
   const progressBar = ninaBot.progressBar((player.position/1000), (track.duration/1000), 20);
-  
+
   const embed = {
     title: "🎷 Jazz | Tocando agora:",
     description: `\`\`\`\n${progressBar}\n[${ninaBot.MsToHour(player.position)}]            [${ninaBot.MsToHour(track.duration)}]\n\`\`\``,

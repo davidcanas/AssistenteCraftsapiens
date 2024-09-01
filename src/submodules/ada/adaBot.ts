@@ -15,6 +15,9 @@ adaBot.on("ready", async () => {
 });
 
 async function playPlaylist() {
+  const currPlayer = adaBot.music.players.get("892472046729179136");
+  if (currPlayer.playing) return;
+
   try {
     const player = adaBot.music.createPlayer({
       guildId: "892472046729179136",
@@ -36,6 +39,7 @@ async function playPlaylist() {
     player.setQueueLoop(true);
 
     if (!player.playing) player.play();
+
     console.log(`Tocando playlist: ${res.playlistInfo.name}`);
   } catch (error) {
     console.error("Erro ao tocar a playlist automaticamente:", error);
