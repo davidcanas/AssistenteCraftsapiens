@@ -16,7 +16,7 @@ adaBot.on("ready", async () => {
 
 async function playPlaylist() {
   const currPlayer = adaBot.music.players.get("892472046729179136");
-  if (currPlayer.playing) return;
+  if (currPlayer) return;
 
   try {
     const player = adaBot.music.createPlayer({

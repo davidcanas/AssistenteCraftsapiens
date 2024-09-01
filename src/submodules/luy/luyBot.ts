@@ -16,8 +16,8 @@ luyBot.on("ready", async () => {
 
 async function playPlaylist() {
   const currPlayer = luyBot.music.players.get("892472046729179136");
-  if (currPlayer.playing) return;
-  
+  if (currPlayer) return;
+
   try {
     const player = luyBot.music.createPlayer({
       guildId: "892472046729179136",
