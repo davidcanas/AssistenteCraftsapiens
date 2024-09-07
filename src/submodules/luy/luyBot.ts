@@ -5,13 +5,13 @@ import { CommandInteraction } from "oceanic.js";
 
 const luyBot = new subClient(process.env.LUY_TOKEN);
 
-luyBot.on("ready", async () => {
+luyBot.once("ready", async () => {
   console.log("\x1b[34m[SUB] luy Bot está online!");
   luyBot.connectLavaLink();
   luyBot.registerSlashCommands();
 
   luyBot.editStatus("idle", [{ name: `🎧 | Pronto para ajudar você estudando!`, type: 2 }]);
-  setTimeout(playPlaylist, 15000); 
+  setTimeout(playPlaylist, 25000); 
 });
 
 async function playPlaylist() {
