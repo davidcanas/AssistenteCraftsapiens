@@ -11,7 +11,7 @@ ninaBot.on("ready", async () => {
   ninaBot.registerSlashCommands();
 
   ninaBot.editStatus("idle", [{ name: `🎷 | Pronta para ajudar você estudando!`, type: 2 }]);
-  setTimeout(playPlaylist, 15000); 
+  setTimeout(playPlaylist, 25000); 
 });
 
 async function playPlaylist() {
