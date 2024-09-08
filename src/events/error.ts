@@ -8,6 +8,7 @@ export default class Error {
 	}
 
 	run(err: Error): void {
-		console.error("Erro " + err);
+		console.log("Erro no client")
+		console.error(err);
 	}
 }
