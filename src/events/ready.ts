@@ -27,7 +27,7 @@ export default class ready {
 		console.log("\x1b[32m[CLIENT] O client foi conectado com sucesso");
 
 		this.client.updateSlash();
-		this.client.connectLavaLink();
+		//this.client.connectLavaLink();
 		
 		await this.client.updateTownyCache();
 	}
