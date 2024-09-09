@@ -193,6 +193,7 @@ export async function getDynmapPlayers() {
 
 	const playerArray = [];
 
+	//@ts-expect-error - playerArray needs to be fixed
 	for (const player of result.players) {
 
 		const db = await staffDB.findOne({ nick: player.name });
@@ -224,6 +225,7 @@ export async function getDynmapPlayersVanilla() {
 
 	const db = await staffDB.find({});
 
+	// @ts-expect-error - playerArray needs to be fixed
 	result.players.forEach((player: any) => {
 
 
