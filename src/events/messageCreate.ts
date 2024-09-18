@@ -20,6 +20,17 @@ export default class MessageCreate {
 
         if (message.author.bot) return;
 
+		if (message.channel.id === "1285975006597091451") {
+			message.createReaction("⭐");
+  			 await message.startThread({
+				name: `⭐`,
+				autoArchiveDuration: 10080,
+				reason: "Automatização"
+
+			});
+
+		}
+		
         const userId = message.author.id;
         const now = Date.now();
 
