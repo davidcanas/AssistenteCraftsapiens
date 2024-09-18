@@ -23,7 +23,7 @@ export default class MessageCreate {
 		if (message.channel.id === "1285975006597091451") {
 			message.createReaction("⭐");
   			 await message.startThread({
-				name: `⭐`,
+				name: `⭐ | ${message.content.slice(0,85)}`,
 				autoArchiveDuration: 10080,
 				reason: "Automatização"
 
