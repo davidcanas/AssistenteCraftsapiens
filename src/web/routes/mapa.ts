@@ -20,6 +20,7 @@ router.get("/iframe", async (req, res) => {
     const cityName = req.query.cityName.replace(/\s+/g, "_");
 
     const cityInfo = await client.utils.dynmap.findCityInfo(serverData, cityName);
+    
 
     res.render("mapa/iframe", { cityInfo, cityName });
 });

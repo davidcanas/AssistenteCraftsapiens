@@ -43,7 +43,7 @@
 </head>
 <body>
     <% if (cityName && cityInfo) {%> 
-        <iframe src="http://jogar.craftsapiens.com.br:2053/?worldname=Earth&zoom=4&x=<%=cityInfo.x%>&z=<%=cityInfo.z%>" id="cityIframe"></iframe>
+        <iframe src="http://jogar.craftsapiens.com.br:2053/?worldname=Earth&zoom=4&x=<%=cityInfo.coords.x%>&z=<%=cityInfo.coords.z%>" id="cityIframe"></iframe>
         <div class="success-message" id="successMessage"><%= cityName %> (<%= cityInfo.mayor %>)</div>
 
     <% } else { %>
