@@ -18,7 +18,7 @@
     "child_process": "^1.0.2",
     "dotenv": "^16.3.1",
     "ejs": "^3.1.10",
-    "express": "^4.19.2",
+    "express": "^4.20.0",
     "express-session": "^1.18.0",
     "he": "^1.2.0",
     "highlight.js": "^11.9.0",
