@@ -170,9 +170,9 @@ export default class InteractionCreate {
 				if (sender !== autor.id) {
 					return interaction.createMessage({
 						content:
-							"cai fora imbecil, apenas " +
+							"<:bruh:1257632851797606441> cai fora imbecil, apenas " +
 							autor.username +
-							", pode clicar nesse lindo botão ^^",
+							" pode clicar nesse lindo botão ^^",
 						flags: 1 << 6
 					});
 				}
