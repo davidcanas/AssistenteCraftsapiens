@@ -96,6 +96,7 @@ export default class PlayerList extends Command {
 		await ctx.sendMessage({
 			content: `👀 ${ctx.author.mention}`,
 			files: [{ contents: buffer, name: "playerlist.png" }],
+			components: [component]
 		});
 	}
 }
