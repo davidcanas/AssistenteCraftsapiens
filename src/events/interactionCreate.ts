@@ -172,7 +172,7 @@ export default class InteractionCreate {
 						content:
 							"cai fora imbecil, apenas " +
 							autor.username +
-							" , pode clicar nesse lindo botão ^^",
+							", pode clicar nesse lindo botão ^^",
 						flags: 1 << 6
 					});
 				}
