@@ -84,15 +84,18 @@ export default class PlayerList extends Command {
 					type: 2,
 					style: 2,
 					customID: "confirm_read",
-					label: "<:lixo:1300170561607172096>",
+					label: "",
+					emoji: {
+						id: "1300170561607172096",
+						name: "lixo"
+					}
 				}
 			]
 	};
 
 		await ctx.sendMessage({
-			content: "👀",
+			content: `👀 ${ctx.author.mention}`,
 			files: [{ contents: buffer, name: "playerlist.png" }],
-			components: [component]
 		});
 	}
 }
