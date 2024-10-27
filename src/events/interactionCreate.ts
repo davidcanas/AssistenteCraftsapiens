@@ -170,16 +170,15 @@ export default class InteractionCreate {
 				if (sender !== autor.id) {
 					return interaction.createMessage({
 						content:
-							"Esse botão é de @" +
+							"cai fora imbecil, apenas " +
 							autor.username +
-							" , apenas ele pode usar!",
+							" , pode clicar nesse lindo botão ^^",
 						flags: 1 << 6
 					});
 				}
 
-				interaction.message.channel.deleteMessage(
-					interaction.message.messageReference.messageID
-				);
+				interaction.message.messageReference ? interaction.channel.messages.get(interaction.message.messageReference.messageID).delete() : 
+				
 				interaction.message.delete();
 				
 				
