@@ -78,7 +78,7 @@ export default class PlayerList extends Command {
 		const buffer = canvas.toBuffer();
 		await ctx.sendMessage({
 			content: "👀",
-			files: [{ contents: buffer, name: "playerlist.png" }],
+			//files: [{ contents: buffer, name: "playerlist.png" }],
 			flags: 1 << 6,
 		});
 	}
