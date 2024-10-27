@@ -76,10 +76,23 @@ export default class PlayerList extends Command {
 
 
 		const buffer = canvas.toBuffer();
+
+		const component = {
+			type: 1,
+			components: [
+				{
+					type: 2,
+					style: 2,
+					customID: "confirm_read",
+					label: "<:lixo:1300170561607172096>",
+				}
+			]
+	};
+
 		await ctx.sendMessage({
 			content: "👀",
-			//files: [{ contents: buffer, name: "playerlist.png" }],
-			flags: 1 << 6,
+			files: [{ contents: buffer, name: "playerlist.png" }],
+			components: [component]
 		});
 	}
 }
