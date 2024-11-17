@@ -73,6 +73,7 @@ export default class silentClassClass extends Command {
         const result = json.choices[0].message.content;
 
         if (result.toLowerCase().includes("sim")) {
+
             message.member.edit({ communicationDisabledUntil: new Date(Date.now() + 28800000).toISOString() })
 
             if (message) {
@@ -94,17 +95,13 @@ export default class silentClassClass extends Command {
             const msg = await ctx.sendMessage("A mensagem foi identificada como ofensiva e foi removida. O usuário foi silenciado temporariamente por 8 horas enquanto o caso é analisado por um administrador, que determinará se serão aplicadas punições adicionais.\n-# Lembre-se: o uso indevido do sistema de denúncias pode resultar na restrição do seu acesso a essa funcionalidade no futuro. Utilize-o de forma responsável!");
 
             setTimeout(() => {
-                msg ? msg.delete() : null;
-            }, 20000);
+                if (ctx.msg) (ctx.msg as Message).delete();
+                if (msg) msg.delete();
+            }, 60000);
 
             return;
         } else {
-            const msg = await ctx.sendMessage("A mensagem não foi identificada como ofensiva.\n-# Lembre-se: o uso indevido do sistema de denúncias pode resultar na restrição do seu acesso a essa funcionalidade no futuro. Utilize-o de forma responsável!");
-
-            setTimeout(() => {
-                msg ? msg.delete() : null;
-            }, 20000);
-
+            (ctx.msg as Message).createReaction("❌");
             return;
         }
 
