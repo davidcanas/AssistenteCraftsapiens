@@ -29,11 +29,21 @@ export default class silentClassClass extends Command {
 
         const message = await ctx.channel.getMessage((ctx.msg as Message).messageReference?.messageID);
 
+
         if (!message) {
             ctx.sendMessage("Não foi possível encontrar a mensagem que você deseja reportar!\n-# Lembre-se que abusar do sistema de reportar poderá impedir você de fazer novas denúncias no futuro!");
             return;
         }
 
+        if(ctx.author.id === message.author.id) {
+            const msg = await ctx.sendMessage("Você não pode reportar sua própria mensagem!\n-# Lembre-se que abusar do sistema de reportar poderá impedir você de fazer novas denúncias no futuro!");
+
+            setTimeout(() => {
+                if (ctx.msg) (ctx.msg as Message).delete();
+                if (msg) msg.delete();
+                return;
+            }, 10000);
+        }
         const headers = {
             "Content-Type": "application/json",
             "Authorization": `Bearer ${process.env.GPT_KEY}`
