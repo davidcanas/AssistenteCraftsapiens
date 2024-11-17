@@ -455,6 +455,24 @@ export default class MessageCreate {
 		if (command) {
 			const db = await this.client.db.global.findOne({ id: message.guild.id });
 
+			if (db.blacklistedUsers.includes(message.author.id)) {
+				const embed = new this.client.embed()
+				.setDescription(":x: **Você foi proibido por um administrador de usar o Assistente**")
+				.setColor("16711680")
+				.setFooter("Essa mensagem se autodestruirá em 4 segundos.");
+
+				const msg = await message.channel.createMessage({
+					embeds: [embed],
+					messageReference: { messageID: message.id }
+				});
+
+				setTimeout(() => {
+					if (msg) msg.delete();
+				}, 4000);
+
+				return;
+			}
+
 			if (command.category === "Music") {
 				if (db.music.blacklistedUsers.includes(message.author.id)) {
 				const embed = new this.client.embed()

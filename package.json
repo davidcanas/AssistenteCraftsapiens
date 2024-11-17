@@ -1,6 +1,6 @@
 {
   "name": "assistentecraftsapiens",
-  "version": "5.0.0",
+  "version": "5.9.0",
   "description": "Um projeto de código-aberto criado para auxiliar os jogadores da craftsapiens",
   "main": "dist/main.js",
   "author": "davidcanas",
@@ -27,6 +27,7 @@
     "jsdom": "^24.0.0",
     "mathjs": "^11.9.1",
     "mongoose": "^8.0.3",
+    "node-cron": "^3.0.3",
     "node-fetch": "^2.6.7",
     "oceanic.js": "^1.11.3-dev.7104364",
     "passport": "^0.7.0",

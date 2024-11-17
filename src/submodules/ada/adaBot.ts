@@ -18,33 +18,49 @@ async function playPlaylist() {
   const currPlayer = adaBot.music.players.get("892472046729179136");
   if (currPlayer) return;
 
-  try {
-    const player = adaBot.music.createPlayer({
-      guildId: "892472046729179136",
-      voiceChannelId: "1005889304658202704",
-      selfDeaf: true,
-    });
+  const maxRetries = 4;
+  let attempts = 0;
 
-    player.connect();
-    const res = await adaBot.music.search(playlist.classical[0].url);
+  while (attempts <= maxRetries) {
+    try {
+      const player = adaBot.music.createPlayer({
+        guildId: "892472046729179136",
+        voiceChannelId: "1005889304658202704",
+        selfDeaf: true,
+      });
 
-    if (res.loadType !== "PLAYLIST_LOADED") throw new Error("Não foi possível carregar a playlist.");
+      player.connect();
+      const res = await adaBot.music.search(playlist.classical[0].url);
 
-    res.tracks.forEach(track => {
-      track.setRequester(adaBot.user);
-      player.queue.add(track);
-    });
+      if (res.loadType !== "PLAYLIST_LOADED") throw new Error("Não foi possível carregar a playlist.");
 
-    (player.queue as DefaultQueue).shuffle();
-    player.setQueueLoop(true);
+      res.tracks.forEach(track => {
+        track.setRequester(adaBot.user);
+        player.queue.add(track);
+      });
 
-    if (!player.playing) player.play();
+      (player.queue as DefaultQueue).shuffle();
+      player.setQueueLoop(true);
 
-    console.log(`Tocando playlist: ${res.playlistInfo.name}`);
-  } catch (error) {
-    console.error("Erro ao tocar a playlist automaticamente:", error);
+      if (!player.playing) player.play();
+
+      console.log(`Tocando playlist: ${res.playlistInfo.name}`);
+      return; // Sai da função se a playlist tocar com sucesso
+    } catch (error) {
+      attempts++;
+      console.error(`Erro ao tocar a playlist automaticamente. Tentativa ${attempts} de ${maxRetries + 1}:`, error);
+
+      if (attempts > maxRetries) {
+        console.error("Número máximo de tentativas atingido. Não foi possível tocar a playlist.");
+        return;
+      }
+
+      // Aguarda 5 segundos antes de tentar novamente
+      await new Promise(resolve => setTimeout(resolve, 6500));
+    }
   }
 }
+
 
 adaBot.on("interactionCreate", async (interaction) => {
   if (!(interaction instanceof CommandInteraction) || interaction.data.name !== "ada") return;

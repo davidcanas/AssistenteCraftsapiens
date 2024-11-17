@@ -52,6 +52,18 @@ export default class InteractionCreate {
 
 			}
 			
+			if (db.blacklistedUsers.includes(interaction.user.id)) {
+				const embed = new this.client.embed()
+				.setDescription(":x: **Você foi proibido por um administrador de usar o Assistente**")
+				.setColor("16711680")
+
+				interaction.createMessage({
+					embeds: [embed],
+					flags: 1 << 6
+				});
+				return;
+			}
+
 			if (cmd.category === "Music") {
 				
 				if (db.music.blacklistedUsers.includes(interaction.user.id)) {

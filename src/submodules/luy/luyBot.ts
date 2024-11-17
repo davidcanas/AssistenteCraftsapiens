@@ -18,39 +18,56 @@ async function playPlaylist() {
   const currPlayer = luyBot.music.players.get("892472046729179136");
   if (currPlayer) return;
 
-  try {
-    const player = luyBot.music.createPlayer({
-      guildId: "892472046729179136",
-      voiceChannelId: "1005889381762084976",
-      selfDeaf: true,
-    });
+  const maxRetries = 4;
+  let attempts = 0;
 
-    player.connect();
-    const res = await luyBot.music.search(playlist.lofi[0].url);
+  while (attempts <= maxRetries) {
+    try {
+      const player = luyBot.music.createPlayer({
+        guildId: "892472046729179136",
+        voiceChannelId: "1005889381762084976",
+        selfDeaf: true,
+      });
 
-    if (res.loadType !== "PLAYLIST_LOADED") throw new Error("Não foi possível carregar a playlist.");
+      player.connect();
+      const res = await luyBot.music.search(playlist.lofi[0].url);
 
-    res.tracks.forEach(track => {
-      track.setRequester(luyBot.user);
-      player.queue.add(track);
-    });
+      if (res.loadType !== "PLAYLIST_LOADED") throw new Error("Não foi possível carregar a playlist.");
 
-    (player.queue as DefaultQueue).shuffle();
-    player.setQueueLoop(true);
+      res.tracks.forEach(track => {
+        track.setRequester(luyBot.user);
+        player.queue.add(track);
+      });
 
-    if (!player.playing) player.play();
-    console.log(`Tocando playlist: ${res.playlistInfo.name}`);
-  } catch (error) {
-    console.error("Erro ao tocar a playlist automaticamente:", error);
+      (player.queue as DefaultQueue).shuffle();
+      player.setQueueLoop(true);
+
+      if (!player.playing) player.play();
+
+      console.log(`Tocando playlist: ${res.playlistInfo.name}`);
+      return; // Sai da função se a playlist tocar com sucesso
+    } catch (error) {
+      attempts++;
+      console.error(`Erro ao tocar a playlist automaticamente. Tentativa ${attempts} de ${maxRetries + 1}:`, error);
+
+      if (attempts > maxRetries) {
+        console.error("Número máximo de tentativas atingido. Não foi possível tocar a playlist.");
+        return;
+      }
+
+      // Aguarda 5 segundos antes de tentar novamente
+      await new Promise(resolve => setTimeout(resolve, 6500));
+    }
   }
 }
+
 
 luyBot.on("interactionCreate", async (interaction) => {
   if (!(interaction instanceof CommandInteraction) || interaction.data.name !== "luy") return;
 
   const player = luyBot.music.players.get(interaction.guildID);
   if (!player || !player.current) {
-    return interaction.createMessage({ content: "Não estou tocando nada no momento." });
+    return interaction.createMessage({ content: "Não estou tocando nluy no momento." });
   }
 
   const track = player.current;

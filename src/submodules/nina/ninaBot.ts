@@ -18,39 +18,55 @@ async function playPlaylist() {
   const currPlayer = ninaBot.music.players.get("892472046729179136");
   if (currPlayer) return;
 
-  try {
-    const player = ninaBot.music.createPlayer({
-      guildId: "892472046729179136",
-      voiceChannelId: "1005889464293392466",
-      selfDeaf: true,
-    });
+  const maxRetries = 4;
+  let attempts = 0;
 
-    player.connect();
-    const res = await ninaBot.music.search(playlist.jazz[0].url);
+  while (attempts <= maxRetries) {
+    try {
+      const player = ninaBot.music.createPlayer({
+        guildId: "892472046729179136",
+        voiceChannelId: "1005889464293392466",
+        selfDeaf: true,
+      });
 
-    if (res.loadType !== "PLAYLIST_LOADED") throw new Error("Não foi possível carregar a playlist.");
+      player.connect();
+      const res = await ninaBot.music.search(playlist.jazz[0].url);
 
-    res.tracks.forEach(track => {
-      track.setRequester(ninaBot.user);
-      player.queue.add(track);
-    });
+      if (res.loadType !== "PLAYLIST_LOADED") throw new Error("Não foi possível carregar a playlist.");
 
-    (player.queue as DefaultQueue).shuffle();
-    player.setQueueLoop(true);
+      res.tracks.forEach(track => {
+        track.setRequester(ninaBot.user);
+        player.queue.add(track);
+      });
 
-    if (!player.playing) player.play();
-    console.log(`Tocando playlist: ${res.playlistInfo.name}`);
-  } catch (error) {
-    console.error("Erro ao tocar a playlist automaticamente:", error);
+      (player.queue as DefaultQueue).shuffle();
+      player.setQueueLoop(true);
+
+      if (!player.playing) player.play();
+
+      console.log(`Tocando playlist: ${res.playlistInfo.name}`);
+      return; 
+    } catch (error) {
+      attempts++;
+      console.error(`Erro ao tocar a playlist automaticamente. Tentativa ${attempts} de ${maxRetries + 1}:`, error);
+
+      if (attempts > maxRetries) {
+        console.error("Número máximo de tentativas atingido. Não foi possível tocar a playlist.");
+        return;
+      }
+
+      await new Promise(resolve => setTimeout(resolve, 6500));
+    }
   }
 }
+
 
 ninaBot.on("interactionCreate", async (interaction) => {
   if (!(interaction instanceof CommandInteraction) || interaction.data.name !== "nina") return;
 
   const player = ninaBot.music.players.get(interaction.guildID);
   if (!player || !player.current) {
-    return interaction.createMessage({ content: "Não estou tocando nada no momento." });
+    return interaction.createMessage({ content: "Não estou tocando nnina no momento." });
   }
 
   const track = player.current;
