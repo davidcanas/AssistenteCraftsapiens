@@ -35,7 +35,7 @@ export default class silentClassClass extends Command {
             return;
         }
 
-        if(ctx.author.id === message.author.id) {
+        if(ctx.author.id !== "733963304610824252" && ctx.author.id === message.author.id) {
             const msg = await ctx.sendMessage("Você não pode reportar sua própria mensagem!\n-# Lembre-se que abusar do sistema de reportar poderá impedir você de fazer novas denúncias no futuro!");
 
             setTimeout(() => {
