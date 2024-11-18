@@ -85,7 +85,7 @@ export default class silentClassClass extends Command {
 
         if (result.toLowerCase().includes("sim")) {
 
-            message.member.edit({ communicationDisabledUntil: new Date(Date.now() + 28800000).toISOString() })
+            message.member?.edit({ communicationDisabledUntil: new Date(Date.now() + 28800000).toISOString() })
 
             if (message) {
                 await message.delete();
