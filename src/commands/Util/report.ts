@@ -93,7 +93,7 @@ export default class silentClassClass extends Command {
 
             const embed = new this.client.embed()
                 .setTitle("Conteúdo inadequado reportado")
-                .setDescription(`<:report:1307789599279546419> **Reportado por:** ${ctx.author.mention} (${ctx.author.id})\n\n <:Steve:905024599274684477> **Usuário**: ${message.author.mention} (${message.author.id}) \n\n<:canal:1307789443628793988> **Canal**: ${ctx.channel.mention}\n\n<:text:1308134831946862732> **Motivo:**\n\`\`\`\n${result.replace("[sim] ", "")}\n\`\`\`<:message:1307790289343090738> **Mensagem** (<t:${Math.floor(new Date(message.timestamp).getTime() / 1000)}:R>):\n\`\`\`\n${message.content}\n\`\`\``)
+                .setDescription(`<:report:1307789599279546419> **Reportado por:** ${ctx.author.mention} (${ctx.author.id})\n\n <:Steve:905024599274684477> **Usuário**: ${message.author.mention} (${message.author.id}) \n\n<:canal:1307789443628793988> **Canal**: ${ctx.channel.mention}\n\n<:text:1308134831946862732> **Motivo:**\n\`\`\`\n${result.replace("[sim] ", "")}\n\n\`\`\`<:message:1307790289343090738> **Mensagem** (<t:${Math.floor(new Date(message.timestamp).getTime() / 1000)}:R>):\n\`\`\`\n${message.content}\n\`\`\``)
                 .setColor("16711680")
                 .setFooter("A mensagem foi identificada como ofensiva e foi removida. O usuário foi silenciado temporariamente por 8 horas.")
                 .setThumbnail(`${message.author.avatarURL()}`)
