@@ -25,6 +25,12 @@ export default class askGPT extends Command {
     }
 
     async execute(ctx: CommandContext): Promise<void> {
+
+        if (ctx.type === 1) {
+            ctx.sendMessage({content: "Este comando foi desativado e provavelmente será deletado em breve\nPedimos desculpa pelo incómodo.", flags: 1 << 6});
+            return;
+        } else return;
+        
         await ctx.defer();
 
         if (!ctx.args[0]) {
