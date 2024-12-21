@@ -37,7 +37,7 @@
     "twemoji-parser": "^14.0.0",
     "typescript": "^5.0.0",
     "util": "^0.12.5",
-    "vulkava": "^1.6.3"
+    "vulkava": "^1.6.4"
   },
   "devDependencies": {
     "@types/dotenv": "^8.2.0",
