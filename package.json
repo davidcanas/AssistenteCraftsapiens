@@ -12,6 +12,7 @@
     "run": "node run.js"
   },
   "dependencies": {
+    "@iamtraction/google-translate": "^2.0.1",
     "axios": "^1.7.9",
     "canvas": "^2.11.2",
     "dotenv": "^16.4.7",
