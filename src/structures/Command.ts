@@ -6,7 +6,7 @@ export default class Command implements CommandSettings {
 	description: string;
 	name: string;
 	aliases?: Array<string>;
-	category: "Info" | "DG" | "Util" | "Music";
+	category: "Info" | "DG" | "Util" | "Music" | "Mod" ;
 	options: Array<object>;
 	default_member_permissions?: number;
 	autocomplete?: boolean;

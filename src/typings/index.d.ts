@@ -20,7 +20,7 @@ interface CommandSettings {
   description: string;
   aliases?: Array<string>;
   usage?: string;
-  category: "Info" | "DG" | "Util" | "Music";
+  category: "Info" | "DG" | "Util" | "Music" | "Mod";
   default_member_permissions?: number;
   autocomplete?: boolean;
   options: Array<object>;

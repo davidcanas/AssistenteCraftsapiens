@@ -62,7 +62,7 @@ export default class silentClassClass extends Command {
         ];
 
         const data = {
-            "model": "gpt-4o",
+            "model": "gpt-4o-mini",
             "messages": messages,
             "max_tokens": 500,
             "temperature": 0.2

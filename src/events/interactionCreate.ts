@@ -8,6 +8,7 @@ import {
 } from "oceanic.js";
 import CommandContext from "../structures/CommandContext";
 
+
 export default class InteractionCreate {
 	client: Client;
 
@@ -17,14 +18,12 @@ export default class InteractionCreate {
 
 	async run(interaction: Interaction) {
 		if (interaction instanceof AutocompleteInteraction) {
-
 			if (!interaction.member) return;
 			const cmd = this.client.commands.find(c => c.name === interaction.data.name);
 
 			if (!cmd) throw new Error("Command not found");
 
 			const options = interaction.data.options.raw as InteractionOptionsWithValue[];
-
 			const focusedField = options.find(o => o.focused);
 
 			cmd.runAutoComplete?.(interaction, focusedField!.value as string, options);
@@ -38,7 +37,7 @@ export default class InteractionCreate {
 			if (!cmd) throw new Error("<!> Command not found");
 
 			const db = await this.client.db.global.findOne({ id: interaction.guild.id });
-            if (db.blacklistedUsers.includes(interaction.user.id)) {
+			if (db.blacklistedUsers.includes(interaction.user.id)) {
 				const embed = new this.client.embed()
 					.setDescription(":x: **Você foi proibido por um administrador de usar comandos**\nMotivo: `Utilização indevida do sistema`")
 					.setColor("16711680");
@@ -47,157 +46,179 @@ export default class InteractionCreate {
 					embeds: [embed],
 					flags: 1 << 6
 				});
-
-				return;
-
-			}
-			
-			if (db.blacklistedUsers.includes(interaction.user.id)) {
-				const embed = new this.client.embed()
-				.setDescription(":x: **Você foi proibido por um administrador de usar o Assistente**")
-				.setColor("16711680")
-
-				interaction.createMessage({
-					embeds: [embed],
-					flags: 1 << 6
-				});
 				return;
 			}
 
-			if (cmd.category === "Music") {
-				
-				if (db.music.blacklistedUsers.includes(interaction.user.id)) {
-					const embed = new this.client.embed()
-						.setDescription(":x: **Você foi proibido por um administrador de usar comandos de Música**\nMotivo: `Utilização indevida do sistema`")
-						.setColor("16711680");
-
-					interaction.createMessage({
-						embeds: [embed],
-						flags: 1 << 6
-					});
-
-					return;
-				}
-				if (!this.client.getDiscordByNick(interaction.member.nick)) {
-					const embed = new this.client.embed()
-						.setDescription("**Para usar o sistema de música da Craftsapiens, você precisa de ter a sua conta discord vinculada com o minecraft!**")
-						.addField("Como vincular?", "> Para vincular sua conta use o comando `/discord link` no minecraft da Craftsapiens!")
-						.setColor("16711680")
-						.setFooter("Qualquer duvida, contacte um STAFF");
-
-					interaction.createMessage({
-						embeds: [embed],
-						flags: 1 << 6
-					});
-
-					return;
-				}
-			}
-
-            db.helped++;
-
+			db.helped++;
 			const ctx = new CommandContext(this.client, interaction);
-       
 			cmd.execute(ctx);
 		}
-		if (!(interaction instanceof CommandInteraction)) {
-			if (interaction instanceof ComponentInteraction) {
 
-				if (interaction.data.customID === "silenciar") {
-					const autor = interaction.message.mentions.users[0];
-					if (interaction.member.id !== autor.id) {
-						interaction.createMessage({
-							content:
-								"Esse botão é de @" +
-								autor.username +
-								" , apenas ele pode silenciar!",
-							flags: 1 << 6
-						});
-						return;
-					}
+		if (interaction instanceof ComponentInteraction) {
+			const customID = interaction.data.customID;
+			const logChannel = interaction.guild.channels.get("940725594835025980")
 
-					const db = await this.client.db.global.findOne({ id: interaction.guild.id });
-					db.ignoredUsers.push(interaction.member.id);
-					await db.save();
-					interaction.createMessage({ content: "Agora você não receberá mais informações sobre as aulas quando perguntar sobre aulas.\nPara ativar novamente use o comando `/silenciar aviso_aulas`", flags: 1 << 6 });
-				}
 
-				if (interaction.data.customID === "delmsgeval") {
-					if (interaction.member?.id !== "733963304610824252") return;
-					interaction.channel.messages.get(interaction.message.id).delete();
-				}
+			if (customID.startsWith("confirm_mute")) {
+				console.log(customID);
+				const [_, __, userID, moderatorID, tempoStr, ...reasonParts] = customID.split("_");
 
-				if (interaction.data.customID === "confirm") {
-					const dbremove = await this.client.db.global.findOne({ id: interaction.guild.id });
-					const autor = interaction.message.mentions.users[0];
+				console.log(moderatorID);
+				const reason = reasonParts.join("_");
+				const tempo = parseFloat(tempoStr);
 
-					if (
-						interaction.member.roles.includes("959259258829021255") ||
-						interaction.member.roles.includes("917900552225054750") ||
-						interaction.member.roles.includes("901251917991256124")
-					) {
-						interaction.message.channel.deleteMessage(
-							interaction.message.messageReference.messageID
-						);
-
-						interaction.message.delete();
-
-						dbremove.usersInCooldown.splice(dbremove.usersInCooldown.indexOf(autor.id), 1);
-						dbremove.save();
-
-						return interaction.createMessage({
-							content:
-								"**[ADMIN]** Você acaba de usar poderes de fontes suspeitas e apagou essa mensagem com sucesso!",
-							flags: 1 << 6
-						});
-					}
-
-					if (interaction.member.id !== autor.id) {
-						return interaction.createMessage({
-							content:
-								"Esse botão é de @" +
-								autor.username +
-								" , apenas ele pode confirmar a leitura!",
-							flags: 1 << 6
-						});
-					}
-
-					interaction.createMessage({
-						content: "Obrigado por confirmar a sua leitura :D.",
-						flags: 1 << 6
-					});
-
-					interaction.message.channel.deleteMessage(
-						interaction.message.messageReference.messageID
-					);
-					interaction.message.delete();
-					dbremove.usersInCooldown.splice(dbremove.usersInCooldown.indexOf(autor.id), 1);
-					dbremove.save();
-				}
-
-			if (interaction.data.customID === "confirm_read") {
-				const autor = interaction.message.mentions.users.find((u) => u.id !== "968686499409313804");
-				const sender = interaction.member.id || interaction.user.id;
-
-				if (sender !== autor.id) {
+				if (interaction.member.id !== moderatorID) {
 					return interaction.createMessage({
-						content:
-							"<:bruh:1257632851797606441> cai fora imbecil, apenas " +
-							autor.username +
-							" pode clicar nesse lindo botão ^^",
-						flags: 1 << 6
+						content: "❌ Apenas o moderador que iniciou a ação pode confirmar o silenciamento!",
+						flags: 1 << 6,
 					});
 				}
 
-				interaction.message.messageReference ? interaction.channel.messages.get(interaction.message.messageReference.messageID).delete() : 
-				
-				interaction.message.delete();
-				
-				
-				} 
-			}
-			return;
-		}
+				const member = interaction.guild.members.get(userID);
+				if (!member) {
+					return interaction.createMessage({
+						content: "❌ O membro não foi encontrado no servidor!",
+						flags: 1 << 6,
+					});
+				}
 
+				const muteUntil = new Date(Date.now() + tempo).toISOString();
+
+				try {
+					await member.edit({ communicationDisabledUntil: muteUntil });
+
+					function MsToTime(time) {
+						time = Math.round(time / 1000);
+
+						const s = time % 60; 
+						const m = Math.floor(time / 60) % 60; 
+						const h = Math.floor(time / 3600) % 24; 
+						const d = Math.floor(time / 86400); 
+
+						const parts = [];
+						if (d > 0) parts.push(d === 1 ? "1 dia" : `${d} dias`);
+						if (h > 0) parts.push(h === 1 ? "1 hora" : `${h} horas`);
+						if (m > 0) parts.push(m === 1 ? "1 minuto" : `${m} minutos`);
+						if (s > 0 && parts.length === 0) parts.push(s === 1 ? "1 segundo" : `${s} segundos`);
+
+						return parts.join(" e ");
+					}
+
+					const embed = new this.client.embed()
+						.setTitle("<:mute:1308134804533987338> Membro Silenciado")
+						.setDescription(`<:Steve:905024599274684477> **Usuário:** ${member.user.mention} (${member.user.id})\n🕰️ **Duração:** ${MsToTime(tempo)}\n <:text:1308134831946862732> **Motivo:**\n\`\`\`\n${reason}\n\`\`\``)
+						.setColor(0xff4757)
+						.setFooter(`Silenciado por ${interaction.member.tag}`, interaction.member.avatarURL())
+						.setThumbnail(member.user.avatarURL())
+						.setTimestamp();
+
+
+					interaction.createMessage({ content: "✅ O membro foi silenciado com sucesso!" });
+					interaction.message.delete();
+
+					if (logChannel?.type === 0) {
+						logChannel.createMessage({
+							embeds: [embed],
+						});
+					}
+
+				} catch (err) {
+					interaction.createMessage({
+						content: "❌ Ocorreu um erro ao tentar silenciar o membro.\nErro: " + err,
+						flags: 1 << 6,
+					});
+				}
+
+				return;
+			}
+
+			if (customID.startsWith("cancel_mute")) {
+				const [_, __, userID, moderatorID] = customID.split("_");
+
+				if (interaction.member.id !== moderatorID) {
+					return interaction.createMessage({
+						content: "❌ Apenas o moderador que iniciou a ação pode cancelar o silenciamento!",
+						flags: 1 << 6,
+					});
+				}
+
+				interaction.createMessage({
+					content: "✅ A ação de silenciamento foi cancelada.",
+					flags: 1 << 6,
+				});
+
+				interaction.message.delete();
+
+				return;
+			}
+
+			if (customID.startsWith("confirm_kick")) {
+				const [_, __, userID, moderatorID, ...reasonParts] = customID.split("_");
+				const reason = reasonParts.join("_");
+
+				if (interaction.member.id !== moderatorID) {
+					return interaction.createMessage({
+						content: "❌ Apenas o moderador que iniciou a ação pode confirmar a expulsão!",
+						flags: 1 << 6,
+					});
+				}
+
+				const member = interaction.guild.members.get(userID);
+				if (!member) {
+					return interaction.createMessage({
+						content: "❌ O membro não foi encontrado no servidor!",
+						flags: 1 << 6,
+					});
+				}
+
+				try {
+					await member.kick(reason);
+
+					const embed = new this.client.embed()
+						.setTitle("<:mine_no:939943857754365962> Membro Expulso")
+						.setDescription(`<:Steve:905024599274684477> **Usuário:** ${member.user.mention} (${member.user.id})\n<:text:1308134831946862732> **Motivo:**\n\`\`\`\n${reason}\n\`\`\``)
+						.setColor(0xff4757)
+						.setFooter(`Expulso por ${interaction.member.tag}`, interaction.member.avatarURL())
+						.setThumbnail(member.user.avatarURL())
+						.setTimestamp();
+
+
+					interaction.createMessage({ content: "✅ O membro foi expulso com sucesso!" });
+					interaction.message.delete();
+
+					if (logChannel?.type === 0) {
+						logChannel.createMessage({
+							embeds: [embed],
+						});
+					}
+				} catch (err) {
+					interaction.createMessage({
+						content: "❌ Ocorreu um erro ao tentar expulsar o membro.",
+						flags: 1 << 6,
+					});
+				}
+
+				return;
+			}
+
+			if (customID.startsWith("cancel_kick")) {
+				const [_, __, userID, moderatorID] = customID.split("_");
+
+				if (interaction.member.id !== moderatorID) {
+					return interaction.createMessage({
+						content: "❌ Apenas o moderador que iniciou a ação pode cancelar a expulsão!",
+						flags: 1 << 6,
+					});
+				}
+
+				interaction.createMessage({
+					content: "✅ A ação de expulsão foi cancelada.",
+					flags: 1 << 6,
+				});
+				interaction.message.delete();
+
+				return;
+			}
+		}
 	}
 }

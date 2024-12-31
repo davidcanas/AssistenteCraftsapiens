@@ -24,7 +24,7 @@ export default class Botinfo extends Command {
 		const embed = new this.client.embed()
 			.setDescription(`<:discord:1185986429147431074> | ${ping}ms\n<:mongo:1185980474095583323> | ${Math.round(
 				(stopDB[0] * 1e9 + stopDB[1]) / 1e6,
-			)}ms\n<:lavalink:1186325123729465444> | ${await this.client.music.nodes[0].ping()}ms\n✨ | v5.9-beta\n<:ramemoji:1185990343888482386> | ${(
+			)}ms\n<:lavalink:1186325123729465444> | ${await this.client.music?.nodes[0].ping()}ms\n✨ | v5.9-beta\n<:ramemoji:1185990343888482386> | ${(
 				process.memoryUsage().heapUsed /
 				1024 /
 				1024
