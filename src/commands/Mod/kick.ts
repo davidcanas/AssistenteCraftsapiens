@@ -50,8 +50,8 @@ export default class Kick extends Command {
 
 
         const embed = new this.client.embed()
-            .setTitle("Confirmação de Expulsão")
-            .setDescription(`Você está prestes a expulsar o membro **${user.tag}**.\n\n**Motivo:** ${reason}`)
+            .setTitle("Expulsão de membro")
+            .setDescription(`Você está prestes a expulsar o membro ${user.mention}.\n\n**Motivo:** ${reason}`)
             .setColor(0xffcc00)
             .setFooter("Ação requerida por " + ctx.author.tag, ctx.author.avatarURL());
 

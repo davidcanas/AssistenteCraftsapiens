@@ -91,7 +91,7 @@ export default class Mute extends Command {
         const muteUntil = new Date(Date.now() + tempoMs).toISOString();
 
         const embed = new this.client.embed()
-            .setTitle("Confirmação de Silenciamento")
+            .setTitle("Silenciamento de membro")
             .setDescription(
                 `Você está prestes a silenciar o membro ${user.mention} por **${tempoStr}**.\n\n**Motivo:** ${reason}`,
             )
