@@ -18,7 +18,7 @@ export default class silentClassClass extends Command {
     async execute(ctx: CommandContext): Promise<void> {
 
         if (ctx.type === 1) {
-            ctx.sendMessage({content: "Você não pode executar este comando usando `/report`, ao invés disso, use `-report`, respondendo à mensagem que você pretende denunciar\n-# Lembre-se que abusar do sistema de reportar poderá impedir você de fazer novas denúncias no futuro!", flags: 1 << 6});
+            ctx.sendMessage({ content: "Você não pode executar este comando usando `/report`, ao invés disso, use `-report`, respondendo à mensagem que você pretende denunciar\n-# Lembre-se que abusar do sistema de reportar poderá impedir você de fazer novas denúncias no futuro!", flags: 1 << 6 });
             return;
         }
 
@@ -35,7 +35,7 @@ export default class silentClassClass extends Command {
             return;
         }
 
-        if(ctx.author.id !== "733963304610824252" && ctx.author.id === message.author.id) {
+        if (ctx.author.id !== "733963304610824252" && ctx.author.id === message.author.id) {
             const msg = await ctx.sendMessage("Você não pode reportar sua própria mensagem!\n-# Lembre-se que abusar do sistema de reportar poderá impedir você de fazer novas denúncias no futuro!");
 
             setTimeout(() => {
@@ -44,28 +44,22 @@ export default class silentClassClass extends Command {
                 return;
             }, 10000);
         }
-        
+
         const headers = {
             "Content-Type": "application/json",
-            "Authorization": `Bearer ${process.env.GPT_KEY}`
+            "Authorization": `${process.env.GEMINI_KEY}`
         };
 
         const messages = [
             {
                 role: "user",
-                content: `Responda apenas com [sim] ou [não] e com o tipo de infração de forma curta e explicativa. A seguinte mensagem tem carácter extremamente ofensivo? \n"${message.content}"`
-            },
-            {
-                role: "system",
-                content: `Você é um modelo de IA especializado em detectar mensagens ofensivas. Sua função é identificar ofensas direcionadas a indivíduos ou grupos com base em critérios como raça, etnia, religião, orientação sexual, identidade de gênero, deficiência ou qualquer outra característica que possa ser usada como base para discriminação ou preconceito. Insultos genéricos ou críticas que não contenham contexto discriminatório ou ataques direcionados a grupos vulneráveis não devem ser interpretados como ofensas graves. Seja preciso e objetivo em sua análise, priorizando a proteção contra discursos que promovam ódio ou preconceito.`
+                parts: [{ "text": "Você é um modelo de IA especializado em detectar mensagens ofensivas. Sua função é identificar ofensas direcionadas a indivíduos ou grupos com base em critérios como raça, etnia, religião, orientação sexual, identidade de gênero, deficiência ou qualquer outra característica que possa ser usada como base para discriminação ou preconceito. Insultos genéricos ou críticas que não contenham contexto discriminatório ou ataques direcionados a grupos vulneráveis não devem ser interpretados como ofensas graves. Seja preciso e objetivo em sua análise, priorizando a proteção contra discursos que promovam ódio ou preconceito. Responda apenas com [sim] ou [não] e com o tipo de infração de forma curta e explicativa. A seguinte mensagem tem carácter extremamente ofensivo?: 'sua puta'" }]
             }
         ];
 
         const data = {
-            "model": "gpt-4o-mini",
-            "messages": messages,
-            "max_tokens": 500,
-            "temperature": 0.2
+            "model": "gemini-2.0-flash-exp",
+            "contents": messages
         };
 
         const response = await fetch(process.env.GPT_URL, {
