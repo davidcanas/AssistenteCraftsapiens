@@ -68,15 +68,15 @@ export default class silentClassClass extends Command {
             body: JSON.stringify(data)
         });
 
-        const json: any = await response.json();
+        const json: any = await response?.json();
 
-        if (json.error) {
+        if (!json.candidates) {
             ctx.sendMessage("Ocorreu um erro ao tentar analisar a mensagem, por favor aguarde o <@733963304610824252>!\n-# Lembre-se que abusar do sistema de reportar poderá impedir você de fazer novas denúncias no futuro!");
             console.log(json.error);
             return;
         }
 
-        const result = json.choices[0].message.content;
+        const result = json.candidates[0].content.parts[0].text;
 
         if (result.toLowerCase().includes("sim")) {
 
