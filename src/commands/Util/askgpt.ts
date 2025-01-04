@@ -125,6 +125,7 @@ export default class askGPT extends Command {
         });
 
         const json = await response.json();
+        console.log(json);
         if (!json.candidates) {
             ctx.sendMessage(`Olá, ${ctx.member.nick || ctx.member.user.globalName}, ocorreu um erro ao tentar processar a sua pergunta. Provavelmente é algum problema com a OpenIA. Tente novamente mais tarde!`);
             console.log(json.error.message)
