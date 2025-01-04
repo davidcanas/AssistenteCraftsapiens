@@ -53,7 +53,7 @@ export default class silentClassClass extends Command {
         const messages = [
             {
                 role: "user",
-                parts: [{ "text": "Você é um modelo de IA especializado em detectar mensagens ofensivas. Sua função é identificar ofensas direcionadas a indivíduos ou grupos com base em critérios como raça, etnia, religião, orientação sexual, identidade de gênero, deficiência ou qualquer outra característica que possa ser usada como base para discriminação ou preconceito. Insultos genéricos ou críticas que não contenham contexto discriminatório ou ataques direcionados a grupos vulneráveis não devem ser interpretados como ofensas graves. Seja preciso e objetivo em sua análise, priorizando a proteção contra discursos que promovam ódio ou preconceito. Responda apenas com [sim] ou [não] e com o tipo de infração de forma curta e explicativa. A seguinte mensagem tem carácter extremamente ofensivo?: 'sua puta'" }]
+                parts: [{ "text": `Você é um modelo de IA especializado em detectar mensagens ofensivas. Sua função é identificar ofensas direcionadas a indivíduos ou grupos com base em critérios como raça, etnia, religião, orientação sexual, identidade de gênero, deficiência ou qualquer outra característica que possa ser usada como base para discriminação ou preconceito. Insultos genéricos ou críticas que não contenham contexto discriminatório ou ataques direcionados a grupos vulneráveis não devem ser interpretados como ofensas graves. Seja preciso e objetivo em sua análise, priorizando a proteção contra discursos que promovam ódio ou preconceito. Responda apenas com [sim] ou [não] e com o tipo de infração de forma curta e explicativa. A seguinte mensagem tem carácter extremamente ofensivo?: "${message.content}"` }]
             }
         ];
 
@@ -62,7 +62,7 @@ export default class silentClassClass extends Command {
             "contents": messages
         };
 
-        const response = await fetch(process.env.GPT_URL, {
+        const response = await fetch(process.env.GEMINI_URL, {
             method: "POST",
             headers: headers,
             body: JSON.stringify(data)
