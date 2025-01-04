@@ -49,7 +49,7 @@ export default class askGPT extends Command {
             "Authorization": `${process.env.GEMINI_KEY}`
         };
 
-        const userMessagesPath = path.resolve(__dirname, "../../data/user_context.txt");
+        const userMessagesPath = path.resolve(__dirname, "../../data/system_context.txt");
         const userMessages = fs.readFileSync(userMessagesPath, "utf-8").split("\n").filter(line => line.trim());
 
         const townyDocsPath = path.resolve(__dirname, "../../data/towny_docs.txt");
