@@ -25,7 +25,7 @@ export default class askGPT extends Command {
     }
 
     async execute(ctx: CommandContext): Promise<void> {
-        
+
         await ctx.defer();
 
         if (!ctx.args[0]) {
@@ -40,7 +40,7 @@ export default class askGPT extends Command {
             { name: "Loja da craftsapiens (apenas dá para comprar premium,vip, ou sapiens)", value: "https://craftsapiens.lojasquare.net" },
             { name: "Mapa", value: "http://jogar.craftsapiens.com.br:50024/mapa" },
             { name: "Código do Assistente (github)", value: "https://github.com/davidcanas/AssistenteCraftsapiens" },
-            {name: "Textura do Slimefun (opcional, Java)", value: "https://bit.ly/craftsapiens-textura"}
+            { name: "Textura do Slimefun (opcional, Java)", value: "https://bit.ly/craftsapiens-textura" }
         ];
         const usefulLinks = linksUteis.map(link => `${link.name} - ${link.value}`).join(", ");
 
@@ -57,8 +57,7 @@ export default class askGPT extends Command {
 
         const timestamp = new Date().toISOString();
         const messages = userMessages.map(content => ({
-            role: "user",
-            content: content
+            text: content
                 .replace("{member_name}", ctx.member.nick || ctx.member.user.globalName)
                 .replace("{member_role}", this.client.getHighestRole(ctx.guild, ctx.member.id))
                 .replace("{channel_id}", ctx.channel.id)
@@ -67,34 +66,34 @@ export default class askGPT extends Command {
                 .replace("{useful_links}", usefulLinks)
                 .replace("{timestamp}", timestamp)
         }));
-        messages.push({role: "user", content: `Atualmente o Survival Geopolítico tem ${this.client.cache.towns.length} cidades ativas e ${this.client.cache.towns.filter(a => a.ruined).length} cidades em ruinas (no mundo geopolitico) `});
-        messages.push({ role: "user", content: townyDocsMessages.join("\n") });
-        messages.push({ role: "user", content: `\nMensagem a responder: "${ctx.args.join(" ")}"`});
+        messages.push({ text: `Atualmente o Survival Geopolítico tem ${this.client.cache.towns.length} cidades ativas e ${this.client.cache.towns.filter(a => a.ruined).length} cidades em ruinas (no mundo geopolitico) ` });
+        messages.push({ text: townyDocsMessages.join("\n") });
+        messages.push({ text: `\nMensagem a responder: "${ctx.args.join(" ")}"` });
 
         const inputText = ctx.args.join(" ");
 
         function normalizeString(str: string) {
             return str.toLowerCase()
-                      .normalize("NFD")
-                      .replace(/[\u0300-\u036f]/g, "");
+                .normalize("NFD")
+                .replace(/[\u0300-\u036f]/g, "");
         }
 
         const detectedCities = this.client.cache.towns.filter(town => normalizeString(inputText).includes(normalizeString(town.name)));
-        
+
         const mentionedResidents = this.client.cache.towns.reduce((acc, town) => {
-            
+
 
             town.members.forEach(resident => {
                 if (normalizeString(inputText).includes(normalizeString(resident))) {
                     acc.push({ resident, town });
                 }
-        
+
             });
 
             if (normalizeString(inputText).includes(normalizeString(town.mayor))) {
 
-                if (!acc.some((item) => item.resident === town.mayor)) { 
-                acc.push({ mayor: town.mayor, town });
+                if (!acc.some((item) => item.resident === town.mayor)) {
+                    acc.push({ mayor: town.mayor, town });
                 }
             }
 
@@ -103,19 +102,22 @@ export default class askGPT extends Command {
         }, []);
 
         if (detectedCities.length > 0) {
-            
+
             const townInfo = detectedCities.map(town => `${town.name}:\nPrefeito: ${town.mayor}\nCoordenadas: X: ${town.coords.x} Z: ${town.coords.z}\nNação: ${town.nation}\nHabitantes: ${town.members.length} (${town.members.join(", ")})\nEm ruínas: ${town.ruined}\n-`).join("\n");
-            messages.push({ role: "user", content: `Cidades mencionadas pelo jogador (ao calcular distâncias, omita os cálculos, diga diretamente o resultado):\n${townInfo}` });
+            messages.push({ text: `Cidades mencionadas pelo jogador (ao calcular distâncias, omita os cálculos, diga diretamente o resultado):\n${townInfo}` });
         }
 
         if (mentionedResidents.length > 0) {
             const residentInfo = mentionedResidents.map(({ resident, town }) => `${resident} é residente de ${town.name}:\nPrefeito: ${town.mayor}\nCoordenadas: X: ${town.coords.x} Z: ${town.coords.z}\nNação: ${town.nation}\nHabitantes: ${town.members.length} (${town.members.join(", ")})\nEm ruínas: ${town.ruined}\n-`).join("\n");
-            messages.push({ role: "user", content: `Jogadores (habitantes) mencionados pelo jogador:\n${residentInfo}` });
+            messages.push({ text: `Jogadores (habitantes) mencionados pelo jogador:\n${residentInfo}` });
         }
 
         const data = {
             "model": "gemini-2.0-flash-exp",
-            "contents": messages
+            "contents": {
+                "role": "user",
+                "parts": messages
+            }
         };
 
         const response = await fetch(process.env.GEMINI_URL, {
