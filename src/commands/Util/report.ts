@@ -78,6 +78,7 @@ export default class silentClassClass extends Command {
 
         if (json.error) {
             ctx.sendMessage("Ocorreu um erro ao tentar analisar a mensagem, por favor aguarde o <@733963304610824252>!\n-# Lembre-se que abusar do sistema de reportar poderá impedir você de fazer novas denúncias no futuro!");
+            console.log(json.error);
             return;
         }
 
