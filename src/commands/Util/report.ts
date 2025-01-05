@@ -58,7 +58,7 @@ export default class silentClassClass extends Command {
         ];
 
         const data = {
-            "model": "gemini-2.0-flash-exp",
+            "model": process.env.AI_MODEL,
             "contents": messages
         };
 

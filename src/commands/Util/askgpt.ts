@@ -113,7 +113,7 @@ export default class askGPT extends Command {
         }
 
         const data = {
-            "model": "gemini-2.0-flash-exp",
+            "model": process.env.AI_MODEL,
             "contents": {
                 "role": "user",
                 "parts": messages
