@@ -120,6 +120,7 @@ export default class askGPT extends Command {
             },
             "generationConfig": {
                 "maxOutputTokens": 600,
+                "temperature": 0.5
             }
         };
 
