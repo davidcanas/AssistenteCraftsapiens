@@ -47,7 +47,7 @@ export default class silentClassClass extends Command {
 
         const headers = {
             "Content-Type": "application/json",
-            "Authorization": `${process.env.GEMINI_KEY}`
+            "Authorization": `${process.env.AI_KEY}`
         };
 
         const messages = [
@@ -62,7 +62,7 @@ export default class silentClassClass extends Command {
             "contents": messages
         };
 
-        const response = await fetch(process.env.GEMINI_URL, {
+        const response = await fetch(process.env.AI_URL, {
             method: "POST",
             headers: headers,
             body: JSON.stringify(data)
