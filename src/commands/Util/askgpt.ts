@@ -117,6 +117,9 @@ export default class askGPT extends Command {
             "contents": {
                 "role": "user",
                 "parts": messages
+            },
+            "generationConfig": {
+                "maxOutputTokens": 600,
             }
         };
 
