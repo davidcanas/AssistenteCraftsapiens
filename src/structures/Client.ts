@@ -329,8 +329,8 @@ export default class DGClient extends Client {
 		const member = guild?.members.find(m => m.user.id == user || m.nick == user);
 		if (!member) return "";
 		const roles = member.roles.map(r => guild?.roles.get(r));
-		const highestRole = roles.reduce((a, b) => a.position > b.position ? a : b);
-		return highestRole.name;
+		const highestRole = roles?.reduce((a, b) => a.position > b.position ? a : b);
+		return highestRole?.name;
 	}
 
 	nFormatter(num, digits) {
