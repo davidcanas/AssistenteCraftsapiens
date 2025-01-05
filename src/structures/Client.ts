@@ -328,8 +328,8 @@ export default class DGClient extends Client {
 	getHighestRole(guild, user: string): string {
 		const member = guild?.members.find(m => m.user.id == user || m.nick == user);
 		if (!member) return "";
-		const roles = member.roles.map(r => guild?.roles.get(r));
-		if (!roles) return "";
+		const roles = member?.roles.map(r => guild?.roles.get(r));
+		if (!roles[0]) return "";
 		const highestRole = roles?.reduce((a, b) => a.position > b.position ? a : b);
 		return highestRole?.name;
 	}
