@@ -25,7 +25,7 @@
     "jimp": "^1.6.0",
     "jsdom": "^25.0.1",
     "mathjs": "^14.0.1",
-    "mongoose": "^8.9.3",
+    "mongoose": "^8.9.5",
     "node-cron": "^3.0.3",
     "oceanic.js": "^1.11.3-dev.9ca907f",
     "passport": "^0.7.0",
