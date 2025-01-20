@@ -50,7 +50,7 @@ export default class Ban extends Command {
         const embed = new this.client.embed()
             .setTitle("Confirmação de Banimento")
             .setDescription(
-                `Você está prestes a banir o membro **${user.tag}**.\n\n**Motivo:** ${reason}`
+                `Você está prestes a banir o membro ${user.mention}.\n\n**Motivo:** ${reason}`
             )
             .setColor(0xff0000)
             .setFooter("Ação requerida por " + ctx.author.tag, ctx.author.avatarURL());

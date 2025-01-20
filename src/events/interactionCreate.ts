@@ -225,51 +225,53 @@ export default class InteractionCreate {
             : interaction.message.delete();
     }
 
-    private async handleConfirmBanInteraction(interaction: ComponentInteraction, customID: string) {
-        const [_, __, userID, moderatorID, ...reasonParts] = customID.split("_");
-        const reason = reasonParts.join("_");
-
-        if (interaction.member.id !== moderatorID) {
-            interaction.createMessage({
-                content: "❌ Apenas o moderador que iniciou a ação pode confirmar o banimento!",
-                flags: 1 << 6
-            });
-            return;
-        }
-
-        const member = interaction.guild.members.get(userID);
-        if (!member) {
-            interaction.createMessage({
-                content: "❌ O membro não foi encontrado no servidor!",
-                flags: 1 << 6
-            });
-            return;
-        }
-
-        try {
-            await member.ban({ deleteMessageDays: 7, reason });
-
-            const embed = new this.client.embed()
-                .setTitle("Membro Banido")
-                .setDescription(`✅ O membro **${member.user.tag}** foi banido do servidor.\n\n**Motivo:** ${reason}`)
-                .setColor(0xff0000)
-                .setFooter("Banido por " + interaction.member.tag, interaction.member.avatarURL());
-
-            interaction.createMessage({ embeds: [embed] });
-
-            const logChannel = interaction.guild.channels.get("940725594835025980");
-            if (logChannel?.type === 0) {
-                logChannel.createMessage({
-                    embeds: [embed.setTitle("Relatório de Banimento").setFooter(null)],
-                });
-            }
-        } catch (err) {
-            interaction.createMessage({
-                content: "❌ Ocorreu um erro ao tentar banir o membro.",
-                flags: 1 << 6
-            });
-        }
-    }
+	private async handleConfirmBanInteraction(interaction: ComponentInteraction, customID: string) {
+		const [_, __, userID, moderatorID, ...reasonParts] = customID.split("_");
+		const reason = reasonParts.join("_");
+	
+		if (interaction.member.id !== moderatorID) {
+			interaction.createMessage({
+				content: "❌ Apenas o moderador que iniciou a ação pode confirmar o banimento!",
+				flags: 1 << 6
+			});
+			return;
+		}
+	
+		const member = interaction.guild.members.get(userID);
+		if (!member) {
+			interaction.createMessage({
+				content: "❌ O membro não foi encontrado no servidor!",
+				flags: 1 << 6
+			});
+			return;
+		}
+	
+		try {
+			await member.ban({ deleteMessageDays: 7, reason });
+	
+			const embed = new this.client.embed()
+				.setTitle("<:ban:1308134804533987339> Membro Banido")
+				.setDescription(`<:Steve:905024599274684477> **Usuário:** ${member.user.mention} (${member.user.id})\n <:text:1308134831946862732> **Motivo:**\n\`\`\`\n${reason}\n\`\`\``)
+				.setColor(0xff0000)
+				.setFooter(`Banido por ${interaction.member.tag}`, interaction.member.avatarURL())
+				.setThumbnail(member.user.avatarURL())
+				.setTimestamp();
+	
+			interaction.createMessage({ content: `<:report:1307789599279546419> | ${interaction.member.mention} Usuário punido. O jogador foi banido permanentemente!` });
+			interaction.message.delete();
+	
+			const logChannel = interaction.guild.channels.get("940725594835025980");
+			if (logChannel?.type === 0) {
+				logChannel.createMessage({ embeds: [embed.setTitle("Relatório de Banimento").setFooter(null)] });
+			}
+		} catch (err) {
+			interaction.createMessage({
+				content: "❌ Ocorreu um erro ao tentar banir o membro.",
+				flags: 1 << 6
+			});
+		}
+	}
+	
 
     private async handleCancelBanInteraction(interaction: ComponentInteraction, customID: string) {
         const [_, __, userID, moderatorID] = customID.split("_");
@@ -323,7 +325,7 @@ export default class InteractionCreate {
                 .setThumbnail(member.user.avatarURL())
                 .setTimestamp();
 
-            interaction.createMessage({ content: "✅ O membro foi silenciado com sucesso!" });
+			interaction.createMessage({ content: `<:report:1307789599279546419> | ${interaction.member.mention} Usuário punido. O jogador foi silenciado temporarimente!` });
             interaction.message.delete();
 
             const logChannel = interaction.guild.channels.get("940725594835025980");
@@ -355,49 +357,53 @@ export default class InteractionCreate {
         });
     }
 
-    private async handleConfirmKickInteraction(interaction: ComponentInteraction, customID: string) {
-        const [_, __, userID, moderatorID, ...reasonParts] = customID.split("_");
-        const reason = reasonParts.join("_");
-
-        if (interaction.member.id !== moderatorID) {
-            interaction.createMessage({
-                content: "❌ Apenas o moderador que iniciou a ação pode confirmar a expulsão!",
-                flags: 1 << 6
-            });
-            return;
-        }
-
-        const member = interaction.guild.members.get(userID);
-        if (!member) {
-            interaction.createMessage({
-                content: "❌ O membro não foi encontrado no servidor!",
-                flags: 1 << 6
-            });
-            return;
-        }
-
-        try {
-            await member.kick(reason);
-
-            const embed = new this.client.embed()
-                .setTitle("Membro Expulso")
-                .setDescription(`✅ O membro **${member.user.tag}** foi expulso do servidor.\n\n**Motivo:** ${reason}`)
-                .setColor(0xffa500)
-                .setFooter("Expulso por " + interaction.member.tag, interaction.member.avatarURL());
-
-            interaction.createMessage({ embeds: [embed] });
-
-            const logChannel = interaction.guild.channels.get("940725594835025980");
-            if (logChannel?.type === 0) {
-                logChannel.createMessage({ embeds: [embed.setTitle("Relatório de Expulsão").setFooter(null)] });
-            }
-        } catch (err) {
-            interaction.createMessage({
-                content: "❌ Ocorreu um erro ao tentar expulsar o membro.",
-                flags: 1 << 6
-            });
-        }
-    }
+	private async handleConfirmKickInteraction(interaction: ComponentInteraction, customID: string) {
+		const [_, __, userID, moderatorID, ...reasonParts] = customID.split("_");
+		const reason = reasonParts.join("_");
+	
+		if (interaction.member.id !== moderatorID) {
+			interaction.createMessage({
+				content: "❌ Apenas o moderador que iniciou a ação pode confirmar a expulsão!",
+				flags: 1 << 6
+			});
+			return;
+		}
+	
+		const member = interaction.guild.members.get(userID);
+		if (!member) {
+			interaction.createMessage({
+				content: "❌ O membro não foi encontrado no servidor!",
+				flags: 1 << 6
+			});
+			return;
+		}
+	
+		try {
+			await member.kick(reason);
+	
+			const embed = new this.client.embed()
+				.setTitle("<:kick:1308134804533987340> Membro Expulso")
+				.setDescription(`<:Steve:905024599274684477> **Usuário:** ${member.user.mention} (${member.user.id})\n <:text:1308134831946862732> **Motivo:**\n\`\`\`\n${reason}\n\`\`\``)
+				.setColor(0xffa500)
+				.setFooter(`Expulso por ${interaction.member.tag}`, interaction.member.avatarURL())
+				.setThumbnail(member.user.avatarURL())
+				.setTimestamp();
+	
+			interaction.createMessage({ content: `<:report:1307789599279546419> | ${interaction.member.mention} Usuário punido. O jogador foi expulso do servidor!` });
+			interaction.message.delete();
+	
+			const logChannel = interaction.guild.channels.get("940725594835025980");
+			if (logChannel?.type === 0) {
+				logChannel.createMessage({ embeds: [embed.setTitle("Relatório de Expulsão").setFooter(null)] });
+			}
+		} catch (err) {
+			interaction.createMessage({
+				content: "❌ Ocorreu um erro ao tentar expulsar o membro.",
+				flags: 1 << 6
+			});
+		}
+	}
+	
 
     private async handleCancelKickInteraction(interaction: ComponentInteraction, customID: string) {
         const [_, __, userID, moderatorID] = customID.split("_");
