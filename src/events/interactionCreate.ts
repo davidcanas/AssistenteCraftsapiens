@@ -214,7 +214,7 @@ export default class InteractionCreate {
 
         if (sender !== author.id) {
             interaction.createMessage({
-                content: `<:bruh:1257632851797606441> cai fora imbecil, apenas ${author.username} pode clicar nesse lindo botão ^^`,
+                content: `<:bruh:1257632851797606441> Cai fora, apenas ${author.username} pode clicar nesse lindo botão ^^`,
                 flags: 1 << 6
             });
             return;
@@ -257,7 +257,7 @@ export default class InteractionCreate {
 				.setThumbnail(member.user.avatarURL())
 				.setTimestamp();
 	
-			interaction.createMessage({ content: `<:report:1307789599279546419> | ${interaction.member.mention} Usuário punido. O jogador foi banido permanentemente!` });
+			(interaction.channel as TextChannel).createMessage({ content: `<:report:1307789599279546419> | ${interaction.member.mention} Usuário punido. O jogador foi banido permanentemente!` });
 			interaction.message.delete();
 	
 			const logChannel = interaction.guild.channels.get("940725594835025980");
@@ -288,6 +288,7 @@ export default class InteractionCreate {
             content: "✅ A ação de banimento foi cancelada.",
             flags: 1 << 6
         });
+		interaction.message.delete();
     }
 
     private async handleConfirmMuteInteraction(interaction: ComponentInteraction, customID: string) {
@@ -325,7 +326,7 @@ export default class InteractionCreate {
                 .setThumbnail(member.user.avatarURL())
                 .setTimestamp();
 
-			interaction.createMessage({ content: `<:report:1307789599279546419> | ${interaction.member.mention} Usuário punido. O jogador foi silenciado temporarimente!` });
+			(interaction.channel as TextChannel).createMessage({ content: `<:report:1307789599279546419> | ${interaction.member.mention} Usuário punido. O jogador foi silenciado temporarimente!` });
             interaction.message.delete();
 
             const logChannel = interaction.guild.channels.get("940725594835025980");
@@ -355,6 +356,7 @@ export default class InteractionCreate {
             content: "✅ A ação de silenciamento foi cancelada.",
             flags: 1 << 6
         });
+		interaction.message.delete();
     }
 
 	private async handleConfirmKickInteraction(interaction: ComponentInteraction, customID: string) {
@@ -389,7 +391,7 @@ export default class InteractionCreate {
 				.setThumbnail(member.user.avatarURL())
 				.setTimestamp();
 	
-			interaction.createMessage({ content: `<:report:1307789599279546419> | ${interaction.member.mention} Usuário punido. O jogador foi expulso do servidor!` });
+			(interaction.channel as TextChannel).createMessage({ content: `<:report:1307789599279546419> | ${interaction.member.mention} Usuário punido. O jogador foi expulso do servidor!` });
 			interaction.message.delete();
 	
 			const logChannel = interaction.guild.channels.get("940725594835025980");
@@ -420,6 +422,7 @@ export default class InteractionCreate {
             content: "✅ A ação de expulsão foi cancelada.",
             flags: 1 << 6
         });
+		interaction.message.delete();
     }
 
     private msToTime(duration: number) {
