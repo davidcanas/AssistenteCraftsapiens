@@ -425,13 +425,28 @@ export default class InteractionCreate {
 		interaction.message.delete();
     }
 
-    private msToTime(duration: number) {
-        const milliseconds = Math.floor((duration % 1000) / 100);
-        const seconds = Math.floor((duration / 1000) % 60);
-        const minutes = Math.floor((duration / (1000 * 60)) % 60);
-        const hours = Math.floor((duration / (1000 * 60 * 60)) % 24);
-        const days = Math.floor(duration / (1000 * 60 * 60 * 24));
-
-        return `${days > 0 ? `${days}d ` : ""}${hours}h ${minutes}m ${seconds}.${milliseconds}s`;
-    }
+	private msToTime(duration: number) {
+		const seconds = Math.floor((duration / 1000) % 60);
+		const minutes = Math.floor((duration / (1000 * 60)) % 60);
+		const hours = Math.floor((duration / (1000 * 60 * 60)) % 24);
+		const days = Math.floor(duration / (1000 * 60 * 60 * 24));
+	
+		const parts = [];
+	
+		if (days > 0) {
+			parts.push(`${days} dia${days > 1 ? 's' : ''}`);
+		}
+		if (hours > 0) {
+			parts.push(`${hours} hora${hours > 1 ? 's' : ''}`);
+		}
+		if (minutes > 0 && days === 0) { 
+			parts.push(`${minutes} minuto${minutes > 1 ? 's' : ''}`);
+		}
+		if (seconds > 0 && days === 0 && hours === 0) { 
+			parts.push(`${seconds} segundo${seconds > 1 ? 's' : ''}`);
+		}
+	
+		return parts.join(' e ');
+	}
+	
 }
