@@ -262,7 +262,7 @@ export default class InteractionCreate {
 	
 			const logChannel = interaction.guild.channels.get("940725594835025980");
 			if (logChannel?.type === 0) {
-				logChannel.createMessage({ embeds: [embed.setTitle("Relatório de Banimento").setFooter(null)] });
+				logChannel.createMessage({ embeds: [embed] });
 			}
 		} catch (err) {
 			interaction.createMessage({
@@ -331,7 +331,7 @@ export default class InteractionCreate {
 
             const logChannel = interaction.guild.channels.get("940725594835025980");
             if (logChannel?.type === 0) {
-                logChannel.createMessage({ embeds: [embed.setTitle("Relatório de Silenciamento").setFooter(null)] });
+                logChannel.createMessage({ embeds: [embed] });
             }
         } catch (err) {
             interaction.createMessage({
@@ -396,7 +396,7 @@ export default class InteractionCreate {
 	
 			const logChannel = interaction.guild.channels.get("940725594835025980");
 			if (logChannel?.type === 0) {
-				logChannel.createMessage({ embeds: [embed.setTitle("Relatório de Expulsão").setFooter(null)] });
+				logChannel.createMessage({ embeds: [embed] });
 			}
 		} catch (err) {
 			interaction.createMessage({
