@@ -13,6 +13,8 @@
   },
   "dependencies": {
     "@iamtraction/google-translate": "^2.0.1",
+    "@types/express": "^5.0.1",
+    "@types/node-fetch": "^2.6.12",
     "axios": "^1.8.4",
     "canvas": "^3.1.0",
     "dotenv": "^16.4.7",
@@ -24,7 +26,6 @@
     "mathjs": "^14.4.0",
     "mongoose": "^8.13.2",
     "node-cron": "^3.0.3",
-    "node-fetch": "^3.3.2",
     "oceanic.js": "^1.11.3-dev.d9f2e80",
     "passport": "^0.7.0",
     "passport-oauth2": "^1.8.0",
@@ -37,7 +38,6 @@
   "devDependencies": {
     "@types/dotenv": "^8.2.0",
     "@types/node": "^20.17.30",
-    "@types/node-fetch": "^2.6.9",
     "@typescript-eslint/eslint-plugin": "^7.5.0",
     "@typescript-eslint/parser": "^7.5.0",
     "eslint": "^8.57.0",
