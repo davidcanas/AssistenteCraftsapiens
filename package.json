@@ -24,6 +24,7 @@
     "mathjs": "^14.4.0",
     "mongoose": "^8.13.2",
     "node-cron": "^3.0.3",
+    "node-fetch": "^3.3.2",
     "oceanic.js": "^1.11.3-dev.d9f2e80",
     "passport": "^0.7.0",
     "passport-oauth2": "^1.8.0",
