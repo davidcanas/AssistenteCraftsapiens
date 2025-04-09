@@ -73,7 +73,7 @@ async function sendMonthlyTopCallTime(client: DGClient) {
 		const embed = new client.embed()
 			.setTitle("🏆 TOP 10 | Call Estudos - " + prevMonth.charAt(0).toUpperCase() + prevMonth.slice(1))
 			.setDescription(description)
-			.setFooter("As horas em call de estudos são resetadas mensalmente!")
+			.setFooter("Os rankings das calls de estudo são resetados mensalmente. Esse é o top 10 do mês anterior, " + prevMonth.charAt(0).toUpperCase() + prevMonth.slice(1) + ".")
 			.setColor("5763719");
 
 		channel.createMessage({
