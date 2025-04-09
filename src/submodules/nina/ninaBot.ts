@@ -32,7 +32,11 @@ async function playPlaylist() {
       player.connect();
       const res = await ninaBot.music.search(playlist.jazz[0].url, "soundcloud");
 
-      if (res.loadType !== "PLAYLIST_LOADED") throw new Error("Não foi possível carregar a playlist.");
+      if (res.loadType !== "PLAYLIST_LOADED") {
+        console.log(res.loadType);
+        console.log(res.exception.message);
+        throw new Error("Não foi possível carregar a playlist.");
+      }
 
       res.tracks.forEach(track => {
         track.setRequester(ninaBot.user);

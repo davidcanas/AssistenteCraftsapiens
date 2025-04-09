@@ -11,7 +11,7 @@ adaBot.on("ready", async () => {
   adaBot.registerSlashCommands();
 
   adaBot.editStatus("idle", [{ name: `🎻 | Pronta para ajudar você estudando!`, type: 2 }]);
-  setTimeout(playPlaylist, 25000); 
+  setTimeout(playPlaylist, 25000);
 });
 
 async function playPlaylist() {
@@ -32,7 +32,11 @@ async function playPlaylist() {
       player.connect();
       const res = await adaBot.music.search(playlist.classical[0].url, "soundcloud");
 
-      if (res.loadType !== "PLAYLIST_LOADED") throw new Error("Não foi possível carregar a playlist.");
+      if (res.loadType !== "PLAYLIST_LOADED") {
+        console.log(res.loadType);
+        console.log(res.exception.message);
+        throw new Error("Não foi possível carregar a playlist.");
+      }
 
       res.tracks.forEach(track => {
         track.setRequester(adaBot.user);
@@ -71,7 +75,7 @@ adaBot.on("interactionCreate", async (interaction) => {
   }
 
   const track = player.current;
-  const progressBar = adaBot.progressBar((player.position/1000), (track.duration/1000), 20);
+  const progressBar = adaBot.progressBar((player.position / 1000), (track.duration / 1000), 20);
   const embed = {
     title: "🎻 Clássica | Tocando agora:",
     description: `\`\`\`\n${progressBar}\n[${adaBot.MsToHour(player.position)}]            [${adaBot.MsToHour(track.duration)}]\n\`\`\``,
