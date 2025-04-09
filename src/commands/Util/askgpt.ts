@@ -78,39 +78,6 @@ export default class askGPT extends Command {
                 .replace(/[\u0300-\u036f]/g, "");
         }
 
-        const detectedCities = this.client.cache.towns.filter(town => normalizeString(inputText).includes(normalizeString(town.name)));
-
-        const mentionedResidents = this.client.cache.towns.reduce((acc, town) => {
-
-
-            town.members.forEach(resident => {
-                if (normalizeString(inputText).includes(normalizeString(resident))) {
-                    acc.push({ resident, town });
-                }
-
-            });
-
-            if (normalizeString(inputText).includes(normalizeString(town.mayor))) {
-
-                if (!acc.some((item) => item.resident === town.mayor)) {
-                    acc.push({ mayor: town.mayor, town });
-                }
-            }
-
-
-            return acc;
-        }, []);
-
-        if (detectedCities.length > 0) {
-
-            const townInfo = detectedCities.map(town => `${town.name}:\nPrefeito: ${town.mayor}\nCoordenadas: X: ${town.coords.x} Z: ${town.coords.z}\nNação: ${town.nation}\nHabitantes: ${town.members.length} (${town.members.join(", ")})\nEm ruínas: ${town.ruined}\n-`).join("\n");
-            messages.push({ text: `Cidades mencionadas pelo jogador (ao calcular distâncias, omita os cálculos, diga diretamente o resultado):\n${townInfo}` });
-        }
-
-        if (mentionedResidents.length > 0) {
-            const residentInfo = mentionedResidents.map(({ resident, town }) => `${resident} é residente de ${town.name}:\nPrefeito: ${town.mayor}\nCoordenadas: X: ${town.coords.x} Z: ${town.coords.z}\nNação: ${town.nation}\nHabitantes: ${town.members.length} (${town.members.join(", ")})\nEm ruínas: ${town.ruined}\n-`).join("\n");
-            messages.push({ text: `Jogadores (habitantes) mencionados pelo jogador:\n${residentInfo}` });
-        }
 
         const data = {
             "model": process.env.AI_MODEL,

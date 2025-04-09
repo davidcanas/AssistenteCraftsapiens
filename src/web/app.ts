@@ -8,7 +8,6 @@ import path from "path";
 import dash from "./routes/dash";
 import punicoes from "./routes/punicoes";
 import mapa from "./routes/mapa";
-import { getDynmapPlayersVanilla } from "../utils/getDynmapInfo";
 import isAdmin from "./helpers/isAdmin";
 
 const app = express();
@@ -77,7 +76,7 @@ app.get("/api/isLogged", async (req, res) => {
 
 app.get("/stats/survival", async (req, res) => {
   
-  const playerList = await getDynmapPlayersVanilla();
+  // DEPRECATED:const playerList = await getDynmapPlayersVanilla();
 
 	res.status(200).render("stats_survival", { 
     user: req.user,
@@ -85,7 +84,7 @@ app.get("/stats/survival", async (req, res) => {
     avatar: client.users.get(req.user?.id)?.avatarURL(),
     guild: client.guilds.get("892472046729179136"),
     highestRole: client.getHighestRole,
-    playerList,
+    //playerList,
     
     });
 });

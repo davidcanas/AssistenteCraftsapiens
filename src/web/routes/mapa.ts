@@ -1,6 +1,5 @@
 import { Router } from "express";
 import bodyParser from "body-parser";
-import client from "../../main";
 
 const router = Router();
 
@@ -14,6 +13,7 @@ router.get("/", async (req, res) => {
     
 });
 
+/* DEPRECATED
 router.get("/iframe", async (req, res) => {
     const serverData = await client.fetch("http://172.17.0.1:2053/up/world/Earth/").then(res => res.json());
 
@@ -24,6 +24,6 @@ router.get("/iframe", async (req, res) => {
 
     res.render("mapa/iframe", { cityInfo, cityName });
 });
-
+*/ 
 
 export default router;

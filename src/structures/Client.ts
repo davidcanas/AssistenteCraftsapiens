@@ -23,7 +23,6 @@ import { NodeOptions } from "vulkava";
 import Music from "./Music";
 
 import levenshteinDistance from "../utils/levenshteinDistance";
-import { getOnlinePlayerInfo, findCityInfo, findPlayerCity, getAllRegisteredCities, getAllRegisteredPlayers, getDynmapPlayers } from "../utils/getDynmapInfo";
 
 import fetch from "node-fetch";
 
@@ -86,14 +85,6 @@ export default class DGClient extends Client {
 		};
 		this.utils = {
 			levDistance: levenshteinDistance,
-			dynmap: {
-				findPlayerCity,
-				findCityInfo,
-				getAllRegisteredCities,
-				getAllRegisteredPlayers,
-				getDynmapPlayers,
-				getOnlinePlayerInfo,
-			},
 		};
 		this.fetch = fetch;
 		this.embed = Embed;
@@ -253,68 +244,7 @@ export default class DGClient extends Client {
 		super.on("packet", (packet) => this.music.handleVoiceUpdate(packet));
 	}
 
-	async getPlayerInfo(player: string) {
-		try {
-			let playerObj: { nick: string; uuid: null; original: boolean; discord?: string | null; staff?: string; isStaff?: boolean; city?: CityInfo; coords?: { x: number; y: number; z: number }; health?: number; armor?: number; online?: boolean };
 
-			const findInMojangRequest = await fetch(
-				`https://api.mojang.com/users/profiles/minecraft/${player}`
-			);
-			const findInDynmapData = await fetch(
-				"http://172.17.0.1:2053/up/world/Earth/"
-			).then((r) => r.json());
-
-			const findInMojang = await findInMojangRequest.json();
-
-			if (findInMojang.errorMessage) {
-				playerObj = {
-					nick: player.toLowerCase(),
-					uuid: null,
-					original: false,
-				};
-			} else {
-				playerObj = {
-					nick: findInMojang.name,
-					uuid: findInMojang.id,
-					original: true,
-				};
-			}
-
-			const db = await this.db.staff.find({}).then(p => p.find(p => p.nick.toLowerCase() == playerObj.nick.toLowerCase()));
-
-			if (db) {
-				playerObj.isStaff = true;
-				playerObj.staff = db.role;
-				playerObj.discord = db.id;
-			} else {
-				playerObj.isStaff = false;
-				playerObj.discord = await this.guilds.get("892472046729179136")?.members.find(m => m?.nick && m.nick?.toLowerCase() == playerObj.nick?.toLowerCase() && m.roles.includes("1152666174157488258"))?.user.id || null;
-			}
-
-			const playerLower = player.toLowerCase();
-			const city = this.cache.towns.find((city) =>
-				city.members.some(member => member.toLowerCase() === playerLower)
-			);
-
-			if (city) {
-				playerObj.city = city;
-			}
-			const online = getOnlinePlayerInfo(findInDynmapData, playerObj.nick);
-			if (online.online) {
-				playerObj.coords = {
-					x: online.x,
-					y: online.y,
-					z: online.z,
-				};
-				playerObj.health = online.health || 0;
-				playerObj.online = true;
-			}
-			return playerObj;
-
-		} catch (err) {
-			console.log(err);
-		}
-	}
 	async getCronograma() {
 		const canal = this.guilds.get("892472046729179136").channels.get("939937615325560912");
 		if (canal.type !== Constants.ChannelTypes.GUILD_ANNOUNCEMENT) return null;
@@ -354,15 +284,5 @@ export default class DGClient extends Client {
 
 		return member;
 	}
-
-	async updateTownyCache() {
-		const data = await fetch("http://172.17.0.1:2053/up/world/Earth/").then(r => r.json());
-
-		this.cache.towns = await getAllRegisteredCities(data);
-
-		console.log("\x1b[32m[CLIENT] Cache de cidades atualizado.");
-
-	}
-
 
 }

@@ -32,6 +32,5 @@ export default class ready {
 			this.client.connectLavaLink();
 		}
 
-		await this.client.updateTownyCache();
 	}
 }

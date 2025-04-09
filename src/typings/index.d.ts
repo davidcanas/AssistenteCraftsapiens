@@ -46,15 +46,6 @@ interface Command extends CommandSettings {
 
 interface Utils {
   levDistance: (src: string, target: string) => number;
-  dynmap: {
-    findPlayerCity: (serverData: ServerData, playerName: string) => CityInfo | undefined;
-    findCityInfo: (serverData: ServerData, cityName: string) => CityInfo | undefined;
-    getAllRegisteredCities: (serverData: ServerData) => string[];
-    getAllRegisteredPlayers: (serverData: ServerData) => string[];
-    getDynmapPlayers: () => Promise<string[]>;
-    //getDynmapPlayersVanilla: () => Promise<object[] | string[]>;
-    getOnlinePlayerInfo: (serverData: ServerData, playerName: string) => Player | undefined;
-  }
 }
 
 interface InteractionOptions {
