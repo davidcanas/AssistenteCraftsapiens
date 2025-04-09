@@ -32,7 +32,7 @@ async function playPlaylist() {
       player.connect();
       const res = await luyBot.music.search(playlist.lofi[0].url, "soundcloud");
 
-      if (res.loadType !== "PLAYLIST_LOADED") {
+      if (res.loadType !== "PLAYLIST_LOADED" && res.loadType !== "TRACK_LOADED") {
         console.log(res.loadType);
         console.log(res.exception.message);
         throw new Error("Não foi possível carregar a playlist.");
