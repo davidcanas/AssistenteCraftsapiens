@@ -30,7 +30,7 @@ async function playPlaylist() {
       });
 
       player.connect();
-      const res = await adaBot.music.search(playlist.classical[0].url);
+      const res = await adaBot.music.search(playlist.classical[0].url, "soundcloud");
 
       if (res.loadType !== "PLAYLIST_LOADED") throw new Error("Não foi possível carregar a playlist.");
 
