@@ -66,7 +66,8 @@ async function sendMonthlyTopCallTime(client: DGClient) {
 			.join("\n");
 
 		const prevMonth = new Date(new Date().setMonth(new Date().getMonth() - 1))
-			.toLocaleString('default', { month: 'long' });
+			.toLocaleString('pt-BR', { month: 'long' });
+		const thisMonth = new Date().toLocaleString('pt-BR', { month: 'long' });
 
 
 		const embed = new client.embed()
@@ -84,7 +85,7 @@ async function sendMonthlyTopCallTime(client: DGClient) {
 						{
 							type: 2,
 							style: 5,
-							label: "Ver ranking completo",
+							label: `Ver ranking completo (${thisMonth.charAt(0).toUpperCase()}${thisMonth.slice(1)})`,
 							url: "http://jogar.craftsapiens.com.br:50024/stats/topcall",
 							emoji: { name: "🏆" },
 						},
