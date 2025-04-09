@@ -126,7 +126,5 @@ cron.schedule("0 0 1 * *", async () => {
 	}, 10000);
 });
 
-setTimeout(async () => {
-	await sendMonthlyTopCallTime(client);
-}, 5000);
+
 export default client;
