@@ -33,7 +33,7 @@ require("./submodules/ada/adaBot");
 require("./submodules/luy/luyBot");
 
 async function sendMonthlyTopCallTime(client: DGClient) {
-	const channelId = "";
+	const channelId = process.env.TOP_CALL_CHANNEL_ID;
 	const channel = client.getChannel(channelId) as TextChannel;
 
 	if (!channel) {
