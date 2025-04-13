@@ -35,7 +35,7 @@ export default class banInfo extends Command {
 
         if (!banInfo) {
             ctx.sendMessage({
-                content: `<:mine_no:939943857754365962> O usuário ${user.tag} **não está** banido do servidor!`,
+                content: `<:mine_no:939943857754365962> O usuário ${user?.tag} **não está** banido do servidor!`,
                 flags: 1 << 6,
             });
             return;
