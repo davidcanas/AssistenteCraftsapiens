@@ -14,7 +14,7 @@ export default class banInfo extends Command {
                     type: 3,
                     name: "id",
                     description: "O ID do membro banido",
-                    required: false,
+                    required: true,
                 },
             ],
         });
