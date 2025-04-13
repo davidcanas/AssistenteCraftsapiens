@@ -44,7 +44,7 @@ export default class banInfo extends Command {
         const embed = new this.client.embed()
             .setTitle("<:report:1307789599279546419> Informações de Banimento")
             .setDescription(
-                `<:Steve_chorando:905024572036907008> O membro ${user.username} está banido do servidor.\n\n<:text:1308134831946862732> **Motivo:**\n \`${banInfo.reason || "Sem motivo especificado"}\``
+                `<:Steve:905024599274684477> O membro ${user.username} **está banido** do servidor.\n\n<:text:1308134831946862732> **Motivo:**\n \`${banInfo.reason || "Sem motivo especificado"}\``
             )
             .setThumbnail(user.avatarURL())
     
