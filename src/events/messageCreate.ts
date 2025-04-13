@@ -20,7 +20,7 @@ export default class MessageCreate {
 
         if (message.author.bot) return;
 
-		if (message.channel.id === "1285975006597091451") {
+		if (message.channel?.id === "1285975006597091451") {
 			message.createReaction("⭐");
   			 await message.startThread({
 				name: `⭐ | ${message.content.slice(0,85)}`,
