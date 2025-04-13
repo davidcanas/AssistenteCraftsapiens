@@ -101,8 +101,8 @@ export default class silentClassClass extends Command {
             const msg = await ctx.sendMessage("A mensagem foi identificada como ofensiva e foi removida. O usuário foi silenciado temporariamente por 8 horas enquanto o caso é analisado por um administrador, que determinará se serão aplicadas punições adicionais.\nMotivo: `" + result.replace("[sim] ", "") + "`\n-# Lembre-se: o uso indevido do sistema de denúncias pode resultar na restrição do seu acesso a essa funcionalidade no futuro. Utilize-o de forma responsável!");
 
             setTimeout(() => {
-                if (ctx.msg) (ctx.msg as Message).delete();
                 if (msg) msg.delete();
+                if (ctx.msg) (ctx.msg as Message).delete();
             }, 60000);
 
             return;

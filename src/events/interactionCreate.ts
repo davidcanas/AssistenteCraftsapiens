@@ -247,10 +247,10 @@ export default class InteractionCreate {
 		}
 	
 		try {
-			await member.ban({ deleteMessageDays: 7, reason });
+			await member.ban({ deleteMessageDays: 7, reason: `Punido por: ${interaction.member.tag}\nMotivo: ${reason}` });
 	
 			const embed = new this.client.embed()
-				.setTitle("<:ban:1308134804533987339> Membro Banido")
+				.setTitle("🚫 Membro Banido")
 				.setDescription(`<:Steve:905024599274684477> **Usuário:** ${member.user.mention} (${member.user.id})\n <:text:1308134831946862732> **Motivo:**\n\`\`\`\n${reason}\n\`\`\``)
 				.setColor(0xff0000)
 				.setFooter(`Banido por ${interaction.member.tag}`, interaction.member.avatarURL())
@@ -266,7 +266,7 @@ export default class InteractionCreate {
 			}
 		} catch (err) {
 			interaction.createMessage({
-				content: "❌ Ocorreu um erro ao tentar banir o membro.",
+				content: "❌ Ocorreu um erro ao tentar banir o membro.\nErro: " + err,
 				flags: 1 << 6
 			});
 		}
@@ -316,7 +316,7 @@ export default class InteractionCreate {
         const muteUntil = new Date(Date.now() + tempo).toISOString();
 
         try {
-            await member.edit({ communicationDisabledUntil: muteUntil });
+            await member.edit({ communicationDisabledUntil: muteUntil, reason: `Punido por: ${interaction.member.tag}\nMotivo: ${reason}` });
 
             const embed = new this.client.embed()
                 .setTitle("<:mute:1308134804533987338> Membro Silenciado")
@@ -335,7 +335,7 @@ export default class InteractionCreate {
             }
         } catch (err) {
             interaction.createMessage({
-                content: "❌ Ocorreu um erro ao tentar silenciar o membro.",
+                content: "❌ Ocorreu um erro ao tentar silenciar o membro.\nErro: " + err,
                 flags: 1 << 6
             });
         }
@@ -381,7 +381,7 @@ export default class InteractionCreate {
 		}
 	
 		try {
-			await member.kick(reason);
+			await member.kick(`Punido por: ${interaction.member.tag}\nMotivo: ${reason}`);
 	
 			const embed = new this.client.embed()
 				.setTitle("<:kick:1308134804533987340> Membro Expulso")
@@ -400,7 +400,7 @@ export default class InteractionCreate {
 			}
 		} catch (err) {
 			interaction.createMessage({
-				content: "❌ Ocorreu um erro ao tentar expulsar o membro.",
+				content: "❌ Ocorreu um erro ao tentar expulsar o membro.\nErro: " + err,
 				flags: 1 << 6
 			});
 		}
