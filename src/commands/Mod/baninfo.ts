@@ -31,7 +31,7 @@ export default class banInfo extends Command {
         }
 
         const user = this.client.users.get(ctx.args[0]);
-        const banInfo = await ctx.guild.getBan(ctx.args[0]);
+        const banInfo = await ctx.guild?.getBan(ctx.args[0]);
 
         if (!banInfo) {
             ctx.sendMessage({
