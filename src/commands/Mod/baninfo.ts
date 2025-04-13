@@ -31,13 +31,6 @@ export default class banInfo extends Command {
         }
 
         const user = this.client.users.get(ctx.args[0]);
-        if (!user) {
-            ctx.sendMessage({
-                content: "❌ Você precisa fornecer um ID de usuário válido!",
-                flags: 1 << 6,
-            });
-            return;
-        }
         const banInfo = await ctx.guild.getBan(ctx.args[0]);
 
         if (!banInfo) {
