@@ -30,8 +30,6 @@ export default class banInfo extends Command {
             return;
         }
 
-        console.log(ctx.args[0]);
-        
         const banInfo = await ctx.guild?.getBan(ctx.args[0]);
         const user = banInfo.user;
 
