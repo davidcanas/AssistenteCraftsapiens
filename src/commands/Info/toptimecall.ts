@@ -65,7 +65,7 @@ export default class TopCallTimeCommand extends Command {
                         : index === 2 ? "🥉"
                         : `**${index + 1}.**`;
         
-            return `${medal} <@${user.id}>\n\- ${formattedTime}`;
+            return `${medal} <@${user.id}> - ${formattedTime}`;
         }).join("\n");
         
 
