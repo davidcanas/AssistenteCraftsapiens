@@ -59,8 +59,15 @@ export default class TopCallTimeCommand extends Command {
 
         const description = rankedUsers.map((user, index) => {
             const formattedTime = ctx.formatTime(user.totalTime);
-            return `**${index + 1}. <@${user.id}>** - ${formattedTime}`;
+            
+            const medal = index === 0 ? "🥇"
+                        : index === 1 ? "🥈"
+                        : index === 2 ? "🥉"
+                        : `**${index + 1}.**`;
+        
+            return `${medal} <@${user.id}> - ${formattedTime}`;
         }).join("\n");
+        
 
         const [ano, mes] = targetMonth.split("-");
         const nomeMes = new Date(Number(ano), Number(mes) - 1).toLocaleString("pt-BR", { month: "long" });
