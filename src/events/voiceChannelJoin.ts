@@ -39,7 +39,7 @@ export default class voiceChannelJoin {
             channel.id === studyChannels["Luy"] ? "lofi" :
             channel.id === studyChannels["Nina"] ? "jazz" : "classical";  
 
-        if (bot && bot.music && player.playing) {
+        if (bot && bot.music && player && player.playing) {
             console.log(`(${member.username} - o bot está a tocar "${player.current.title}" nesta Call de Estudo`);
         } else {
             console.log(`(${member.username} - por algum motivo o bot não está a tocar nada nesta Call de Estudo, a tentar iniciar!`);
