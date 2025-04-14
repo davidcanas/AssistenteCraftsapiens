@@ -26,7 +26,8 @@ export default class voiceChannelLeave {
         if (!session) return;
 
         const leaveTime = new Date();
-        const duration = (leaveTime.getTime() - new Date(session.joinTime).getTime()) / 1000; 
+        const duration = Math.floor((leaveTime.getTime() - new Date(session.joinTime).getTime()) / 1000);
+
 
         console.log(`(${member.username} - saiu da Call de Estudo às ${leaveTime}`);
 
