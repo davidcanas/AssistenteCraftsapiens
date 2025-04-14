@@ -22,7 +22,7 @@ export default class MessageCreate {
 
 		if (message.channel?.id === "1285975006597091451") {
 			message.createReaction("⭐");
-  			 await message.startThread({
+                await message.startThread({
 				name: `⭐ | ${message.content.slice(0,85)}`,
 				autoArchiveDuration: 10080,
 				reason: "Automatização"
@@ -473,7 +473,7 @@ export default class MessageCreate {
 				return;
 			}
 
-			if (command.category === "Music" || command.name === "calltime") {
+			if (command.category === "Music") {
 				if (db.music.blacklistedUsers.includes(message.author.id)) {
 				const embed = new this.client.embed()
 				.setDescription(":x: **Você foi proibido por um administrador de usar comandos de Música**\nMotivo: `Utilização indevida do sistema`")
@@ -493,7 +493,7 @@ export default class MessageCreate {
 			}
 			if (!this.client.getDiscordByNick(message.member.nick)) {
 				const embed = new this.client.embed()
-				.setDescription("**Para usar esse comando, você precisa de ter a sua conta discord vinculada com o minecraft!**")
+				.setDescription("**Para usar o sistema de Música, você precisa de ter a sua conta discord vinculada com o minecraft!**")
 				.addField("Como vincular?", "> Para vincular sua conta use o comando `/discord link` no minecraft da Craftsapiens!")
 				.setColor("16711680")
 				.setFooter("Qualquer duvida, contacte um STAFF | Essa mensagem se autodestruirá em 1 minuto!");

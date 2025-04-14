@@ -41,6 +41,26 @@ export default class CallTimeCommand extends Command {
             return;
         }
 
+		if (!this.client.getDiscordByNick(ctx.member?.nick)) {
+			const embed = new this.client.embed()
+			.setDescription("**Para usufruir do sistema #EstudoFocado, você precisa de ter a sua conta discord vinculada com o minecraft!**")
+			.addField("Como vincular?", "> Para vincular sua conta use o comando `/discord link` no minecraft da Craftsapiens!")
+			.setColor("16711680")
+			.setFooter("Qualquer dúvida, contacte um STAFF | Essa mensagem se autodestruirá em 30 segundos!");
+
+			const msg = await ctx.sendMessage({
+				embeds: [embed],
+				messageReference: { messageID: ctx.msg.id },
+				flags: 1 << 6
+			});
+
+			setTimeout(() => {
+				if (msg) msg.delete();
+			}, 30000);
+
+			return;
+		}
+
 		const topUsers = await this.client.db.users.find({})
 			.sort({ totalTimeInCall: -1 }).exec();
 
