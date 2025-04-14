@@ -65,7 +65,7 @@ export default class TopCallTimeCommand extends Command {
                         : index === 2 ? "🥉"
                         : `**${index + 1}.**`;
         
-            return `${medal} <@${user.id}> - ${formattedTime}`;
+            return `${medal} ${ctx.guild.members.get(user.id)} - ${formattedTime}`;
         }).join("\n");
         
 
