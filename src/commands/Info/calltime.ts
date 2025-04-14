@@ -16,7 +16,7 @@ function formatTime(seconds: number): string {
 	return parts.join(" e ");
 }
 
-function getLastMonths(count = 2): string[] {
+function getLastMonths(count = 3): string[] {
 	const months = [];
 	const now = new Date();
 	for (let i = 1; i <= count; i++) {
@@ -102,7 +102,7 @@ export default class CallTimeCommand extends Command {
 
 		const embed = new this.client.embed()
 			.setTitle(`🕒 Tempo em calls de estudo - ${discordMember.nick}`)
-			.setDescription(`🔹 Tempo atual: **${formattedTime}**\n🔹 Posição no ranking: **#${userPosition}**\n\n${historicoMeses.length > 0 ? "📊 **Histórico dos últimos meses:**\n" + historicoMeses.join("\n") : "`Nenhum histórico de meses anteriores encontrado.`"}\n\n<:purplearrow:1145719018121089045> Use </topcalltime:1279029830779797629> para ver o ranking completo.`)
+			.setDescription(`🔹 Tempo atual: **${formattedTime}**\n🔹 Posição no ranking: **#${userPosition}**\n\n${historicoMeses.length > 0 ? "📊 **Histórico dos últimos meses:**\n" + historicoMeses.join("\n") : "<:cafe:1319819127111553024>  `Nenhum histórico de meses anteriores encontrado.`"}\n\n<:purplearrow:1145719018121089045> Use </topcalltime:1279029830779797629> para ver o ranking completo.`)
 			.setColor("5763719");
 
 		ctx.sendMessage({ embeds: [embed] });
