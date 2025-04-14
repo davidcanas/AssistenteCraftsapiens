@@ -101,21 +101,40 @@ async function sendMonthlyTopCallTime(client: DGClient) {
 
 async function resetTopHorasCall() {
 	try {
-		await userDB.updateMany(
-			{},
-			{
-				$set: {
-					totalTimeInCall: 0,
-					lastTimeInCall: null,
-					voiceSessions: []
+		const now = new Date();
+		const prevMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+		const monthKey = `${prevMonth.getFullYear()}-${String(prevMonth.getMonth() + 1).padStart(2, "0")}`;
+
+		const users = await userDB.find({});
+
+		for (const user of users) {
+			if (user.totalTimeInCall > 0) {
+				user.monthlyStats = user.monthlyStats || [];
+
+				const existingMonth = user.monthlyStats.find(stat => stat.month === monthKey);
+				if (existingMonth) {
+					existingMonth.totalTime += user.totalTimeInCall;
+				} else {
+					user.monthlyStats.push({
+						month: monthKey,
+						totalTime: user.totalTimeInCall,
+					});
 				}
 			}
-		);
-		console.log("Dados de chamadas de voz resetados com sucesso para todos os usuários.");
+
+			user.totalTimeInCall = 0;
+			user.lastTimeInCall = null;
+			user.voiceSessions = [];
+
+			await user.save();
+		}
+
+		console.log("Ranking mensal salvo e dados resetados com sucesso.");
 	} catch (error) {
 		console.error("Erro ao resetar dados de chamadas de voz:", error);
 	}
 }
+
 
 cron.schedule("0 0 1 * *", async () => {
 

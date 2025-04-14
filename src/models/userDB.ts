@@ -1,12 +1,16 @@
 import { Schema, model, Document, Types } from "mongoose";
 
-// Interface para o documento do usuário
 interface VoiceSession {
     _id: Types.ObjectId;
     channel: string;
     joinTime: Date;
     leaveTime: Date | null;
     duration: number;
+}
+
+interface MonthlyStat {
+    month: string; // formato: "2025-04"
+    totalTime: number;
 }
 
 interface userDB extends Document {
@@ -16,9 +20,10 @@ interface userDB extends Document {
     totalTimeInCall: number;
     lastTimeInCall: Date | null;
     punicoes: Array<object>;
+    monthlyStats: MonthlyStat[];
 }
 
-// Esquema para as sessões de voz
+
 const VoiceSessionSchema = new Schema<VoiceSession>({
     _id: { type: Schema.Types.ObjectId, default: () => new Types.ObjectId() },
     channel: { type: String, required: true },
@@ -27,14 +32,19 @@ const VoiceSessionSchema = new Schema<VoiceSession>({
     duration: { type: Number, default: 0 }
 });
 
-// Esquema para o usuário
+const MonthlyStatSchema = new Schema<MonthlyStat>({
+    month: { type: String, required: true },
+    totalTime: { type: Number, default: 0 },
+});
+
 const userDBSchema = new Schema<userDB>({
     id: { type: String, required: true },
     nick: { type: String, default: null },
-    voiceSessions: [VoiceSessionSchema], // Definido como um array de subdocumentos
+    voiceSessions: [VoiceSessionSchema], 
     totalTimeInCall: { type: Number, default: 0 },
     lastTimeInCall: { type: Date, default: null },
-    punicoes: { type: [Schema.Types.Mixed], default: [] }, // Array de objetos
+    punicoes: { type: [Schema.Types.Mixed], default: [] },
+    monthlyStats: { type: [MonthlyStatSchema], default: [] },
 }, {
     versionKey: false,
 });

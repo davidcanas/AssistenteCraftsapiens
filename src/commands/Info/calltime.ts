@@ -2,60 +2,96 @@ import Command from "../../structures/Command";
 import Client from "../../structures/Client";
 import CommandContext from "../../structures/CommandContext";
 
+function formatTime(seconds: number): string {
+	const days = Math.floor(seconds / 86400);
+	const hours = Math.floor((seconds % 86400) / 3600);
+	const minutes = Math.floor((seconds % 3600) / 60);
+
+	const parts = [];
+	if (days > 0) parts.push(`${days} ${days === 1 ? "dia" : "dias"}`);
+	if (hours > 0) parts.push(`${hours} ${hours === 1 ? "hora" : "horas"}`);
+	if (minutes > 0) parts.push(`${minutes} ${minutes === 1 ? "minuto" : "minutos"}`);
+
+	if (parts.length === 0) return "menos de 1 minuto";
+	return parts.join(" e ");
+}
+
+function getLastMonths(count = 2): string[] {
+	const months = [];
+	const now = new Date();
+	for (let i = 1; i <= count; i++) {
+		const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+		const y = d.getFullYear();
+		const m = String(d.getMonth() + 1).padStart(2, "0");
+		months.push(`${y}-${m}`);
+	}
+	return months;
+}
+
 export default class CallTimeCommand extends Command {
-    constructor(client: Client) {
-        super(client, {
-            name: "calltime",
-            description: "Verifique o tempo total de permanência na chamada de voz",
-            category: "Info",
-            aliases: ["voicetime", "callduration"],
-            options: [],
-        });
-    }
+	constructor(client: Client) {
+		super(client, {
+			name: "calltime",
+			description: "Verifique o tempo total de permanência na chamada de voz",
+			category: "Info",
+			aliases: ["voicetime", "callduration"],
+			options: [],
+		});
+	}
 
-    async execute(ctx: CommandContext): Promise<void> {
- 
-        const userId = ctx.author.id;
+	async execute(ctx: CommandContext): Promise<void> {
+		const userId = ctx.author.id;
 
-        const topUsers = await this.client.db.users.find({})
-            .sort({ totalTimeInCall: -1 }) 
-            .exec(); 
-        if (topUsers.length === 0) {
-            ctx.sendMessage({
-                content: "Nenhum registro de chamadas de voz encontrado.",
-            });
-            return;
-        }
+		const topUsers = await this.client.db.users.find({})
+			.sort({ totalTimeInCall: -1 }).exec();
 
+		if (topUsers.length === 0) {
+			ctx.sendMessage({ content: "Nenhum registro de chamadas de voz encontrado." });
+			return;
+		}
 
-        const user = await this.client.db.users.findOne({ id: userId });
+		const user = await this.client.db.users.findOne({ id: userId });
+		if (!user) {
+			ctx.sendMessage({ content: "Você não tem registros de chamadas de voz." });
+			return;
+		}
 
-        if (!user) {
-           ctx.sendMessage({
-                content: "Você não tem registros de chamadas de voz.",
-            });
-            return;
-        }
+		const totalDuration = user.totalTimeInCall || 0;
+		const userPosition = topUsers.findIndex((u) => u.id === userId) + 1;
 
-        const totalDuration = user.totalTimeInCall; // em segundos
+		const formattedTime = formatTime(totalDuration);
 
-        const userPosition = topUsers.findIndex((u) => u.id === userId) + 1;
+		const ultimosMeses = getLastMonths(2);
+		const historicoMeses = [];
 
-        // HH:MM:SS
-        const hours = Math.floor(totalDuration / 3600);
-        const minutes = Math.floor((totalDuration % 3600) / 60);
-        const seconds = totalDuration % 60;
+		for (const mes of ultimosMeses) {
+            
+			const stats = user.monthlyStats?.find(stat => stat.month === mes);
+			if (stats) {
+				const allUsers = await this.client.db.users.find({
+					"monthlyStats.month": mes
+				}).exec();
 
-        const formattedTime = `${Math.round(hours).toString().padStart(2, "0")}h:${Math.round(minutes).toString().padStart(2, "0")}min:${Math.round(seconds).toString().padStart(2, "0")}s`;
+				const sorted = allUsers.map(u => {
+					const found = u.monthlyStats.find(stat => stat.month === mes);
+					return { id: u.id, total: found ? found.totalTime : 0 };
+				}).sort((a, b) => b.total - a.total);
 
+				const posicao = sorted.findIndex(u => u.id === userId) + 1;
 
-        const embed = new this.client.embed()
-            .setTitle("🕒 Tempo em calls de estudo")
-            .setDescription(`Seu tempo total de permanência em calls de estudo é: **${formattedTime}**\nVocê está na posição **#${userPosition}** no ranking.\n\n<:purplearrow:1145719018121089045> Use </topcalltime:1279029830779797629> para ver o ranking.`)
-            .setColor("5763719");
+				const date = new Date(mes + "-01");
+				const nomeMes = date.toLocaleString("pt-BR", { month: "long", year: "numeric" });
+				const tempo = formatTime(stats.totalTime);
 
-        ctx.sendMessage({
-            embeds: [embed]
-        });
-    }
+				historicoMeses.push(`📅 **${nomeMes}** — ${tempo} • 🥇 Posição: #${posicao}`);
+			}
+		}
+
+		const embed = new this.client.embed()
+			.setTitle("🕒 Tempo em calls de estudo")
+			.setDescription(`🔹 Tempo atual: **${formattedTime}**\n🔹 Posição no ranking: **#${userPosition}**\n\n${historicoMeses.length > 0 ? "📊 **Histórico dos últimos meses:**\n" + historicoMeses.join("\n") : "📊 Nenhum histórico de meses anteriores encontrado."}\n\n<:purplearrow:1145719018121089045> Use </topcalltime:1279029830779797629> para ver o ranking completo.`)
+			.setColor("5763719");
+
+		ctx.sendMessage({ embeds: [embed] });
+	}
 }
