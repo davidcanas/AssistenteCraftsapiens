@@ -32,15 +32,28 @@ export default class CallTimeCommand extends Command {
 	constructor(client: Client) {
 		super(client, {
 			name: "calltime",
-			description: "Verifique o tempo total de permanência na chamada de voz",
+			description: "Verifique o tempo total de permanência no sistema de #Estudo Focado",
 			category: "Info",
 			aliases: ["voicetime", "callduration"],
-			options: [],
+			options: [
+                {
+                    type: 6, 
+                    name: "user",
+                    description: "Caso queira ver o tempo de outro usuário",
+                    required: false,
+                },
+            ],
 		});
 	}
 
 	async execute(ctx: CommandContext): Promise<void> {
-		const userId = ctx.author.id;
+		const userId = ctx.args[0] || ctx.author.id;
+        const discordMember = ctx.guild.members.get(userId);
+       
+        if (!discordMember) {
+            ctx.sendMessage({ content: "❌ Usuário não encontrado!" });
+            return;
+        }
 
 		const topUsers = await this.client.db.users.find({})
 			.sort({ totalTimeInCall: -1 }).exec();
@@ -65,7 +78,7 @@ export default class CallTimeCommand extends Command {
 		const historicoMeses = [];
 
 		for (const mes of ultimosMeses) {
-            
+
 			const stats = user.monthlyStats?.find(stat => stat.month === mes);
 			if (stats) {
 				const allUsers = await this.client.db.users.find({
@@ -83,13 +96,13 @@ export default class CallTimeCommand extends Command {
 				const nomeMes = date.toLocaleString("pt-BR", { month: "long", year: "numeric" });
 				const tempo = formatTime(stats.totalTime);
 
-				historicoMeses.push(`📅 **${nomeMes}** — ${tempo} • 🥇 Posição: #${posicao}`);
+				historicoMeses.push(`**${nomeMes}** — \`${tempo}\` • 🥇 Posição: \`#${posicao}\``);
 			}
 		}
 
 		const embed = new this.client.embed()
-			.setTitle("🕒 Tempo em calls de estudo")
-			.setDescription(`🔹 Tempo atual: **${formattedTime}**\n🔹 Posição no ranking: **#${userPosition}**\n\n${historicoMeses.length > 0 ? "📊 **Histórico dos últimos meses:**\n" + historicoMeses.join("\n") : "📊 Nenhum histórico de meses anteriores encontrado."}\n\n<:purplearrow:1145719018121089045> Use </topcalltime:1279029830779797629> para ver o ranking completo.`)
+			.setTitle(`🕒 Tempo em calls de estudo - ${discordMember.nick}`)
+			.setDescription(`🔹 Tempo atual: **${formattedTime}**\n🔹 Posição no ranking: **#${userPosition}**\n\n${historicoMeses.length > 0 ? "📊 **Histórico dos últimos meses:**\n" + historicoMeses.join("\n") : "`Nenhum histórico de meses anteriores encontrado.`"}\n\n<:purplearrow:1145719018121089045> Use </topcalltime:1279029830779797629> para ver o ranking completo.`)
 			.setColor("5763719");
 
 		ctx.sendMessage({ embeds: [embed] });
