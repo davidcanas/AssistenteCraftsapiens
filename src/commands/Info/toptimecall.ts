@@ -2,22 +2,6 @@ import Command from "../../structures/Command";
 import Client from "../../structures/Client";
 import CommandContext from "../../structures/CommandContext";
 
-function formatTime(seconds: number): string {
-    const days = Math.floor(seconds / 86400);
-    const hours = Math.floor((seconds % 86400) / 3600);
-    const minutes = Math.floor((seconds % 3600) / 60);
-
-    const parts = [];
-
-    if (days > 0) parts.push(`${days} ${days === 1 ? "dia" : "dias"}`);
-    if (hours > 0) parts.push(`${hours} ${hours === 1 ? "hora" : "horas"}`);
-    if (minutes > 0) parts.push(`${minutes} ${minutes === 1 ? "minuto" : "minutos"}`);
-
-    if (parts.length === 0) return "menos de 1 minuto";
-    if (parts.length === 1) return parts[0];
-    return parts.slice(0, 2).join(" e ");
-}
-
 export default class TopCallTimeCommand extends Command {
     constructor(client: Client) {
         super(client, {
@@ -74,7 +58,7 @@ export default class TopCallTimeCommand extends Command {
         }
 
         const description = rankedUsers.map((user, index) => {
-            const formattedTime = formatTime(user.totalTime);
+            const formattedTime = ctx.formatTime(user.totalTime);
             return `**${index + 1}. <@${user.id}>** - ${formattedTime}`;
         }).join("\n");
 

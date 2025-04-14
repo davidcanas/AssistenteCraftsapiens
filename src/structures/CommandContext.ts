@@ -90,7 +90,7 @@ export default class CommandContext {
 
 					this.args = options.map((ops) => ops.value.toString().trim());
 					this.argsObj = options.map((ops) => ops);
-						
+
 
 
 
@@ -191,19 +191,39 @@ export default class CommandContext {
 	MsToHour(time) {
 		time = Math.round(time / 1000);
 		const s = time % 60,
-		m = ~~((time / 60) % 60),
-		h = ~~(time / 60 / 60);
+			m = ~~((time / 60) % 60),
+			h = ~~(time / 60 / 60);
 
 		return h === 0
-		? `${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`
-		: `${String(Math.abs(h) % 24).padStart(2, "0")}:${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`;
+			? `${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`
+			: `${String(Math.abs(h) % 24).padStart(2, "0")}:${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`;
 	}
-    progressBar(current, total, barSize) {
-		const progress = Math.round((barSize*current)/total);
- 
-		return "━".repeat(progress > 0 ? progress-1 : progress) + "🔘" + "━".repeat(barSize-progress);
+	formatTime(seconds: number): string {
+		const days = Math.floor(seconds / 86400);
+		const hours = Math.floor((seconds % 86400) / 3600);
+		const minutes = Math.floor((seconds % 3600) / 60);
+		const secs = Math.floor(seconds % 60);
+
+		const parts = [];
+		if (days > 0) parts.push(`${days} ${days === 1 ? "dia" : "dias"}`);
+		if (hours > 0) parts.push(`${hours} ${hours === 1 ? "hora" : "horas"}`);
+		if (minutes > 0) parts.push(`${minutes} ${minutes === 1 ? "minuto" : "minutos"}`);
+		if (secs > 0) parts.push(`${secs} ${secs === 1 ? "segundo" : "segundos"}`);
+
+		if (parts.length === 0) return "menos de 1 segundo";
+		if (parts.length === 1) return parts[0];
+		if (parts.length === 2) return parts.join(" e ");
+
+		const last = parts.pop();
+		return parts.join(", ") + " e " + last;
+	}
+	
+	progressBar(current, total, barSize) {
+		const progress = Math.round((barSize * current) / total);
+
+		return "━".repeat(progress > 0 ? progress - 1 : progress) + "🔘" + "━".repeat(barSize - progress);
 		// 
-		}
+	}
 
 	async defer() {
 		if (this.interactionOrMessage instanceof CommandInteraction) {

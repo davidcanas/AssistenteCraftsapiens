@@ -2,20 +2,6 @@ import Command from "../../structures/Command";
 import Client from "../../structures/Client";
 import CommandContext from "../../structures/CommandContext";
 
-function formatTime(seconds: number): string {
-	const days = Math.floor(seconds / 86400);
-	const hours = Math.floor((seconds % 86400) / 3600);
-	const minutes = Math.floor((seconds % 3600) / 60);
-
-	const parts = [];
-	if (days > 0) parts.push(`${days} ${days === 1 ? "dia" : "dias"}`);
-	if (hours > 0) parts.push(`${hours} ${hours === 1 ? "hora" : "horas"}`);
-	if (minutes > 0) parts.push(`${minutes} ${minutes === 1 ? "minuto" : "minutos"}`);
-
-	if (parts.length === 0) return "menos de 1 minuto";
-	return parts.join(" e ");
-}
-
 function getLastMonths(count = 3): string[] {
 	const months = [];
 	const now = new Date();
@@ -72,7 +58,7 @@ export default class CallTimeCommand extends Command {
 		const totalDuration = user.totalTimeInCall || 0;
 		const userPosition = topUsers.findIndex((u) => u.id === userId) + 1;
 
-		const formattedTime = formatTime(totalDuration);
+		const formattedTime = ctx.formatTime(totalDuration);
 
 		const ultimosMeses = getLastMonths(2);
 		const historicoMeses = [];
@@ -94,7 +80,7 @@ export default class CallTimeCommand extends Command {
 
 				const date = new Date(mes + "-01");
 				const nomeMes = date.toLocaleString("pt-BR", { month: "long", year: "numeric" });
-				const tempo = formatTime(stats.totalTime);
+				const tempo = ctx.formatTime(stats.totalTime);
 
 				historicoMeses.push(`**${nomeMes}** — \`${tempo}\` • 🥇 Posição: \`#${posicao}\``);
 			}
