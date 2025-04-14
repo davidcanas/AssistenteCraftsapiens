@@ -17,8 +17,8 @@ export default class voiceChannelJoin {
         const studyChannels: { [key: string]: string } = {
             "Ada": "1005889304658202704",
             "Luy": "1005889381762084976",
-            "Nina": "1005889464293392466",
-            "Estudo4": "1272703689567768598"
+            "Nina": "1005889464293392466"
+          //  "Estudo4": "1272703689567768598"
         };
 
         if (!Object.values(studyChannels).includes(channel.id)) return;

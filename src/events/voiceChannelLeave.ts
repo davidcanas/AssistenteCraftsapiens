@@ -10,7 +10,7 @@ export default class voiceChannelLeave {
 
     async run(member: Member, channel: VoiceChannel | StageChannel | Uncached) {
 
-        const studyChannels = ["1005889304658202704", "1005889381762084976", "1005889464293392466", "1272703689567768598"];
+        const studyChannels = ["1005889304658202704", "1005889381762084976", "1005889464293392466"];
 
         if (!studyChannels.includes(channel.id)) return;
 
