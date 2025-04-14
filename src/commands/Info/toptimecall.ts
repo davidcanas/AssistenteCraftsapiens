@@ -20,8 +20,8 @@ export default class TopCallTimeCommand extends Command {
         });
     }
 
-    async execute(ctx: CommandContext): Promise<void> {
-        const inputMonth = ctx.args[0]
+    async execute(context: CommandContext): Promise<void> {
+        const inputMonth = context.args[0];
 
         const now = new Date();
         const currentMonth = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
@@ -51,14 +51,14 @@ export default class TopCallTimeCommand extends Command {
             .slice(0, 10);
 
         if (rankedUsers.length === 0) {
-            ctx.sendMessage({
+            context.sendMessage({
                 content: `Nenhum registro de chamadas de voz encontrado para o mês **${targetMonth}**.`,
             });
             return;
         }
 
         const description = rankedUsers.map((user, index) => {
-            const formattedTime = ctx.formatTime(user.totalTime);
+            const formattedTime = context.formatTime(user.totalTime);
             
             const medal = index === 0 ? "🥇"
                         : index === 1 ? "🥈"
@@ -77,7 +77,7 @@ export default class TopCallTimeCommand extends Command {
             .setDescription(description)
             .setColor("5763719");
 
-        ctx.sendMessage({
+        context.sendMessage({
             embeds: [embed],
             components: [
                 {

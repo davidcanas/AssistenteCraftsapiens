@@ -78,7 +78,7 @@ export default class Mute extends Command {
         };
 
         const tempoMs = parseTime(tempoStr);
-        const eightDaysInMs = 8 * 24 * 60 * 60 * 1000
+        const eightDaysInMs = 8 * 24 * 60 * 60 * 1000;
 
         if (!tempoMs || tempoMs <= 0 || tempoMs > eightDaysInMs) {
             ctx.sendMessage({
@@ -87,8 +87,6 @@ export default class Mute extends Command {
             });
             return;
         }
-
-        const muteUntil = new Date(Date.now() + tempoMs).toISOString();
 
         const embed = new this.client.embed()
             .setTitle("Silenciamento de membro")

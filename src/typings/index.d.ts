@@ -1,19 +1,4 @@
- 
-import { AutocompleteInteraction } from "oceanic.js";
-
-interface Player {
-  world?: string;
-  armor?: number;
-  online?: boolean;
-  name?: string;
-  x?: number;
-  y?: number;
-  z?: number;
-  health?: number;
-  sort?: number;
-  type?: string;
-  account?: string;
-}
+ import { AutocompleteInteraction } from "oceanic.js";
 
 interface CommandSettings {
   name: string;
@@ -24,19 +9,6 @@ interface CommandSettings {
   default_member_permissions?: number;
   autocomplete?: boolean;
   options: Array<object>;
-}
-
-interface CityInfo {
-  name: string;
-  mayor: string;
-  nation: string;
-  members: string[];
-  coords: {
-  x?: number;
-  y?: number;
-  z?: number;
-  };
-  ruined?: boolean;
 }
 
 interface Command extends CommandSettings {
