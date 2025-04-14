@@ -14,9 +14,7 @@ export default class Command implements CommandSettings {
 	constructor(client: Client, options: CommandSettings) {
 		this.client = client;
 		this.name = options.name;
-		this.description =
-      options.category + " | " + options.description ||
-      options.category + " | " + "Nenhuma descrição especificada";
+		this.description = options.category + " | " + options.description;
 		this.aliases = options.aliases;
 		this.category = options.category;
 		this.options = options.options;
