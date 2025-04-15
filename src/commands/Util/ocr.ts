@@ -93,7 +93,7 @@ export default class OCR extends Command {
                             }
                         },
                         {
-                            "text": "Transcreva o texto desta imagem com precisão. Inclua toda a formatação, símbolos especiais e mantenha a estrutura original. Explique também o que é a imagem fornecida"
+                            "text": "Transcreva o texto desta imagem com precisão. Inclua toda a formatação, símbolos especiais e mantenha a estrutura original."
                         }
                     ]
                 }
@@ -126,7 +126,7 @@ export default class OCR extends Command {
 
             const embed = new this.client.embed()
                 .setColor("RANDOM")
-                .setTitle("🔍 OCR Resultado")
+                .setTitle("🔍 OCR")
                 .setDescription(`${extractedText}\n`)
                 .setFooter(`Solicitado por ${ctx.member?.nick || ctx.member?.user.globalName}`);
 
