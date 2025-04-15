@@ -2,7 +2,7 @@ import Command from "../../structures/Command";
 import Client from "../../structures/Client";
 import CommandContext from "../../structures/CommandContext";
 
-export default class OCR extends Command {
+export default class TestAttach extends Command {
     constructor(client: Client) {
         super(client, {
             name: "test_attach",
@@ -15,7 +15,6 @@ export default class OCR extends Command {
                     description: "The file to upload",
                     required: false
                 },
-
             ],
         });
     }
@@ -23,26 +22,30 @@ export default class OCR extends Command {
     async execute(ctx: CommandContext): Promise<void> {
         await ctx.defer();
 
-        const imagemAttachment = ctx.args[0];
+        // Obter o primeiro attachment disponível
+        const attachment = ctx.attachments[0];
 
-        if (!imagemAttachment ) {
-            ctx.sendMessage("Por favor, forneça uma imagem como anexo.");
+        if (!attachment) {
+            ctx.sendMessage("Por favor, anexe um arquivo ao comando.");
             return;
         }
-
 
         try {
+            // Debug no console
+            console.log("Attachment recebido:", attachment);
             
-            console.log(imagemAttachment);
-            ctx.sendMessage(imagemAttachment);
-            
+            // Construir resposta
+            const response = `✅ Attachment recebido!\n**Detalhes:**
+URL: ${attachment.url}
+Nome do arquivo: ${attachment.filename}
+Tipo: ${attachment.contentType}
+Tamanho: ${(attachment.size / 1024).toFixed(2)} KB`;
 
+            ctx.sendMessage(response);
+            
         } catch (error) {
-            console.error(error);
-            ctx.sendMessage("Ocorreu um erro ao processar a imagem. Verifique o URL ou o anexo.");
-            return;
+            console.error("Erro no teste de attachment:", error);
+            ctx.sendMessage("Ocorreu um erro ao processar o arquivo.");
         }
-
-
     }
 }

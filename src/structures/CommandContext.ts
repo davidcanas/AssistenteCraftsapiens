@@ -108,7 +108,15 @@ export default class CommandContext {
 				this.args = interaction.data
 					.resolved!.messages!.get(interaction.data.targetID!)!
 					.content.split(/ +/);
+			} else {
+			this.type = Type.INTERACTION;
+			this.attachments = [];
+		
+			if (interaction.data.resolved?.attachments) {
+				this.attachments = [...interaction.data.resolved.attachments.values()];
 			}
+		
+		}
 		}
 	}
 
