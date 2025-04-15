@@ -70,15 +70,6 @@ export default class askGPT extends Command {
         messages.push({ text: townyDocsMessages.join("\n") });
         messages.push({ text: `\nMensagem a responder: "${ctx.args.join(" ")}"` });
 
-        const inputText = ctx.args.join(" ");
-
-        function normalizeString(str: string) {
-            return str.toLowerCase()
-                .normalize("NFD")
-                .replace(/[\u0300-\u036f]/g, "");
-        }
-
-
         const data = {
             "model": process.env.AI_MODEL,
             "contents": {
