@@ -127,7 +127,7 @@ export default class OCR extends Command {
             const embed = new this.client.embed()
                 .setColor("RANDOM")
                 .setTitle("🔍 OCR Resultado")
-                .setDescription(`\`\`\`\n${extractedText}\n\`\`\``)
+                .setDescription(`${extractedText}\n`)
                 .setFooter(`Solicitado por ${ctx.member?.nick || ctx.member?.user.globalName}`);
 
             ctx.sendMessage({ embeds: [embed] });
