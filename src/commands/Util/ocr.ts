@@ -3,6 +3,7 @@ import Client from "../../structures/Client";
 import CommandContext from "../../structures/CommandContext";
 import fetch from "node-fetch";
 import { Buffer } from "buffer";
+import { Attachment } from "oceanic.js";
 
 export default class OCR extends Command {
     constructor(client: Client) {
@@ -12,7 +13,7 @@ export default class OCR extends Command {
             category: "Util",
             options: [
                 {
-                    type: 11, 
+                    type: 11, // ATTACHMENT
                     name: "imagem",
                     description: "A imagem para extrair o texto",
                     required: false
@@ -30,10 +31,19 @@ export default class OCR extends Command {
     async execute(ctx: CommandContext): Promise<void> {
         await ctx.defer();
 
-        const imagemAttachment = ctx.args[0];
+        const slashAttachmentId = ctx.args[0];
+        let attachment: Attachment | undefined;
+
+        if (slashAttachmentId) {
+            attachment = ctx.attachments.find(a => a.id === slashAttachmentId);
+        }
+
+        const messageAttachment = ctx.attachments?.[0];
         const imagemUrl = ctx.args[1];
 
-        if (!imagemAttachment && !imagemUrl) {
+        const imageSource = attachment || messageAttachment || imagemUrl;
+
+        if (!imageSource) {
             ctx.sendMessage("Por favor, forneça uma imagem como anexo ou uma URL.");
             return;
         }
@@ -42,8 +52,10 @@ export default class OCR extends Command {
         let mimeType: string;
 
         try {
-            
-            //const imageUrl = imagemAttachment ? imagemAttachment?.url : imagemUrl!;
+            const imageUrl = imageSource instanceof Attachment 
+                ? imageSource.url 
+                : imageSource;
+
             const response = await fetch(imageUrl);
             
             if (!response.ok) throw new Error("Falha ao buscar a imagem.");
@@ -81,7 +93,7 @@ export default class OCR extends Command {
                             }
                         },
                         {
-                            "text": "Transcreva o texto desta imagem com precisão. Inclua toda a formatação, símbolos especiais e mantenha a estrutura original."
+                            "text": "Transcreva o texto desta imagem com precisão. Inclua toda a formatação, símbolos especiais e mantenha a estrutura original. Explique também o que é a imagem fornecida"
                         }
                     ]
                 }
@@ -107,13 +119,14 @@ export default class OCR extends Command {
 
             let extractedText = json.candidates[0].content.parts[0].text;
 
+            // Truncar para limite do Discord
             if (extractedText.length > 4096) {
                 extractedText = extractedText.substring(0, 4093) + "...";
             }
 
             const embed = new this.client.embed()
                 .setColor("RANDOM")
-                .setTitle("� OCR Resultado")
+                .setTitle("🔍 OCR Resultado")
                 .setDescription(`\`\`\`\n${extractedText}\n\`\`\``)
                 .setFooter(`Solicitado por ${ctx.member?.nick || ctx.member?.user.globalName}`);
 

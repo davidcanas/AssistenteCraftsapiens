@@ -10,7 +10,7 @@ export default class TestAttach extends Command {
             category: "DG",
             options: [
                 {
-                    type: 11, 
+                    type: 11,
                     name: "image",
                     description: "The file to upload",
                     required: false
@@ -33,8 +33,8 @@ export default class TestAttach extends Command {
         try {
             // Debug no console
             console.log("Attachment recebido:", attachment);
-            
-            // Construir resposta
+
+
             const response = `✅ Attachment recebido!\n**Detalhes:**
 URL: ${attachment.url}
 Nome do arquivo: ${attachment.filename}
@@ -42,7 +42,7 @@ Tipo: ${attachment.contentType}
 Tamanho: ${(attachment.size / 1024).toFixed(2)} KB`;
 
             ctx.sendMessage(response);
-            
+
         } catch (error) {
             console.error("Erro no teste de attachment:", error);
             ctx.sendMessage("Ocorreu um erro ao processar o arquivo.");
