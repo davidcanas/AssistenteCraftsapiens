@@ -134,7 +134,7 @@ export default class OCR extends Command {
 
         } catch (error) {
             console.error("Erro no OCR:", error);
-            ctx.sendMessage("Ocorreu um erro ao processar a imagem. Tente novamente com uma imagem mais clara.");
+            ctx.sendMessage("Ocorreu um erro ao processar a imagem. Tente novamente.");
         }
     }
 }
