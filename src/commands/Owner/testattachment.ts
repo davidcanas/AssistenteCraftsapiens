@@ -11,8 +11,8 @@ export default class OCR extends Command {
             options: [
                 {
                     type: 11, 
-                    name: "imagem",
-                    description: "A imagem para testar",
+                    name: "image",
+                    description: "The file to upload",
                     required: false
                 },
 
