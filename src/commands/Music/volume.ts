@@ -2,6 +2,7 @@ import Command from "../../structures/Command";
 import Client from "../../structures/Client";
 import CommandContext from "../../structures/CommandContext";
 import { ConnectionState } from "vulkava";
+import { Constants } from "oceanic.js";
 
 export default class Volume extends Command {
 	constructor(client: Client) {
@@ -13,11 +14,11 @@ export default class Volume extends Command {
 			options: [
 				{
 					name: "volume",
-					type: 3,
+					type: Constants.ApplicationCommandOptionTypes.STRING,
 					description: "O volume a definir [0-500]",
 					required: true,
 				},
-			], //lol
+			], 
 		});
 	}
 

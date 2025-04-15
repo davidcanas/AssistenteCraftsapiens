@@ -2,6 +2,7 @@ import Command from "../../structures/Command";
 import Client from "../../structures/Client";
 import CommandContext from "../../structures/CommandContext";
 import { create, all } from "mathjs";
+import { Constants } from "oceanic.js";
 
 export default class calcClass extends Command {
 	constructor(client: Client) {
@@ -12,7 +13,7 @@ export default class calcClass extends Command {
 			aliases: ["calcular"],
 			options: [
 				{
-					type: 3,
+					type: Constants.ApplicationCommandOptionTypes.USER,
 					name: "calculo",
 					description: "A expressão matemática que você quer calcular",
 					required: true

@@ -3,6 +3,7 @@ import Command from "../../structures/Command";
 import Client from "../../structures/Client";
 import CommandContext from "../../structures/CommandContext";
 import translate from "@iamtraction/google-translate";
+import { Constants } from "oceanic.js";
 
 export default class translatorClass extends Command {
 	constructor(client: Client) {
@@ -13,14 +14,14 @@ export default class translatorClass extends Command {
 			aliases: ["traduzir", "tradutor"],
 			options: [
 				{
-					type: 3,
+					type: Constants.ApplicationCommandOptionTypes.STRING,
 					name: "lang",
-					description: "A linguagem no qual o texto será traduzido",
+					description: "A linguagem no qual o texto será traduzido (ex: pt)",
 					required: true
 
 				},
 				{
-					type: 3,
+					type: Constants.ApplicationCommandOptionTypes.STRING,
 					name: "texto",
 					description: "O texto a ser traduzido",
 					required: true

@@ -1,6 +1,7 @@
 import Command from "../../structures/Command";
 import Client from "../../structures/Client";
 import CommandContext from "../../structures/CommandContext";
+import { Constants } from "oceanic.js";
 
 function getLastMonths(count = 3): string[] {
 	const months = [];
@@ -23,7 +24,7 @@ export default class CallTimeCommand extends Command {
 			aliases: ["voicetime", "callduration"],
 			options: [
                 {
-                    type: 6, 
+                    type: Constants.ApplicationCommandOptionTypes.USER, 
                     name: "user",
                     description: "Caso queira ver o tempo de outro usuário",
                     required: false,

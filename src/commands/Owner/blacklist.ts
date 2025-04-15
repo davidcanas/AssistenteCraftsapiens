@@ -1,6 +1,7 @@
 import Command from "../../structures/Command";
 import Client from "../../structures/Client";
 import CommandContext from "../../structures/CommandContext";
+import { Constants } from "oceanic.js";
 
 export default class blacklist extends Command {
 	constructor(client: Client) {
@@ -13,15 +14,15 @@ export default class blacklist extends Command {
 				{
 					name: "listar",
 					description: "Lista os usuários na blacklist",
-					type: 1
+					type: Constants.ApplicationCommandOptionTypes.SUB_COMMAND
 				},
 				{
 					name: "add",
 					description: "Banir um jogador de usar o assistente",
-					type: 1,
+					type: Constants.ApplicationCommandOptionTypes.SUB_COMMAND,
 					options: [
 						{
-							type: 6,
+							type: Constants.ApplicationCommandOptionTypes.USER,
 							name: "user",
 							description: "Usuário que deseja banir de usar o assistente",
 							required: true
@@ -31,12 +32,12 @@ export default class blacklist extends Command {
 				{
 					name: "remove",
 					description: "Permite um jogador de usar o assistente",
-					type: 1,
+					type: Constants.ApplicationCommandOptionTypes.SUB_COMMAND,
 					options: [
 						{
-							type: 6,
+							type: Constants.ApplicationCommandOptionTypes.USER,
 							name: "user",
-							description: "Usuário que deseja desbanir de usar comandos de música",
+							description: "Usuário que deseja voltar a permitir usar o assistente",
 							required: true
 						}
 					]
@@ -80,7 +81,6 @@ export default class blacklist extends Command {
 
 		if (action === "add" || action === "remove") {
 			const user = this.client.users.get(target);
-			const channel = this.client.guilds.get("892472046729179136").channels.get(target);
         
 			if (user && user.username) {
 				

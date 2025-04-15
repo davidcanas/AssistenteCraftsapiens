@@ -2,7 +2,7 @@ import Command from "../../structures/Command";
 import Client from "../../structures/Client";
 import CommandContext from "../../structures/CommandContext";
 import { ConnectionState, Player } from "vulkava";
-import { VoiceChannel } from "oceanic.js";
+import { Constants, VoiceChannel } from "oceanic.js";
 
 export default class play extends Command {
 	constructor(client: Client) {
@@ -13,8 +13,8 @@ export default class play extends Command {
 			aliases: ["p", "tocar"],
 			options: [{
 				name: "music",
-				description: "A música a tocar",
-				type: 3,
+				description: "A música para tocar",
+				type: Constants.ApplicationCommandOptionTypes.STRING,
 				required: true,
 			}],
 		});

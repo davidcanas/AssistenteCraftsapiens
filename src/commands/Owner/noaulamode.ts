@@ -1,6 +1,7 @@
 import Command from "../../structures/Command";
 import Client from "../../structures/Client";
 import CommandContext from "../../structures/CommandContext";
+import { Constants } from "oceanic.js";
 
 export default class noAulaClass extends Command {
 	constructor(client: Client) {
@@ -10,7 +11,7 @@ export default class noAulaClass extends Command {
 			category: "DG",
 			aliases: [],
 			options: [{
-				type: 3,
+				type: Constants.ApplicationCommandOptionTypes.STRING,
 				name: "oquefazer",
 				description: "Ativar ou desativar o sistema de não haver aulas",
 				required: true,
@@ -26,7 +27,7 @@ export default class noAulaClass extends Command {
 				]
 			},
 			{
-				type: 3,
+				type: Constants.ApplicationCommandOptionTypes.STRING,
 				name: "motivo",
 				description: "(Caso seja para desativar) Motivo de não haver aulas",
 				required: false

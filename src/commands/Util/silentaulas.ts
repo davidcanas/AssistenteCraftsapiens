@@ -1,6 +1,7 @@
 import Command from "../../structures/Command";
 import Client from "../../structures/Client";
 import CommandContext from "../../structures/CommandContext";
+import { Constants } from "oceanic.js";
 
 export default class silentClassClass extends Command {
 	constructor(client: Client) {
@@ -13,7 +14,7 @@ export default class silentClassClass extends Command {
 				{
 					name: "aviso_aulas",
 					description: "Silencia os avisos de aulas enviados pelo bot quando é perguntado sobre aula",
-					type: 1,
+					type: Constants.ApplicationCommandOptionTypes.SUB_COMMAND,
 				}
 			],
 

@@ -2,6 +2,7 @@ import Command from "../../structures/Command";
 import Client from "../../structures/Client";
 import CommandContext from "../../structures/CommandContext";
 import { create } from "sourcebin";
+import { Constants } from "oceanic.js";
 
 export default class Eval extends Command {
 	constructor(client: Client) {
@@ -13,7 +14,7 @@ export default class Eval extends Command {
 			options: [
 				{
 					name: "input",
-					type: 3,
+					type: Constants.ApplicationCommandOptionTypes.STRING,
 					description: "Descrição não definida",
 					required: true,
 				},

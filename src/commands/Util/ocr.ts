@@ -3,23 +3,23 @@ import Client from "../../structures/Client";
 import CommandContext from "../../structures/CommandContext";
 import fetch from "node-fetch";
 import { Buffer } from "buffer";
-import { Attachment } from "oceanic.js";
+import { Attachment, Constants } from "oceanic.js";
 
 export default class OCR extends Command {
     constructor(client: Client) {
         super(client, {
             name: "ocr",
-            description: "Extrai texto de uma imagem usando OCR",
+            description: "Extrai texto de uma imagem usando OCR (com IA)",
             category: "Util",
             options: [
                 {
-                    type: 11, // ATTACHMENT
+                    type: Constants.ApplicationCommandOptionTypes.ATTACHMENT, 
                     name: "imagem",
                     description: "A imagem para extrair o texto",
                     required: false
                 },
                 {
-                    type: 3, // STRING
+                    type: Constants.ApplicationCommandOptionTypes.STRING, 
                     name: "url",
                     description: "URL da imagem para extrair o texto",
                     required: false

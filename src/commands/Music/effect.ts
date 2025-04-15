@@ -2,6 +2,7 @@ import Command from "../../structures/Command";
 import Client from "../../structures/Client";
 import CommandContext from "../../structures/CommandContext";
 import { ConnectionState } from "vulkava";
+import { Constants } from "oceanic.js";
 
 export default class Speedup extends Command {
 	constructor(client: Client) {
@@ -12,7 +13,7 @@ export default class Speedup extends Command {
 			aliases: ["speedup"],
 			options: [
 				{
-					type: 3,
+					type: Constants.ApplicationCommandOptionTypes.STRING,
 					name: "efeito",
 					description: "O efeito a ativar",
 					required: true,

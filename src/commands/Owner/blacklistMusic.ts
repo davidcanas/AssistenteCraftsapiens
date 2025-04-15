@@ -1,6 +1,7 @@
 import Command from "../../structures/Command";
 import Client from "../../structures/Client";
 import CommandContext from "../../structures/CommandContext";
+import { Constants } from "oceanic.js";
 
 export default class blacklistMusic extends Command {
 	constructor(client: Client) {
@@ -13,21 +14,21 @@ export default class blacklistMusic extends Command {
 				{
 					name: "listar",
 					description: "Lista os usuários/canais na blacklist de comandos de música",
-					type: 1
+					type: Constants.ApplicationCommandOptionTypes.SUB_COMMAND
 				},
 				{
 					name: "add",
 					description: "Banir um jogador ou canal de usar comandos de música",
-					type: 1,
+					type: Constants.ApplicationCommandOptionTypes.SUB_COMMAND,
 					options: [
 						{
-							type: 6,
+							type: Constants.ApplicationCommandOptionTypes.USER,
 							name: "user",
 							description: "Usuário que deseja banir de usar comandos de música",
 							required: false
 						},
 						{
-							type: 7,
+							type: Constants.ApplicationCommandOptionTypes.CHANNEL,
 							name: "channel",
 							description: "Canal que deseja banir de usar comandos de música",
 							required: false
@@ -37,16 +38,16 @@ export default class blacklistMusic extends Command {
 				{
 					name: "remove",
 					description: "Remove um jogador ou canal da blacklist de comandos de musica",
-					type: 1,
+					type: Constants.ApplicationCommandOptionTypes.SUB_COMMAND,
 					options: [
 						{
-							type: 6,
+							type: Constants.ApplicationCommandOptionTypes.USER,
 							name: "user",
 							description: "Usuário que deseja desbanir de usar comandos de música",
 							required: false
 						},
 						{
-							type: 7,
+							type: Constants.ApplicationCommandOptionTypes.CHANNEL,
 							name: "channel",
 							description: "Canal que deseja desbanir de usar comandos de música",
 							required: false

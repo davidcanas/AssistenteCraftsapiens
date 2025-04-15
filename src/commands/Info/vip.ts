@@ -1,6 +1,7 @@
 import Command from "../../structures/Command";
 import Client from "../../structures/Client";
 import CommandContext from "../../structures/CommandContext";
+import { Constants } from "oceanic.js";
 
 export default class vipCommand extends Command {
 	constructor(client: Client) {
@@ -13,19 +14,19 @@ export default class vipCommand extends Command {
 				{
 					name: "topdoadores",
 					description: "Veja o top doadores desse mês na craftsapiens",
-					type: 1,
+					type: Constants.ApplicationCommandOptionTypes.SUB_COMMAND,
 					options: []
 				},
 				{
 					name: "ultimascompras",
 					description: "Veja as ultimas compras na craftsapiens",
-					type: 1,
+					type: Constants.ApplicationCommandOptionTypes.SUB_COMMAND,
 					options: []
 				},
 				{
 					name: "comprar",
 					description: "Link do site para comprar vip/premium/sapiens na craftsapiens",
-					type: 1,
+					type: Constants.ApplicationCommandOptionTypes.SUB_COMMAND,
 					options: []
 				},
 				{
@@ -34,7 +35,7 @@ export default class vipCommand extends Command {
 					type: 1,
 					options: [
 						{
-							type: 3,
+							type: Constants.ApplicationCommandOptionTypes.STRING,
 							name: "cupom",
 							description: "Cupom de desconto",
 							required: true,

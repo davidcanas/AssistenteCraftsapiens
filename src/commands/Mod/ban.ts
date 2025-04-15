@@ -1,6 +1,7 @@
 import Command from "../../structures/Command";
 import Client from "../../structures/Client";
 import CommandContext from "../../structures/CommandContext";
+import { Constants } from "oceanic.js";
 
 export default class Ban extends Command {
     constructor(client: Client) {
@@ -11,13 +12,13 @@ export default class Ban extends Command {
             aliases: ["banir"],
             options: [
                 {
-                    type: 6, 
+                    type: Constants.ApplicationCommandOptionTypes.USER, 
                     name: "user",
                     description: "Usuário que deseja banir",
                     required: true,
                 },
                 {
-                    type: 3,
+                    type: Constants.ApplicationCommandOptionTypes.STRING,
                     name: "motivo",
                     description: "Motivo do banimento",
                     required: false,

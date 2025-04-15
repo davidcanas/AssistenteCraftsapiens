@@ -1,6 +1,7 @@
 import Command from "../../structures/Command";
 import Client from "../../structures/Client";
 import CommandContext from "../../structures/CommandContext";
+import { Constants } from "oceanic.js";
 
 export default class Kick extends Command {
     constructor(client: Client) {
@@ -11,13 +12,13 @@ export default class Kick extends Command {
             aliases: ["expulsar"],
             options: [
                 {
-                    type: 6, 
+                    type: Constants.ApplicationCommandOptionTypes.USER, 
                     name: "user",
                     description: "Jogador que deseja expulsar do servidor",
                     required: true,
                 },
                 {
-                    type: 3, 
+                    type: Constants.ApplicationCommandOptionTypes.STRING, 
                     name: "motivo",
                     description: "Motivo da expulsão",
                     required: false,

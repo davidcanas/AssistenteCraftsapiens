@@ -1,6 +1,7 @@
 import Command from "../../structures/Command";
 import Client from "../../structures/Client";
 import CommandContext from "../../structures/CommandContext";
+import { Constants } from "oceanic.js";
 
 export default class TopCallTimeCommand extends Command {
     constructor(client: Client) {
@@ -11,7 +12,7 @@ export default class TopCallTimeCommand extends Command {
             aliases: ["topvoicetime", "topcallduration"],
             options: [
                 {
-                    type: 3,
+                    type: Constants.ApplicationCommandOptionTypes.STRING,
                     name: "mes",
                     description: "Mês no formato YYYY-MM (ex: 2025-03). Se não for informado, o mês atual será considerado.",
                     required: false,

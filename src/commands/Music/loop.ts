@@ -2,6 +2,7 @@ import Command from "../../structures/Command";
 import Client from "../../structures/Client";
 import CommandContext from "../../structures/CommandContext";
 import { ConnectionState } from "vulkava";
+import { Constants } from "oceanic.js";
 
 export default class Loop extends Command {
 	constructor(client: Client) {
@@ -12,7 +13,7 @@ export default class Loop extends Command {
 			aliases: [""],
 			options: [
 				{
-                    type: 3,
+                    type: Constants.ApplicationCommandOptionTypes.STRING,
                     name: "modo",
                     description: "Ativa o loop na playlist (queue) ou na musica atual (track)",
                     required: true,

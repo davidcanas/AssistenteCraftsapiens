@@ -4,7 +4,7 @@ import CommandContext from "../../structures/CommandContext";
 import fetch from "node-fetch";
 import fs from "fs";
 import path from "path";
-
+import { Constants } from "oceanic.js";
 
 export default class askGPT extends Command {
     constructor(client: Client) {
@@ -15,18 +15,54 @@ export default class askGPT extends Command {
             aliases: ["askgpt", "gpt"],
             options: [
                 {
-                    type: 3,
+                    type: Constants.ApplicationCommandOptionTypes.STRING,
                     name: "pergunta",
                     description: "A pergunta a fazer ao assistente",
                     required: true
+                },
+                {
+                    type: Constants.ApplicationCommandOptionTypes.ATTACHMENT, // ATTACHMENT
+                    name: "imagem",
+                    description: "Imagem relacionada à pergunta",
+                    required: false
                 }
             ],
         });
     }
 
     async execute(ctx: CommandContext): Promise<void> {
-
         await ctx.defer();
+
+        let imagePart: any = null;
+        const attachmentOption = ctx.args[1];
+        const attachment = attachmentOption 
+            ? ctx.attachments.find(a => a.id === attachmentOption)
+            : ctx.attachments[0];
+
+        if (attachment) {
+            try {
+                const response = await fetch(attachment.url);
+                if (!response.ok) throw new Error("Falha ao buscar a imagem");
+                
+                const mimeType = response.headers.get("content-type");
+                if (!mimeType?.startsWith("image/")) {
+                    ctx.sendMessage("O arquivo fornecido não é uma imagem válida!");
+                    return;
+                }
+
+                const buffer = await response.buffer();
+                imagePart = {
+                    inlineData: {
+                        mimeType: mimeType,
+                        data: buffer.toString("base64")
+                    }
+                };
+            } catch (error) {
+                console.error("Erro ao processar imagem:", error);
+                ctx.sendMessage("Erro ao processar a imagem anexada!");
+                return;
+            }
+        }
 
         if (!ctx.args[0]) {
             ctx.args[0] = "[mencionou]";
@@ -70,11 +106,17 @@ export default class askGPT extends Command {
         messages.push({ text: townyDocsMessages.join("\n") });
         messages.push({ text: `\nMensagem a responder: "${ctx.args.join(" ")}"` });
 
+        const parts = [];
+        if (imagePart) {
+            parts.push(imagePart);
+        }
+        parts.push(...messages.map(msg => ({ text: msg.text })));
+
         const data = {
             "model": process.env.AI_MODEL,
             "contents": {
                 "role": "user",
-                "parts": messages
+                "parts": parts
             },
             "generationConfig": {
                 "maxOutputTokens": 600,

@@ -19,7 +19,7 @@ export default class IPCommand extends Command {
 			.setTitle("<:craftsapiens:905025137869463552> Craftsapiens")
 			.setDescription("O servidor suporta todas as plataformas (Java, Bedrock)\nCaso você seja um jogador de Bedrock, use a porta `19132` para se conectar!")
 			.addField("🌐 IP", "`jogar.craftsapiens.com.br`", false)
-			.addField("💫 Versões", "1.17-1.20.4 (Java/PC)\nestável mais recente (Bedrock/Celular)", false)
+			.addField("💫 Versões", "1.20-1.21.4 (Java/PC)\nestável mais recente (Bedrock/Celular)", false)
 			.addField("🟢 Status", fetch.online ? "Online" : "Offline", false)
 			.setThumbnail("https://cdn.discordapp.com/avatars/734297444744953907/81cad590e4210c0842963d23327d855d.png?size=2048");
 		if (fetch.online) {

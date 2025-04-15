@@ -3,6 +3,7 @@ import Command from "../../structures/Command";
 import Client from "../../structures/Client";
 import CommandContext from "../../structures/CommandContext";
 import { create } from "sourcebin";
+import { Constants } from "oceanic.js";
 
 export default class Shell extends Command {
   constructor(client: Client) {
@@ -13,8 +14,8 @@ export default class Shell extends Command {
       aliases: ["execute"],
       options: [
         {
-          name: "code",
-          type: 3,
+          name: "prompt",
+          type: Constants.ApplicationCommandOptionTypes.STRING,
           description: "O código a executar.",
           required: true,
         },

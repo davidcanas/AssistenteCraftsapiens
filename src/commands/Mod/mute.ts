@@ -1,6 +1,7 @@
 import Command from "../../structures/Command";
 import Client from "../../structures/Client";
 import CommandContext from "../../structures/CommandContext";
+import { Constants } from "oceanic.js";
 
 export default class Mute extends Command {
     constructor(client: Client) {
@@ -11,19 +12,19 @@ export default class Mute extends Command {
             aliases: ["silenciar"],
             options: [
                 {
-                    type: 6, 
+                    type: Constants.ApplicationCommandOptionTypes.USER, 
                     name: "user",
                     description: "Jogador que deseja silenciar",
                     required: true,
                 },
                 {
-                    type: 3,
+                    type: Constants.ApplicationCommandOptionTypes.STRING,
                     name: "tempo",
                     description: "Tempo de silenciamento (ex.: 1d, 5min, 36s)",
                     required: true,
                 },
                 {
-                    type: 3, 
+                    type: Constants.ApplicationCommandOptionTypes.STRING, 
                     name: "motivo",
                     description: "Motivo do silenciamento",
                     required: false,

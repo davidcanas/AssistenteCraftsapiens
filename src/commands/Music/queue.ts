@@ -11,7 +11,7 @@ export default class Queue extends Command {
 			description: "Vê a lista de musicas que estão na fila",
 			category: "Music",
 			aliases: ["lista", "list"],
-			options: [], //lol
+			options: [], 
 		});
 	}
 

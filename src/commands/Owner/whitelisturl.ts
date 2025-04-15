@@ -1,6 +1,7 @@
 import Command from "../../structures/Command";
 import Client from "../../structures/Client";
 import CommandContext from "../../structures/CommandContext";
+import { Constants } from "oceanic.js";
 
 export default class whitelistUrl extends Command {
 	constructor(client: Client) {
@@ -13,9 +14,9 @@ export default class whitelistUrl extends Command {
 				{
 					name: "add",
 					description: "Adiciona um URL na whitelist",
-					type: 1,
+					type: Constants.ApplicationCommandOptionTypes.SUB_COMMAND,
 					options: [{
-						type: 3,
+						type: Constants.ApplicationCommandOptionTypes.STRING,
 						name: "dominio",
 						description: "Domínio que deseja adicionar da whitelist (Exemplo: google.com)", 
 						required: true
@@ -25,9 +26,9 @@ export default class whitelistUrl extends Command {
 				{
 					name: "remove",
 					description: "Remove um URL da whitelist",
-					type: 1,
+					type: Constants.ApplicationCommandOptionTypes.SUB_COMMAND,
 					options:[{
-						type: 3,
+						type: Constants.ApplicationCommandOptionTypes.STRING,
 						name: "dominio",
 						description: "Domínio que deseja remover da whitelist (Exemplo: google.com)",
 						required: true
@@ -37,13 +38,13 @@ export default class whitelistUrl extends Command {
 				{
 					name: "list",
 					description: "Lista todos os URLs na whitelist",
-					type: 1,
+					type: Constants.ApplicationCommandOptionTypes.SUB_COMMAND,
 					options: []
 				},
 				{
 					name: "toggle",
 					description: "Ativa ou desativa o sistema de antilink",
-					type: 1,
+					type: Constants.ApplicationCommandOptionTypes.SUB_COMMAND,
 					options: []
 				}
 			],
