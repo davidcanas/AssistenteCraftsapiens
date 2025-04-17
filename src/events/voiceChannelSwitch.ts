@@ -14,10 +14,18 @@ export default class voiceChannelSwitch {
   
         if (member.bot) return;
 
+        setTimeout(async () => {
+        
         this.client.emit("voiceChannelLeave", member, oldChannel);
 
+        }, 2000);
+        
+        setTimeout(async () => {
+        
         this.client.emit("voiceChannelJoin", member, newChannel);
 
+        }, 7000);
+        
         console.log(`Usuário ${member.username} trocou de canal de voz`);
     }
 }
