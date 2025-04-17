@@ -17,7 +17,7 @@ export default class voiceChannelLeave {
         if (!user || !user.voiceSessions || user.voiceSessions.length === 0) return;
 
         const session = user.voiceSessions.find((s: any) =>
-            s.channel === channel.id && s.leaveTime === null
+            s.id === `${member.id}_${user.voiceSessions.length}` && s.leaveTime === null
         );
         if (!session) return;
 

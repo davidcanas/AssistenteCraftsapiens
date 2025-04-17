@@ -87,24 +87,22 @@ export default class voiceChannelJoin {
         console.log(`(${member.username} - entrou na Call de Estudo às ${joinTime}`);
 
         // Avoid duplicate session
-        if (user && user.voiceSessions.find((s: any) => s.channel === channel.id && s.leaveTime === null)) {
-            console.log(`(${member.username} - já está na Call de Estudo, não foi possível adicionar uma nova sessão, evitando possível bug :D :sunglasses:, eu me amo.`);
-            return;
-        }
+      //  if (user && user.voiceSessions.find((s: any) => s.channel === channel.id && s.leaveTime === null)) {
+        //    console.log(`(${member.username} - já está na Call de Estudo, não foi possível adicionar uma nova sessão, evitando possível bug :D :sunglasses:, eu me amo.`);
+        //    return;
+        //}
 
-        // Prepare new session ID for debug
         const newSessionId = new ObjectId();
         const previousSessions = user?.voiceSessions?.length ?? 0;
         const previousTotal = user?.totalTimeInCall ?? 0;
 
-        // Push new session
         await this.client.db.users.updateOne(
             { id: member.id },
             {
                 $push: {
                     voiceSessions: {
                         _id: newSessionId,
-                        channel: channel.id,
+                        id: `${member.id}_${previousSessions + 1}`,
                         joinTime: joinTime,
                         leaveTime: null,
                         duration: 0

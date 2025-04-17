@@ -2,7 +2,7 @@ import { Schema, model, Document, Types } from "mongoose";
 
 interface VoiceSession {
     _id: Types.ObjectId;
-    channel: string;
+    id: string;
     joinTime: Date;
     leaveTime: Date | null;
     duration: number;
@@ -26,7 +26,7 @@ interface userDB extends Document {
 
 const VoiceSessionSchema = new Schema<VoiceSession>({
     _id: { type: Schema.Types.ObjectId, default: () => new Types.ObjectId() },
-    channel: { type: String, required: true },
+    id: { type: String, required: true },
     joinTime: { type: Date, required: true },
     leaveTime: { type: Date, default: null },
     duration: { type: Number, default: 0 }
