@@ -11,8 +11,8 @@ export default class voiceChannelSwitch {
     }
 
     async run(member: Member, oldState: null | JSONVoiceState) {
-        console.log("Old state", oldState.selfDeaf);
-        console.log("New state", member.voiceState?.selfDeaf);
+        console.log("Old state " + member.username, oldState.selfDeaf);
+        console.log("New state " + member.username, member.voiceState?.selfDeaf);
 
     }
 }
