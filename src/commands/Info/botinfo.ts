@@ -25,7 +25,6 @@ export default class Botinfo extends Command {
 			let ping = this.client.shards.get(0)?.latency || 0;
 			if (ping === Infinity) ping = 0;
 
-
 			const memoryUsed = (process.memoryUsage().heapUsed / 1024 / 1024).toFixed(2);
 			const cpuUsage = (process.cpuUsage().system / 1024 / 1024).toFixed(2);
 			const uptime = ctx.MsToDate(this.client.uptime);
