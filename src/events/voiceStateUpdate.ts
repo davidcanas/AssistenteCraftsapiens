@@ -24,12 +24,12 @@ export default class voiceChannelSwitch {
         if (member.bot) return;
 
 
-        if (member.voiceState.selfDeaf === true && oldState?.selfDeaf === false) {
-            console.log("User " + member.username + " is now deafened");
+        if (member.voiceState.selfDeaf === true) {
+            console.log("User " + member.username + " is deafened");
             member.editVoiceState({channelID: null});
         }
-        if (member.voiceState.selfDeaf === false && oldState?.selfDeaf === true) {
-            console.log("User " + member.username + " is now undeafened");
+        if (member.voiceState.selfDeaf === false) {
+            console.log("User " + member.username + " is undeafened");
         }
 
     }
