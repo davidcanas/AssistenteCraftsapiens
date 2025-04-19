@@ -26,6 +26,7 @@ export default class voiceChannelSwitch {
 
         if (member.voiceState.selfDeaf === true && oldState?.selfDeaf === false) {
             console.log("User " + member.username + " is now deafened");
+            member.editVoiceState({channelID: null});
         }
         if (member.voiceState.selfDeaf === false && oldState?.selfDeaf === true) {
             console.log("User " + member.username + " is now undeafened");
