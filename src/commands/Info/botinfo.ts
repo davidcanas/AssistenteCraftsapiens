@@ -25,9 +25,6 @@ export default class Botinfo extends Command {
 			let ping = this.client.shards.get(0)?.latency || 0;
 			if (ping === Infinity) ping = 0;
 
-			const lavalinkPing = this.client.music?.nodes[0]
-				? await this.client.music.nodes[0].ping()
-				: "N/A";
 
 			const memoryUsed = (process.memoryUsage().heapUsed / 1024 / 1024).toFixed(2);
 			const cpuUsage = (process.cpuUsage().system / 1024 / 1024).toFixed(2);
@@ -38,7 +35,6 @@ export default class Botinfo extends Command {
 				.setDescription(
 					`<:discord:1185986429147431074> | ${ping}ms\n` +
 					`<:mongo:1185980474095583323> | ${dbResponseTime}ms\n` +
-					`<:lavalink:1186325123729465444> | ${lavalinkPing}ms\n` +
 					`✨ | v${version}\n` +
 					`<:ramemoji:1185990343888482386> | ${memoryUsed}MB\n` +
 					`<:cpu:1185985428977897483> | ${cpuUsage}%\n` +
