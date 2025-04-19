@@ -1,4 +1,4 @@
-import { JSONVoiceState, Member } from "oceanic.js";
+import { Member } from "oceanic.js";
 import Client from "../structures/Client";
 
 export default class voiceChannelSwitch {
@@ -10,7 +10,7 @@ export default class voiceChannelSwitch {
         this.client = client;
     }
 
-    async run(member: Member, oldState: null | JSONVoiceState) {
+    async run(member: Member) {
 
         // const guildID = "892472046729179136";
 
@@ -26,7 +26,7 @@ export default class voiceChannelSwitch {
 
         if (member.voiceState.selfDeaf === true) {
             console.log("User " + member.username + " is deafened");
-            await member.editVoiceState({channelID: null});
+            await member.edit({channelID: null, rea});
         }
         if (member.voiceState.selfDeaf === false) {
             console.log("User " + member.username + " is undeafened");
