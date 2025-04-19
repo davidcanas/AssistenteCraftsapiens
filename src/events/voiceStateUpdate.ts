@@ -11,8 +11,25 @@ export default class voiceChannelSwitch {
     }
 
     async run(member: Member, oldState: null | JSONVoiceState) {
-        console.log("Old state " + member.username, oldState.selfDeaf);
-        console.log("New state " + member.username, member.voiceState?.selfDeaf);
+
+        // const guildID = "892472046729179136";
+
+        const studyChannels: { [key: string]: string } = {
+            "Ada": "1005889304658202704",
+            "Luy": "1005889381762084976",
+            "Nina": "1005889464293392466"
+        };
+
+        if (!Object.values(studyChannels).includes(member.voiceState.channelID)) return;
+        if (member.bot) return;
+
+
+        if (member.voiceState.selfDeaf === true && oldState?.selfDeaf === false) {
+            console.log("User " + member.username + " is now deafened");
+        }
+        if (member.voiceState.selfDeaf === false && oldState?.selfDeaf === true) {
+            console.log("User " + member.username + " is now undeafened");
+        }
 
     }
 }
