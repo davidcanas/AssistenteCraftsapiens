@@ -1,100 +1,192 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt">
 <head>
-  <title>Top em Call de Estudo</title>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Top em Call de Estudo</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-  
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
   <style>
+    :root {
+      --bg-dark: #1e1f23;
+      --card-bg: #282a36;
+      --text-light: #f8f8f2;
+    }
     body {
-      background-color: #282b30;
-      color: #fff;
+      background-color: var(--bg-dark);
+      color: var(--text-light);
+      font-family: 'Segoe UI', sans-serif;
     }
-    .player-card {
+    .header {
+      background: linear-gradient(135deg, #6272a4, #44475a);
+      padding: 60px 0;
+      text-align: center;
+      margin-bottom: 30px;
+    }
+    .header h1 {
+      font-size: 2.5rem;
+      margin-bottom: 0.5rem;
+    }
+    .header p {
+      font-size: 1.1rem;
+      opacity: 0.8;
+    }
+    .search-container {
+      max-width: 400px;
+      margin: 0 auto 30px;
+    }
+    #searchBox {
       background-color: #333;
-      border-radius: 10px;
-      padding: 8px;
-      margin-bottom: 10px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      transition: background-color 0.3s ease;
+      border: none;
+      color: var(--text-light);
     }
-    .player-card:hover {
-      background-color: #555;
-    }
-    .player-card h4 {
-      color: #fff;
-      margin-bottom: 0;
-      font-size: 14px;
-      display: flex;
-      align-items: center;
-    }
-    .player-card p {
-      margin-bottom: 0;
-      font-size: 14px;
-      display: flex;
-      align-items: center;
+    #searchBox::placeholder {
+      color: #aaa;
     }
     .players-list {
-      max-height: 60vh;
-      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+      max-width: 600px;
+      margin: 0 auto;
     }
-    .players-title {
-      font-size: 20px;
-      font-weight: bold;
+    @keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.player-card {
+  animation: fadeIn 0.6s ease forwards;
+  opacity: 0;
+
+  animation-delay: calc(var(--i) * 0.1s);
+}
+    .player-card {
+      background-color: var(--card-bg);
+      border-radius: 12px;
+      padding: 20px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+      transition: transform 0.2s, box-shadow 0.2s;
+      display: flex;
+      align-items: center;
+    }
+    .player-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 6px 16px rgba(0,0,0,0.5);
+    }
+    .player-rank {
+      font-size: 1.5rem;
+      font-weight: 700;
+      width: 60px;
+      text-align: center;
       color: #fff;
     }
+    .player-info {
+      flex: 1;
+      margin-left: 15px;
+    }
+    .player-nick {
+      font-size: 1.2rem;
+      margin-bottom: 5px;
+    }
+    .player-nick .tag {
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      margin-right: 8px;
+    }
+    .player-time {
+      font-size: 0.9rem;
+      display: flex;
+      align-items: center;
+      opacity: 0.9;
+    }
+    .player-time i {
+      margin-right: 6px;
+      color: #8be9fd;
+    }
+    /* Cores dos cargos */
+    .tag.admin       { color: #AA0000; }
+    .tag.dev         { color: #55FFFF; }
+    .tag.reitor      { color: #5555FF; }
+    .tag.moderador   { color: #FF5555; }
+    .tag.ajuda       { color: #FFAA00; }
+    .tag.premium     { color: #55AA55; }
+    .tag.vip         { color: #FFFF55; }
+    .tag.booster     { color: #FF55FF; }
+    .tag.alunos      { color: #6d3f8b; }
+    .tag.monitoria   { color: #FE7310; }
   </style>
-   <%- include('../partials/navbar.ejs') %>
 </head>
 <body>
-  <% include('../partials/navbar.ejs') %>
-  <div class="container-fluid p-5 bg-primary text-white text-center">
-    <h1>🏆 Top membros com mais Tempo em Call</h1>
-    <p>Veja quem são os membros que mais passaram tempo em calls de estudo.</p>
-  </div>
-  
-  <div class="container mt-4">
-    <div class="row">
-        <div class="players-list">
-          <% topUsers.forEach(function(user, index) { %>
-            <% if (user.totalTimeInCall === 0) return; %>
-            <div class="player-card">
-              
-                    <% if (!highestRole(guild, user.nick) || highestRole(guild, user.nick) == "Alunos") { %>
-                      <h4><%=index+1%>º <span class="tag alunos">[Aluno]</span><%= user.nick %></h4>
-                    <% } else { %>
-                    <h4><%=index+1%>º <span class="tag <%=highestRole(guild, user.nick).toLowerCase()%>">[<%=highestRole(guild, user.nick)%>]</span> <%= user.nick %></h4>
-                    <% } %>
-                    <p>
-                      <%
-                      const days = Math.floor(user.totalTimeInCall / 86400);
-                      const hours = Math.floor((user.totalTimeInCall % 86400) / 3600);
-                      const minutes = Math.floor((user.totalTimeInCall % 3600) / 60);
-                      const seconds = Math.round(user.totalTimeInCall % 60);
-                    
-                      const timeParts = [];
-                      if (days > 0) timeParts.push(`${days} ${days === 1 ? 'dia' : 'dias'}`);
-                      if (hours > 0) timeParts.push(`${hours} ${hours === 1 ? 'hora' : 'horas'}`);
-                      if (minutes > 0) timeParts.push(`${minutes} ${minutes === 1 ? 'minuto' : 'minutos'}`);
-                      if (seconds > 0) timeParts.push(`${seconds} ${seconds === 1 ? 'segundo' : 'segundos'}`);
-                    
-                      const formattedTime = timeParts.join(" ");
-                      if (formattedTime.length === 0) {
-                        formattedTime = "Nenhum tempo registrado";
-                      }
-                    %>
-                    <%= formattedTime %>
-                    </p>
-                    
-            </div>
-          <% }); %>
-        </div>
+
+  <%- include('../partials/navbar.ejs') %>
+
+  <section class="header text-white">
+    <div class="container">
+      <h1><i class="fas fa-headset"></i> Top Membros em Call</h1>
+      <p>Quem mais dedicou tempo em calls de estudo? Confira abaixo!</p>
     </div>
+  </section>
+
+  <div class="search-container">
+    <input id="searchBox" class="form-control" type="search" placeholder="Buscar por nome..." />
   </div>
+
+<div class="players-list">
+  <% topUsers.forEach(function(user, index) { %>
+    <% if (user.totalTimeInCall === 0) return; %>
+    <div class="player-card" data-nick="<%= user.nick.toLowerCase() %>" style="--i:<%= index %>;">
+      <div class="player-rank">
+        <% if (index === 0) { %>
+          🥇
+        <% } else if (index === 1) { %>
+          🥈
+        <% } else if (index === 2) { %>
+          🥉
+        <% } else { %>
+          <%= index + 1 %>º
+        <% } %>
+      </div>
+      <div class="player-info">
+        <div class="player-nick">
+          <% 
+            const roleRaw = highestRole(guild, user.nick) || 'Alunos';
+            const role     = roleRaw.toLowerCase();
+          %>
+          <span class="tag <%= role %>">[<%= roleRaw %>]</span>
+          <strong><%= user.nick %></strong>
+        </div>
+        <div class="player-time">
+          <i class="fas fa-clock"></i>
+          <%
+            const days    = Math.floor(user.totalTimeInCall / 86400);
+            const hours   = Math.floor((user.totalTimeInCall % 86400) / 3600);
+            const minutes = Math.floor((user.totalTimeInCall % 3600) / 60);
+            const seconds = Math.round(user.totalTimeInCall % 60);
+            const parts = [];
+            if (days)    parts.push(`${days} ${days===1?'dia':'dias'}`);
+            if (hours)   parts.push(`${hours} ${hours===1?'hora':'horas'}`);
+            if (minutes) parts.push(`${minutes} ${minutes===1?'minuto':'minutos'}`);
+            if (seconds) parts.push(`${seconds} ${seconds===1?'segundo':'segundos'}`);
+            const timeStr = parts.join(' ') || 'Nenhum tempo registrado';
+          %>
+          <%= timeStr %>
+        </div>
+      </div>
+    </div>
+  <% }); %>
+</div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    // Filtrar cards pelo nick
+    document.getElementById('searchBox').addEventListener('input', function(){
+      const term = this.value.toLowerCase();
+      document.querySelectorAll('.player-card').forEach(card => {
+        const nick = card.getAttribute('data-nick');
+        card.style.display = nick.includes(term) ? 'flex' : 'none';
+      });
+    });
+  </script>
 </body>
 </html>
