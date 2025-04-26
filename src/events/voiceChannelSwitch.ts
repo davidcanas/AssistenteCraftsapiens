@@ -115,11 +115,6 @@ export default class voiceChannelSwitch {
             await ch.createMessage({ embeds: [debugEmbedJoin] });
         }
 
-        this.client.emit("voiceChannelLeave", member, oldChannel);
-        setTimeout(async () => {
-            this.client.emit("voiceChannelJoin", member, newChannel);
-        }, 1000);
-
         console.log(`Usuário ${member.username} trocou de canal de voz`);
     }
 }
