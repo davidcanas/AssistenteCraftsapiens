@@ -10,7 +10,7 @@ import {
 	Member,
 } from "oceanic.js";
 
-import { CityInfo, Command, Utils } from "../typings/index";
+import { Command, Utils } from "../typings/index";
 
 import global from "../models/globalDB";
 import users from "../models/userDB";
@@ -41,9 +41,6 @@ export default class DGClient extends Client {
 		global: typeof global;
 		users: typeof users;
 		staff: typeof staff;
-	};
-	cache: {
-		towns: CityInfo[],
 	};
 	utils: Utils;
 	fetch: typeof fetch;
@@ -80,9 +77,6 @@ export default class DGClient extends Client {
 		this.ada = adaBot;
 		this.luy = luyBot;
 
-		this.cache = {
-			towns: [],
-		};
 		this.utils = {
 			levDistance: levenshteinDistance,
 		};

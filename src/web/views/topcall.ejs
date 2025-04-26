@@ -66,24 +66,29 @@
             <div class="player-card">
               
                     <% if (!highestRole(guild, user.nick) || highestRole(guild, user.nick) == "Alunos") { %>
-                      <h4><%= user.nick %></h4>
+                      <h4><%=index+1%>º <span class="tag alunos">[Aluno]</span><%= user.nick %></h4>
                     <% } else { %>
                     <h4><%=index+1%>º <span class="tag <%=highestRole(guild, user.nick).toLowerCase()%>">[<%=highestRole(guild, user.nick)%>]</span> <%= user.nick %></h4>
                     <% } %>
                     <p>
-                      <% 
-                        const hours = Math.floor(user.totalTimeInCall / 3600);
-                        const minutes = Math.floor((user.totalTimeInCall % 3600) / 60);
-                        const seconds = Math.round(user.totalTimeInCall % 60);
+                      <%
+                      const days = Math.floor(user.totalTimeInCall / 86400);
+                      const hours = Math.floor((user.totalTimeInCall % 86400) / 3600);
+                      const minutes = Math.floor((user.totalTimeInCall % 3600) / 60);
+                      const seconds = Math.round(user.totalTimeInCall % 60);
                     
-                        const timeParts = [];
-                        if (hours > 0) timeParts.push(`${hours} ${hours === 1 ? 'hora' : 'horas'}`);
-                        if (minutes > 0) timeParts.push(`${minutes} ${minutes === 1 ? 'minuto' : 'minutos'}`);
-                        if (seconds > 0) timeParts.push(`${seconds} ${seconds === 1 ? 'segundo' : 'segundos'}`);
+                      const timeParts = [];
+                      if (days > 0) timeParts.push(`${days} ${days === 1 ? 'dia' : 'dias'}`);
+                      if (hours > 0) timeParts.push(`${hours} ${hours === 1 ? 'hora' : 'horas'}`);
+                      if (minutes > 0) timeParts.push(`${minutes} ${minutes === 1 ? 'minuto' : 'minutos'}`);
+                      if (seconds > 0) timeParts.push(`${seconds} ${seconds === 1 ? 'segundo' : 'segundos'}`);
                     
-                        const formattedTime = timeParts.join(" ");
-                      %>
-                      <%= formattedTime %>
+                      const formattedTime = timeParts.join(" ");
+                      if (formattedTime.length === 0) {
+                        formattedTime = "Nenhum tempo registrado";
+                      }
+                    %>
+                    <%= formattedTime %>
                     </p>
                     
             </div>
