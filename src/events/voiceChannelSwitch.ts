@@ -13,8 +13,8 @@ export default class voiceChannelSwitch {
 
     async run(
         member: Member,
-        oldChannel: VoiceChannel | StageChannel | Uncached,
-        newChannel: VoiceChannel | StageChannel | Uncached
+        newChannel: VoiceChannel | StageChannel | Uncached,
+        oldChannel: VoiceChannel | StageChannel | Uncached
     ) {
         if (oldChannel.id === newChannel.id) return;
         if (member.bot) return;
