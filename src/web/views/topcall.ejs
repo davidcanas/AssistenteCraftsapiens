@@ -11,6 +11,7 @@
       --bg-dark: #1e1f23;
       --card-bg: #282a36;
       --text-light: #f8f8f2;
+      --accent: #8be9fd;
     }
     body {
       background-color: var(--bg-dark);
@@ -22,168 +23,207 @@
       padding: 60px 0;
       text-align: center;
       margin-bottom: 30px;
-    }
-    .header h1 {
-      font-size: 2.5rem;
-      margin-bottom: 0.5rem;
-    }
-    .header p {
-      font-size: 1.1rem;
-      opacity: 0.8;
-    }
-    .search-container {
-      max-width: 400px;
-      margin: 0 auto 30px;
-    }
-    #searchBox {
-      background-color: #333;
-      border: none;
       color: var(--text-light);
     }
-    #searchBox::placeholder {
-      color: #aaa;
+    .header h1 { font-size: 2.5rem; margin-bottom: 0.5rem; }
+    .header p { font-size: 1.1rem; opacity: 0.8; }
+    /* Podium Top 3 */
+    .podium {
+      display: flex;
+      justify-content: center;
+      align-items: flex-end;
+      flex-wrap: wrap;
+      gap: 1rem;
+      max-width: 1000px;
+      margin: 0 auto 40px;
+      padding: 0 1rem;
     }
-    .players-list {
+    .podium-card {
+      background-color: var(--card-bg);
+      border-radius: 12px;
+      padding: 1rem;
+      text-align: center;
+      color: var(--text-light);
+      flex: 1 1 120px;
+      max-width: 220px;
+      position: relative;
       display: flex;
       flex-direction: column;
-      gap: 15px;
-      max-width: 600px;
-      margin: 0 auto;
+      justify-content: flex-end;
+      animation: fadeIn 0.6s ease forwards;
+      opacity: 0;
     }
-    @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(10px); }
-  to   { opacity: 1; transform: translateY(0); }
-}
-
-.player-card {
-  animation: fadeIn 0.6s ease forwards;
-  opacity: 0;
-
-  animation-delay: calc(var(--i) * 0.1s);
-}
+    .podium-card[data-rank="1"] { order: 2; }
+    .podium-card[data-rank="2"] { order: 1; }
+    .podium-card[data-rank="3"] { order: 3; }
+    .podium-rank {
+      font-size: 2.5rem;
+      position: absolute;
+      top: -10px;
+      left: 50%;
+      transform: translateX(-50%);
+    }
+    .podium-avatar {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      border: 3px solid #ffd700;
+      object-fit: cover;
+      margin: 1rem auto 0;
+    }
+    .podium-name {
+      margin-top: 0.5rem;
+      font-size: 1.1rem;
+      font-weight: 600;
+    }
+    .podium-time {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.95rem;
+      color: var(--accent);
+      margin-top: 0.5rem;
+    }
+    .podium-time i {
+      margin-right: 0.5rem;
+    }
+    /* Search box */
+    .search-container { max-width: 400px; margin: 0 auto 30px; padding: 0 1rem; }
+    #searchBox { background-color: #333; border: none; color: var(--text-light); }
+    #searchBox::placeholder { color: #aaa; }
+    /* Lista dos demais */
+    .players-list { display: flex; flex-direction: column; gap: 15px; max-width: 600px; margin: 0 auto 60px; padding: 0 1rem; }
     .player-card {
       background-color: var(--card-bg);
       border-radius: 12px;
-      padding: 20px;
+      padding: 15px;
       box-shadow: 0 4px 12px rgba(0,0,0,0.3);
       transition: transform 0.2s, box-shadow 0.2s;
       display: flex;
       align-items: center;
+      animation: fadeIn 0.6s ease forwards;
+      opacity: 0;
     }
-    .player-card:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 6px 16px rgba(0,0,0,0.5);
+    .player-card:hover { transform: translateY(-3px); box-shadow: 0 6px 16px rgba(0,0,0,0.5); }
+    .player-avatar { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; margin-right: 12px; }
+    .player-rank { font-size: 1.5rem; font-weight: 700; width: 60px; text-align: center; color: #fff; }
+    .player-info { flex: 1; display: flex; align-items: center; }
+    .player-details { display: flex; flex-direction: column; }
+    .player-nick { font-size: 1.2rem; display: flex; align-items: center; gap: 8px; margin-bottom: 5px; }
+    .player-nick .tag { font-size: 1rem; text-transform: uppercase; }
+    .player-time { font-size: 0.9rem; display: flex; align-items: center; opacity: 0.9; }
+    .player-time i { margin-right: 6px; color: var(--accent); }
+    /* Tags colors */
+    .tag.admin { color: #AA0000; }
+    .tag.dev { color: #55FFFF; }
+    .tag.reitor { color: #5555FF; }
+    .tag.moderador { color: #FF5555; }
+    .tag.ajuda { color: #FFAA00; }
+    .tag.premium { color: #55AA55; }
+    .tag.vip { color: #FFFF55; }
+    .tag.booster { color: #FF55FF; }
+    .tag.alunos { color: #6d3f8b; }
+    .tag.monitoria { color: #FE7310; }
+    /* Responsive */
+    @media (max-width: 768px) {
+      .podium { flex-direction: column-reverse; align-items: center; }
+      .podium-card { max-width: 90%; }
+      .podium-rank { font-size: 2rem; top: 5px; }
+      .podium-avatar { width: 60px; height: 60px; }
     }
-    .player-rank {
-      font-size: 1.5rem;
-      font-weight: 700;
-      width: 60px;
-      text-align: center;
-      color: #fff;
-    }
-    .player-info {
-      flex: 1;
-      margin-left: 15px;
-    }
-    .player-nick {
-      font-size: 1.2rem;
-      margin-bottom: 5px;
-    }
-    .player-nick .tag {
-      font-size: 1.2rem;
-      margin-right: 3px;
-    }
-    .player-time {
-      font-size: 0.9rem;
-      display: flex;
-      align-items: center;
-      opacity: 0.9;
-    }
-    .player-time i {
-      margin-right: 6px;
-      color: #8be9fd;
-    }
-    /* Cores dos cargos */
-    .tag.admin       { color: #AA0000; }
-    .tag.dev         { color: #55FFFF; }
-    .tag.reitor      { color: #5555FF; }
-    .tag.moderador   { color: #FF5555; }
-    .tag.ajuda       { color: #FFAA00; }
-    .tag.premium     { color: #55AA55; }
-    .tag.vip         { color: #FFFF55; }
-    .tag.booster     { color: #FF55FF; }
-    .tag.alunos      { color: #6d3f8b; }
-    .tag.monitoria   { color: #FE7310; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
   </style>
 </head>
 <body>
 
   <%- include('../partials/navbar.ejs') %>
 
-  <section class="header text-white">
+  <section class="header">
     <div class="container">
       <h1><i class="fas fa-headset"></i> Top Membros em Call</h1>
       <p>Quem mais dedicou tempo em calls de estudo? Confira abaixo!</p>
     </div>
   </section>
 
+  <section class="podium">
+    <% const defaultAvatar = 'https://static-00.iconduck.com/assets.00/avatar-default-icon-2048x2048-h6w375ur.png'; %>
+    <% const validUsers = topUsers.filter(u => u.totalTimeInCall > 0);
+       const [first, second, third] = validUsers; %>
+
+    <% if(second) { %>
+    <div class="podium-card" data-rank="2">
+      <div class="podium-rank">🥈</div>
+      <img src="<%= guild.members.get(second.id).avatarURL() %>" alt="Avatar <%= second.nick %>" class="podium-avatar" />
+      <div class="podium-name"><%= second.nick %></div>
+      <div class="podium-time"><i class="fas fa-clock"></i>
+        <% let t2=[];
+          const d2=Math.floor(second.totalTimeInCall/86400), h2=Math.floor((second.totalTimeInCall%86400)/3600), m2=Math.floor((second.totalTimeInCall%3600)/60), s2=Math.round(second.totalTimeInCall%60);
+          if(d2) t2.push(d2+' dia'+(d2>1?'s':'')); if(h2) t2.push(h2+' hora'+(h2>1?'s':'')); if(m2) t2.push(m2+' minuto'+(m2>1?'s':'')); if(s2) t2.push(s2+' segundo'+(s2>1?'s':''));
+        %><%= t2.join(' ')||'Nenhum tempo' %>
+      </div>
+    </div>
+    <% } %>
+
+    <% if(first) { %>
+    <div class="podium-card" data-rank="1">
+      <div class="podium-rank">🥇</div>
+      <img src="<%= guild.members.get(first.id).avatarURL() %>" alt="Avatar <%= first.nick %>" class="podium-avatar" />
+      <div class="podium-name"><%= first.nick %></div>
+      <div class="podium-time"><i class="fas fa-clock"></i>
+        <% let t1=[]; const d1=Math.floor(first.totalTimeInCall/86400), h1=Math.floor((first.totalTimeInCall%86400)/3600), m1=Math.floor((first.totalTimeInCall%3600)/60), s1=Math.round(first.totalTimeInCall%60);
+          if(d1) t1.push(d1+' dia'+(d1>1?'s':'')); if(h1) t1.push(h1+' hora'+(h1>1?'s':'')); if(m1) t1.push(m1+' minuto'+(m1>1?'s':'')); if(s1) t1.push(s1+' segundo'+(s1>1?'s':''));
+        %><%= t1.join(' ')||'Nenhum tempo' %>
+      </div>
+    </div>
+    <% } %>
+
+    <% if(third) { %>
+    <div class="podium-card" data-rank="3">
+      <div class="podium-rank">🥉</div>
+      <img src="<%= guild.members.get(third.id).avatarURL() %>" alt="Avatar <%= third.nick %>" class="podium-avatar" />
+      <div class="podium-name"><%= third.nick %></div>
+      <div class="podium-time"><i class="fas fa-clock"></i>
+        <% let t3=[]; const d3=Math.floor(third.totalTimeInCall/86400), h3=Math.floor((third.totalTimeInCall%86400)/3600), m3=Math.floor((third.totalTimeInCall%3600)/60), s3=Math.round(third.totalTimeInCall%60);
+          if(d3) t3.push(d3+' dia'+(d3>1?'s':'')); if(h3) t3.push(h3+' hora'+(h3>1?'s':'')); if(m3) t3.push(m3+' minuto'+(m3>1?'s':'')); if(s3) t3.push(s3+' segundo'+(s3>1?'s':''));
+        %><%= t3.join(' ')||'Nenhum tempo' %>
+      </div>
+    </div>
+    <% } %>
+  </section>
+
   <div class="search-container">
     <input id="searchBox" class="form-control" type="search" placeholder="Buscar por nome..." />
   </div>
 
-<div class="players-list">
-  <% topUsers.forEach(function(user, index) { %>
-    <% if (user.totalTimeInCall === 0) return; %>
-    <div class="player-card" data-nick="<%= user.nick.toLowerCase() %>" style="--i:<%= index %>;">
-      <div class="player-rank">
-        <% if (index === 0) { %>
-          🥇
-        <% } else if (index === 1) { %>
-          🥈
-        <% } else if (index === 2) { %>
-          🥉
-        <% } else { %>
-          <%= index + 1 %>º
-        <% } %>
-      </div>
-      <div class="player-info">
-        <div class="player-nick">
-          <% 
-            const roleRaw = highestRole(guild, user.nick) || 'Alunos';
-            const role     = roleRaw.toLowerCase();
-          %>
-          <span class="tag <%= role %>">[<%= roleRaw %>]</span>
-          <strong><%= user.nick %></strong>
-        </div>
-        <div class="player-time">
-          <i class="fas fa-clock"></i>
-          <%
-            const days    = Math.floor(user.totalTimeInCall / 86400);
-            const hours   = Math.floor((user.totalTimeInCall % 86400) / 3600);
-            const minutes = Math.floor((user.totalTimeInCall % 3600) / 60);
-            const seconds = Math.round(user.totalTimeInCall % 60);
-            const parts = [];
-            if (days)    parts.push(`${days} ${days===1?'dia':'dias'}`);
-            if (hours)   parts.push(`${hours} ${hours===1?'hora':'horas'}`);
-            if (minutes) parts.push(`${minutes} ${minutes===1?'minuto':'minutos'}`);
-            if (seconds) parts.push(`${seconds} ${seconds===1?'segundo':'segundos'}`);
-            const timeStr = parts.join(' ') || 'Nenhum tempo registrado';
-          %>
-          <%= timeStr %>
+  <div class="players-list">
+    <% const others = validUsers.slice(3); others.forEach((user,index) => { %>
+      <div class="player-card" data-nick="<%= user.nick.toLowerCase() %>" style="--i:<%= index %>">
+        <div class="player-rank"><%= index+4 %>º</div>
+        <div class="player-info">
+          <img src="<%= guild.members.get(user.id).avatarURL() %>" alt="Avatar <%= user.nick %>" class="player-avatar" />
+          <div class="player-details">
+            <div class="player-nick">
+              <% const roleRaw=highestRole(guild,user.nick)||'Alunos'; const role=roleRaw.toLowerCase(); %>
+              <span class="tag <%= role %>">[<%= roleRaw %>]</span>
+              <strong><%= user.nick %></strong>
+            </div>
+            <div class="player-time"><i class="fas fa-clock"></i>
+              <% let parts=[]; const d=Math.floor(user.totalTimeInCall/86400), h=Math.floor((user.totalTimeInCall%86400)/3600), m=Math.floor((user.totalTimeInCall%3600)/60), s=Math.round(user.totalTimeInCall%60);
+                 if(d) parts.push(d+' dia'+(d>1?'s':'')); if(h) parts.push(h+' hora'+(h>1?'s':'')); if(m) parts.push(m+' minuto'+(m>1?'s':'')); if(s) parts.push(s+' segundo'+(s>1?'s':''));
+              %><%= parts.join(' ')||'Nenhum tempo' %>
+            </div>
+          </div>
         </div>
       </div>
-    </div>
-  <% }); %>
-</div>
+    <% }) %>
+  </div>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
   <script>
-    // Filtrar cards pelo nick
     document.getElementById('searchBox').addEventListener('input', function(){
-      const term = this.value.toLowerCase();
-      document.querySelectorAll('.player-card').forEach(card => {
-        const nick = card.getAttribute('data-nick');
-        card.style.display = nick.includes(term) ? 'flex' : 'none';
+      const term=this.value.toLowerCase();
+      document.querySelectorAll('.player-card').forEach(card=>{
+        card.style.display = card.getAttribute('data-nick').includes(term) ? 'flex' : 'none';
       });
     });
   </script>
