@@ -206,7 +206,6 @@
 
   .player-nick .tag {
     font-size: 1rem;
-    text-transform: uppercase;
   }
 
   .player-time {
@@ -327,6 +326,8 @@
     <div class="podium-card" data-rank="2">
       <div class="podium-rank">🥈</div>
       <img src="<%= guild.members.get(second.id).avatarURL() %>" alt="Avatar <%= second.nick %>" class="podium-avatar" />
+       <% const roleRaw=highestRole(guild,second.nick)||'Alunos'; const role=roleRaw.toLowerCase(); %>
+              <span class="tag <%= role %>">[<%= roleRaw %>]</span>
       <div class="podium-name"><%= second.nick %></div>
       <div class="podium-time"><i class="fas fa-clock"></i>
         <% let t2=[];
@@ -341,6 +342,8 @@
     <div class="podium-card" data-rank="1">
       <div class="podium-rank"></div>
       <img src="<%= guild.members.get(first.id).avatarURL() %>" alt="Avatar <%= first.nick %>" class="podium-avatar" />
+       <% const roleRaw=highestRole(guild,first.nick)||'Alunos'; const role=roleRaw.toLowerCase(); %>
+              <span class="tag <%= role %>">[<%= roleRaw %>]</span>
       <div class="podium-name"><%= first.nick %></div>
       <div class="podium-time"><i class="fas fa-clock"></i>
         <% let t1=[]; const d1=Math.floor(first.totalTimeInCall/86400), h1=Math.floor((first.totalTimeInCall%86400)/3600), m1=Math.floor((first.totalTimeInCall%3600)/60), s1=Math.round(first.totalTimeInCall%60);
@@ -354,6 +357,8 @@
     <div class="podium-card" data-rank="3">
       <div class="podium-rank">🥉</div>
       <img src="<%= guild.members.get(third.id).avatarURL() %>" alt="Avatar <%= third.nick %>" class="podium-avatar" />
+       <% const roleRaw=highestRole(guild,third.nick)||'Alunos'; const role=roleRaw.toLowerCase(); %>
+              <span class="tag <%= role %>">[<%= roleRaw %>]</span>
       <div class="podium-name"><%= third.nick %></div>
       <div class="podium-time"><i class="fas fa-clock"></i>
         <% let t3=[]; const d3=Math.floor(third.totalTimeInCall/86400), h3=Math.floor((third.totalTimeInCall%86400)/3600), m3=Math.floor((third.totalTimeInCall%3600)/60), s3=Math.round(third.totalTimeInCall%60);
