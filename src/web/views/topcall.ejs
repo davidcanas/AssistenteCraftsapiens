@@ -339,6 +339,7 @@
 
     <% if(first) { %>
     <div class="podium-card" data-rank="1">
+      <div class="podium-rank"></div>
       <img src="<%= guild.members.get(first.id).avatarURL() %>" alt="Avatar <%= first.nick %>" class="podium-avatar" />
       <div class="podium-name"><%= first.nick %></div>
       <div class="podium-time"><i class="fas fa-clock"></i>
