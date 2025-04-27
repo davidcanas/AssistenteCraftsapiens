@@ -102,7 +102,6 @@ export default class askGPT extends Command {
                 .replace("{useful_links}", usefulLinks)
                 .replace("{timestamp}", timestamp)
         }));
-        messages.push({ text: `Atualmente o Survival Geopolítico tem ${this.client.cache.towns.length} cidades ativas e ${this.client.cache.towns.filter(a => a.ruined).length} cidades em ruinas (no mundo geopolitico) ` });
         messages.push({ text: townyDocsMessages.join("\n") });
         messages.push({ text: `\nMensagem a responder: "${ctx.args.join(" ")}"` });
 
