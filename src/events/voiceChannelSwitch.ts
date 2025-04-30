@@ -30,7 +30,7 @@ export default class voiceChannelSwitch {
             .channels.get(this.debugChannelID) as TextChannel;
 
         // WHEN LEAVING A STUDY CHANNEL
-        if (!Object.values(studyChannels).includes(newChannel.id)) {
+        if (Object.values(studyChannels).includes(oldChannel.id) && !Object.values(studyChannels).includes(newChannel.id)) {
             const user = await this.client.db.users.findOne({ id: member.id });
             if (!user || !user.voiceSessions?.length) return;
 
@@ -73,7 +73,7 @@ export default class voiceChannelSwitch {
             );
         }
         // WHEN JOINING A STUDY CHANNEL
-        else if (Object.values(studyChannels).includes(newChannel.id)) {
+        else if (!Object.values(studyChannels).includes(oldChannel.id) && Object.values(studyChannels).includes(newChannel.id)) {
             const user = await this.client.db.users.findOne({ id: member.id }) || { voiceSessions: [], totalTimeInCall: 0 };
             const previousSessions = user.voiceSessions.length;
             const previousTotal = user.totalTimeInCall || 0;
