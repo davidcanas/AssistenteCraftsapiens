@@ -66,8 +66,8 @@ async function sendMonthlyTopCallTime(client: DGClient) {
 			.join("\n");
 
 		const prevMonth = new Date(new Date().setMonth(new Date().getMonth() - 1))
-			.toLocaleString('pt-BR', { month: 'long' });
-		const thisMonth = new Date().toLocaleString('pt-BR', { month: 'long' });
+			.toLocaleString("pt-BR", { month: "long" });
+		const thisMonth = new Date().toLocaleString("pt-BR", { month: "long" });
 
 
 		const embed = new client.embed()
@@ -136,7 +136,7 @@ async function resetTopHorasCall() {
 }
 
 
-cron.schedule("0 0 1 * *", async () => {
+cron.schedule("0 4 1 * *", async () => {
 
 	await sendMonthlyTopCallTime(client);
 
