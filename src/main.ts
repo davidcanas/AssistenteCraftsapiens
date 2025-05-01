@@ -46,22 +46,39 @@ async function sendMonthlyTopCallTime(client: DGClient) {
 			.sort({ totalTimeInCall: -1 })
 			.limit(10)
 			.exec();
-	
+
 		if (!topUsers || topUsers.length === 0) {
 			channel.createMessage({ content: "Nenhum registro de chamadas de voz encontrado no mês anterior." });
 			return;
 		}
-	
+
 		const description = topUsers
-			.filter(user => user.totalTimeInCall > 0) 
+			.filter(user => user.totalTimeInCall > 0)
 			.map((user, index) => {
-				const hours = Math.floor(user.totalTimeInCall / 3600);
+
+				const days = Math.floor(user.totalTimeInCall / 86400);
+				const hours = Math.floor((user.totalTimeInCall % 86400) / 3600);
 				const minutes = Math.floor((user.totalTimeInCall % 3600) / 60);
-				const seconds = Math.floor(user.totalTimeInCall % 60);
-	
-				const formattedTime = `${hours.toString().padStart(2, "0")}h:${minutes.toString().padStart(2, "0")}min:${seconds.toString().padStart(2, "0")}s`;
-	
-				return `**${index + 1}. <@${user.id}>** - ${formattedTime}`;
+				const secs = Math.floor(user.totalTimeInCall % 60);
+
+				const parts = [];
+				if (days > 0) parts.push(`${days} ${days === 1 ? "dia" : "dias"}`);
+				if (hours > 0) parts.push(`${hours} ${hours === 1 ? "hora" : "horas"}`);
+				if (minutes > 0) parts.push(`${minutes} ${minutes === 1 ? "minuto" : "minutos"}`);
+				if (secs > 0) parts.push(`${secs} ${secs === 1 ? "segundo" : "segundos"}`);
+
+				if (parts.length === 0) return "menos de 1 segundo";
+				if (parts.length === 1) return parts[0];
+				if (parts.length === 2) return parts.join(" e ");
+
+				const last = parts.pop();
+
+				const formattedTime = parts.join(", ") + " e " + last;
+				const medal = index === 0 ? "🥇"
+					: index === 1 ? "🥈"
+						: index === 2 ? "🥉"
+							: `**${index + 1}.**`;
+				return `${medal} **${user.nick}** - ${formattedTime}`;
 			})
 			.join("\n");
 
