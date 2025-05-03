@@ -105,7 +105,6 @@ export default class InteractionCreate {
 
         interaction.createMessage({
             embeds: [embed],
-            flags: 1 << 6
         });
     }
 
