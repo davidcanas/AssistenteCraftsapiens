@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import Client from "../structures/Client";
 import {
     Interaction,
@@ -44,7 +45,7 @@ export default class InteractionCreate {
 
         const db = await this.client.db.global.findOne({ id: interaction.guild.id });
         if (db.blacklistedUsers.includes(interaction.user.id)) {
-            this.sendBlacklistMessage(interaction, "Você foi proibido por um administrador de usar comandos");
+            this.sendBlacklistMessage(interaction, "```js\nException in thread \"main\" java.security.AccessControlException: Permission denied: user attempted unauthorized interaction with command \"use_this_bot\"\n    at bot.security.PermissionManager.laughQuietly(PermissionManager.java:87)\n    at bot.commandHandler(CommandManager.java:42)\n    at bot.onMessageReceived(EventListener.java:27)\n    at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1136)\n    at java.base/java.lang.Thread.run(Thread.java:833)\n\n// Note: Access denied. Must be a you problem.\n// Hint: If you're reading this, it’s probably not a bug.\n```");
             return;
         }
 
@@ -99,7 +100,7 @@ export default class InteractionCreate {
 
     private sendBlacklistMessage(interaction: CommandInteraction, message: string) {
         const embed = new this.client.embed()
-            .setDescription(`:x: **${message}**\nMotivo: \`Utilização indevida do sistema\``)
+            .setDescription(`:x: Ocorreu um erro ao executar esse comando!\n${message}`)
             .setColor("16711680");
 
         interaction.createMessage({
@@ -434,19 +435,19 @@ export default class InteractionCreate {
 		const parts = [];
 	
 		if (days > 0) {
-			parts.push(`${days} dia${days > 1 ? 's' : ''}`);
+			parts.push(`${days} dia${days > 1 ? "s" : ""}`);
 		}
 		if (hours > 0) {
-			parts.push(`${hours} hora${hours > 1 ? 's' : ''}`);
+			parts.push(`${hours} hora${hours > 1 ? "s" : ""}`);
 		}
 		if (minutes > 0 && days === 0) { 
-			parts.push(`${minutes} minuto${minutes > 1 ? 's' : ''}`);
+			parts.push(`${minutes} minuto${minutes > 1 ? "s" : ""}`);
 		}
 		if (seconds > 0 && days === 0 && hours === 0) { 
-			parts.push(`${seconds} segundo${seconds > 1 ? 's' : ''}`);
+			parts.push(`${seconds} segundo${seconds > 1 ? "s" : ""}`);
 		}
 	
-		return parts.join(' e ');
+		return parts.join(" e ");
 	}
 	
 }

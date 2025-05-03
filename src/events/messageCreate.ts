@@ -457,7 +457,7 @@ export default class MessageCreate {
 
 			if (db.blacklistedUsers.includes(message.author.id)) {
 				const embed = new this.client.embed()
-				.setDescription(":x: **Você foi proibido por um administrador de usar o Assistente**")
+				.setDescription(":x: Ocorreu um erro ao executar esse comando!\n```js\nException in thread \"main\" java.security.AccessControlException: Permission denied: user attempted unauthorized interaction with command \"use_this_bot\"\n    at bot.security.PermissionManager.laughQuietly(PermissionManager.java:87)\n    at bot.commandHandler(CommandManager.java:42)\n    at bot.onMessageReceived(EventListener.java:27)\n    at bot.java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1136)\n    at bot.java.base/java.lang.Thread.run(Thread.java:833)\n\n// Note: Access denied. Must be a you problem.\n// Hint: If you're reading this, it’s probably not a bug.\n```")
 				.setColor("16711680")
 				.setFooter("Essa mensagem se autodestruirá em 4 segundos.");
 
