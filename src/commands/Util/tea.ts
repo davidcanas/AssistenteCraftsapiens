@@ -37,7 +37,7 @@ export default class TeaCommand extends Command {
                 .setDescription("Agora você receberá notificações sobre novos vídeos do Professor Kelvin relacionados ao autismo.")
                 .addField("📢 Notificações", "Você será notificado sempre que um novo vídeo for publicado.")
                 .addField("🎥 Participação", "Você poderá participar dos vídeos do canal Professor Kelvin.")
-                .setColor("16711680");
+                .setColor("RANDOM");
 
             ctx.sendMessage({
                 embeds: [embed],
