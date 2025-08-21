@@ -58,12 +58,12 @@
     <% if (cityName && cityInfo) {%>
 
 
-        <iframe src="http://jogar.craftsapiens.com.br:30009/?worldname=Earth&zoom=4&x=<%=cityInfo.location.x%>&z=<%=cityInfo.location.z%>"
+        <iframe src="http://jogar.craftsapiens.com.br:30009/?worldname=Earth&zoom=4&x=<%=cityInfo.data.location.x%>&z=<%=cityInfo.data.location.z%>"
             id="cityIframe"></iframe>
 
 
         <iframe
-            src="http://jogar.craftsapiens.com.br:30009/?worldname=Earth&zoom=4&x=<%=cityInfo.location.x%>&z=<%=cityInfo.location.z%>"
+            src="http://jogar.craftsapiens.com.br:30009/?worldname=Earth&zoom=4&x=<%=cityInfo.data.location.x%>&z=<%=cityInfo.data.location.z%>"
             id="cityIframe"></iframe>
 
         <div class="success-message" id="successMessage">
