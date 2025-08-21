@@ -288,11 +288,11 @@ export default class DGClient extends Client {
 	}
 
 
-	async apiFetch(endpoint: string): Promise<any> {
+	async getTownInfo(cityName: string): Promise<any> {
 		const API_BASE = process.env.API_URL;
 		const TOKEN = process.env.API_TOKEN;
 
-		const res = await fetch(`${API_BASE}${endpoint}`, {
+		const res = await fetch(`${API_BASE}/towns/${cityName}`, {
 			headers: {
 				"Authorization": `Bearer ${TOKEN}`,
 				"Content-Type": "application/json",
@@ -304,28 +304,79 @@ export default class DGClient extends Client {
 		if (!res.ok || data.error) {
 			throw new Error(data.error || res.statusText);
 		}
-
 		return data;
 	}
 
-	getTownInfo(cityName: string): Promise<any> {
-		return this.apiFetch(`/towns/${cityName}`);
+	async getTownList(): Promise<any> {
+		const API_BASE = process.env.API_URL;
+		const TOKEN = process.env.API_TOKEN;
+
+		const res = await fetch(`${API_BASE}/towns`, {
+			headers: {
+				"Authorization": `Bearer ${TOKEN}`,
+				"Content-Type": "application/json",
+			},
+		});
+
+		const data = await res.json();
+
+		if (!res.ok || data.error) {
+			throw new Error(data.error || res.statusText);
+		}
+		return data;
 	}
 
-	getTownList(): Promise<any> {
-		return this.apiFetch("/towns");
+	async getPlayerList(): Promise<any> {
+		const API_BASE = process.env.API_URL;
+		const TOKEN = process.env.API_TOKEN;
+
+		const res = await fetch(`${API_BASE}/players`, {
+			headers: {
+				"Authorization": `Bearer ${TOKEN}`,
+				"Content-Type": "application/json",
+			},
+		});
+		const data = await res.json();
+		if (!res.ok || data.error) {
+			throw new Error(data.error || res.statusText);
+		}
+		return data;
 	}
 
-	getPlayerList(): Promise<any> {
-		return this.apiFetch("/players");
+	async getPlayerInfo(playerName: string): Promise<any> {
+		const API_BASE = process.env.API_URL;
+		const TOKEN = process.env.API_TOKEN;
+
+		const res = await fetch(`${API_BASE}/players/${playerName}`, {
+			headers: {
+				"Authorization": `Bearer ${TOKEN}`,
+				"Content-Type": "application/json",
+			},
+		});
+
+		const data = await res.json();
+
+		if (!res.ok || data.error) {
+			throw new Error(data.error || res.statusText);
+		}
+		return data;
 	}
 
-	getPlayerInfo(playerName: string): Promise<any> {
-		return this.apiFetch(`/players/${playerName}`);
-	}
+	async getServerInfo(): Promise<any> {
+		const API_BASE = process.env.API_URL;
+		const TOKEN = process.env.API_TOKEN;
+		const res = await fetch(`${API_BASE}/server`, {
+			headers: {
+				"Authorization": `Bearer ${TOKEN}`,
+				"Content-Type": "application/json",
+			},
+		});
+		const data = await res.json();
+		if (!res.ok || data.error) {
+			throw new Error(data.error || res.statusText);
+		}
+		return data;
 
-	getServerInfo(): Promise<any> {
-		return this.apiFetch("/server");
 	}
 
 }
