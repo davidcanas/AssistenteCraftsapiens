@@ -320,9 +320,6 @@ export default class DGClient extends Client {
 
 		const data = await res.json();
 
-		if (!res.ok || data.error) {
-			throw new Error(data.error || res.statusText);
-		}
 		return data;
 	}
 
@@ -337,9 +334,6 @@ export default class DGClient extends Client {
 			},
 		});
 		const data = await res.json();
-		if (!res.ok || data.error) {
-			throw new Error(data.error || res.statusText);
-		}
 		return data;
 	}
 
@@ -355,10 +349,6 @@ export default class DGClient extends Client {
 		});
 
 		const data = await res.json();
-
-		if (!res.ok || data.error) {
-			throw new Error(data.error || res.statusText);
-		}
 		return data;
 	}
 
@@ -372,9 +362,6 @@ export default class DGClient extends Client {
 			},
 		});
 		const data = await res.json();
-		if (!res.ok || data.error) {
-			throw new Error(data.error || res.statusText);
-		}
 		return data;
 
 	}
