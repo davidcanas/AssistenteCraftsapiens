@@ -1,14 +1,21 @@
 <!DOCTYPE html>
+
 <html>
+
 <head>
+
     <title>City</title>
+
     <style>
-        html, body {
+        html,
+        body {
             margin: 0;
             padding: 0;
             height: 100%;
             overflow: hidden;
+
         }
+
         iframe {
             width: 100%;
             height: 100%;
@@ -17,6 +24,7 @@
             top: 0;
             left: 0;
         }
+
         .error-message {
             position: absolute;
             top: 50%;
@@ -28,6 +36,7 @@
             display: none;
             z-index: 1000;
         }
+
         .success-message {
             position: absolute;
             top: 50%;
@@ -38,52 +47,89 @@
             padding: 10px;
             display: none;
             z-index: 1000;
+
         }
     </style>
+
 </head>
+
 <body>
 
-        <iframe src="http://jogar.craftsapiens.com.br:2053/?worldname=Earth" id="cityIframe"></iframe>
-        <div class="success-message" id="successMessage">[Craftsapiens] Survival Geopolítico</div>
+    <% if (cityName && cityInfo) {%>
 
-   <!---- } else {
-        <iframe src="http://jogar.craftsapiens.com.br:2053/" id="cityIframe"></iframe>
-        <div class="error-message" id="errorMessage">cityName  não encontrada</div>
-     } -->
 
-  
-    <div id="cityNameData" data-cityname="cityName"></div>
-    <div id="cityInfoData" data-cityinfo="cityInfo"></div>
+        <iframe src="http://jogar.craftsapiens.com.br:30009/?worldname=Earth&zoom=4&x=<%=cityInfo.location.x%>&z=<%=cityInfo.location.z%>"
+            id="cityIframe"></iframe>
 
-    <script>
-        
-        function showErrorMessage() {
-            var errorMessage = document.getElementById('errorMessage');
-            errorMessage.style.display = 'block';
-            setTimeout(function() {
-                errorMessage.style.display = 'none';
-            }, 3000); 
-        }
 
-        var cityName = document.getElementById('cityNameData').getAttribute('data-cityname');
-        var cityInfo = document.getElementById('cityInfoData').getAttribute('data-cityinfo');
+        <iframe
+            src="http://jogar.craftsapiens.com.br:30009/?worldname=Earth&zoom=4&x=<%=cityInfo.location.x%>&z=<%=cityInfo.location.z%>"
+            id="cityIframe"></iframe>
 
-      
-        if (!cityInfo && cityName) {
-            showErrorMessage();
-        }
+        <div class="success-message" id="successMessage">
+            <%= cityName %> (<%= cityInfo.data.mayor %>)
+        </div>
 
-        function showSuccessMessage() {
-            var successMessage = document.getElementById('successMessage');
-            successMessage.style.display = 'block';
-            setTimeout(function() {
-                successMessage.style.display = 'none';
-            }, 2000); 
-        }
 
-        if (cityInfo) {
-            showSuccessMessage();
-        }
-    </script>
+
+        <% } else { %>
+
+            <iframe src="http://jogar.craftsapiens.com.br:30009/" id="cityIframe"></iframe>
+
+            <div class="error-message" id="errorMessage">
+                <%= cityName %> não encontrada
+            </div>
+
+            <% } %>
+
+                <div id="cityNameData" data-cityname="<%= cityName %>"></div>
+                <div id="cityInfoData" data-cityinfo="<%= cityInfo %>"></div>
+                <script>
+                    function showErrorMessage() {
+
+                        var errorMessage = document.getElementById('errorMessage');
+
+                        errorMessage.style.display = 'block';
+
+                        setTimeout(function () {
+
+                            errorMessage.style.display = 'none';
+
+                        }, 3000);
+
+                    }
+
+                    var cityName = document.getElementById('cityNameData').getAttribute('data-cityname');
+                    var cityInfo = document.getElementById('cityInfoData').getAttribute('data-cityinfo');
+
+
+                    if (!cityInfo && cityName) {
+
+                        showErrorMessage();
+
+                    }
+
+
+
+                    function showSuccessMessage() {
+
+                        var successMessage = document.getElementById('successMessage');
+
+                        successMessage.style.display = 'block';
+
+                        setTimeout(function () {
+                            successMessage.style.display = 'none';
+
+                        }, 2000);
+
+                    }
+
+                    if (cityInfo) {
+                        showSuccessMessage();
+                    }
+
+                </script>
+
 </body>
+
 </html>

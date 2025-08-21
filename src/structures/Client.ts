@@ -10,7 +10,7 @@ import {
 	Member,
 } from "oceanic.js";
 
-import { Command, Utils } from "../typings/index";
+import { Command, Utils, Api } from "../typings/index";
 
 import global from "../models/globalDB";
 import users from "../models/userDB";
@@ -42,6 +42,7 @@ export default class DGClient extends Client {
 		users: typeof users;
 		staff: typeof staff;
 	};
+	api: Api;
 	utils: Utils;
 	fetch: typeof fetch;
 	embed: typeof Embed;
@@ -79,6 +80,13 @@ export default class DGClient extends Client {
 
 		this.utils = {
 			levDistance: levenshteinDistance,
+		};
+		this.api = {
+			getTownInfo: this.getTownInfo,
+			getTownList: this.getTownList,
+			getPlayerInfo: this.getPlayerInfo,
+			getPlayerList: this.getPlayerList,
+			getServerInfo: this.getServerInfo,
 		};
 		this.fetch = fetch;
 		this.embed = Embed;
@@ -277,6 +285,47 @@ export default class DGClient extends Client {
 		const member = this.guilds.get("892472046729179136")?.members.find(m => m?.nick && m.nick?.toLowerCase() == nick?.toLowerCase() && m.roles.includes("1152666174157488258")) || null;
 
 		return member;
+	}
+
+
+	async apiFetch(endpoint: string): Promise<any> {
+		const API_BASE = process.env.API_URL;
+		const TOKEN = process.env.API_TOKEN;
+
+		const res = await fetch(`${API_BASE}${endpoint}`, {
+			headers: {
+				"Authorization": `Bearer ${TOKEN}`,
+				"Content-Type": "application/json",
+			},
+		});
+
+		const data = await res.json();
+
+		if (!res.ok || data.error) {
+			throw new Error(data.error || res.statusText);
+		}
+
+		return data;
+	}
+
+	getTownInfo(cityName: string): Promise<any> {
+		return this.apiFetch(`/towns/${cityName}`);
+	}
+
+	getTownList(): Promise<any> {
+		return this.apiFetch("/towns");
+	}
+
+	getPlayerList(): Promise<any> {
+		return this.apiFetch("/players");
+	}
+
+	getPlayerInfo(playerName: string): Promise<any> {
+		return this.apiFetch(`/players/${playerName}`);
+	}
+
+	getServerInfo(): Promise<any> {
+		return this.apiFetch("/server");
 	}
 
 }

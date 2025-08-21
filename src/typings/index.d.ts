@@ -20,6 +20,13 @@ interface Utils {
   levDistance: (src: string, target: string) => number;
 }
 
+interface Api {
+  getTownInfo: (cityName: string) => Promise<any>;
+  getTownList: () => Promise<Array<string>>;
+  getPlayerInfo: (playerName: string) => Promise<any>;
+  getPlayerList: () => Promise<Array<string>>;
+  getServerInfo: () => Promise<any>;
+}
 interface InteractionOptions {
   name: string;
   value: string;
