@@ -16,15 +16,13 @@ router.get("/", async (req, res) => {
 
 router.get("/iframe", async (req, res) => {
 
+    const cityName = req.query.cityName ? req.query.cityName.replace(/\s+/g, "_") : null;
+    let cityInfo = null;
+
     if(req.query.cityName) {
-        req.query.cityName = req.query.cityName.replace(/\s+/g, "_");
-    } else {
-        req.query.cityName = "spawn";
+        cityInfo = await client.api.getTownInfo(cityName);
+        console.log(cityInfo);
     }
-    
-    const cityName = req.query.cityName.replace(/\s+/g, "_");
-    const cityInfo = await client.api.getTownInfo(cityName);
-    console.log(cityInfo);
 
     res.render("mapa/iframe", { cityInfo, cityName });
 
