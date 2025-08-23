@@ -36,26 +36,24 @@ export default class PlayerList extends Command {
 		const title = "Lista de jogadores online";
 		ctx2d.fillText(title, (width - ctx2d.measureText(title).width) / 2, padding + 40);
 
-		// cores no padrão & do minecraft
 		const groupColors: Record<string, string> = {
-			premium: "#00AA00",   // &2
-			vip: "#FFFF55",       // &e
-			professor: "#55FF55", // &a
-			admin: "#AA0000",     // &4
-			dev: "#55FFFF",       // &b
-			reitor: "#00AAAA"     // &3
+			premium: "#00AA00",  
+			vip: "#FFFF55",      
+			professor: "#55FF55", 
+			admin: "#AA0000",    
+			dev: "#55FFFF",      
+			reitor: "#00AAAA",
+			ajuda: "#FFAA00"
 		};
 
-		// mapa §x → cor
 		const mcColors: Record<string, string> = {
 			"§0": "#000000", "§1": "#0000AA", "§2": "#00AA00", "§3": "#00AAAA",
 			"§4": "#AA0000", "§5": "#AA00AA", "§6": "#FFAA00", "§7": "#AAAAAA",
 			"§8": "#555555", "§9": "#5555FF", "§a": "#55FF55", "§b": "#55FFFF",
 			"§c": "#FF5555", "§d": "#FF55FF", "§e": "#FFFF55", "§f": "#FFFFFF",
-			"§r": "#FFFFFF" // reset → branco
+			"§r": "#FFFFFF"
 		};
 
-		// função para desenhar texto com cores do minecraft
 		function drawColoredText(text: string, x: number, y: number) {
 			let currentColor = "#FFFFFF";
 			let i = 0;
@@ -82,36 +80,30 @@ export default class PlayerList extends Command {
 			const group = player.group?.toLowerCase();
 			const groupColor = groupColors[group] || "white";
 
-			// capitalizar grupo
 			const groupFormatted = group ? group.charAt(0).toUpperCase() + group.slice(1) : "Jogador";
 
 			const tag = `[${groupFormatted}] `;
 			const nick = player.nickname || player.username;
 
-			// calcular alinhamento central
 			const totalWidth = ctx2d.measureText(tag).width +
 				nick.replace(/§./g, "").split("").reduce((acc, ch) => acc + ctx2d.measureText(ch).width, 0);
 
 			let xOffset = (width - totalWidth) / 2;
 			const y = baseHeight + i * lineHeight;
 
-			// desenha tag
 			ctx2d.fillStyle = groupColor;
 			ctx2d.fillText(tag, xOffset, y);
 			xOffset += ctx2d.measureText(tag).width;
 
-			// desenha nickname com cores do Minecraft
 			drawColoredText(nick, xOffset, y);
 		});
 
-		// logo
 		const logo = await loadImage("https://i.imgur.com/S6tkD7r.jpeg");
 		ctx2d.drawImage(logo, 10, 10, 80, 80);
 
-		// total
 		ctx2d.fillStyle = "#888";
 		ctx2d.font = "20px Sans";
-		const totalText = `Total: ${players.length} jogadores online (Com o /mapa ativo)`;
+		const totalText = `Total: ${players.length} jogadores online`;
 		ctx2d.fillText(totalText, (width - ctx2d.measureText(totalText).width) / 2, height - padding);
 
 		const buffer = canvas.toBuffer();
