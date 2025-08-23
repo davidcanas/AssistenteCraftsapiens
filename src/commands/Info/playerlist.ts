@@ -20,6 +20,39 @@ export default class PlayerList extends Command {
 		const response = await this.client.api.getPlayerList();
 		const players = response.data.players.filter((p: any) => p.status.online);
 
+		// hierarquia
+		const hierarchy = [
+			"reitor",
+			"dev",
+			"admin",
+			"professor",
+			"moderador",
+			"ajuda",
+			"premium",
+			"vip",
+			"default"
+		];
+
+		// cores dos grupos
+		const groupColors: Record<string, string> = {
+			premium: "#00AA00",   
+			vip: "#FFFF55",       
+			professor: "#55FF55", 
+			admin: "#AA0000",    
+			dev: "#55FFFF",       
+			reitor: "#00AAAA",    
+			ajuda: "#FFAA00",     
+			moderador: "#FF5555",
+			default: "white"
+		};
+
+		// ordenação pela hierarquia
+		players.sort((a: any, b: any) => {
+			const rankA = hierarchy.indexOf(a.group?.toLowerCase() || "default");
+			const rankB = hierarchy.indexOf(b.group?.toLowerCase() || "default");
+			return rankA - rankB;
+		});
+
 		const padding = 20, lineHeight = 40, baseHeight = 140, width = 800;
 		const height = baseHeight + players.length * lineHeight + padding;
 
@@ -30,21 +63,10 @@ export default class PlayerList extends Command {
 		ctx2d.fillStyle = "#23272A";
 		ctx2d.fillRect(0, 0, width, height);
 
-		// título
 		ctx2d.fillStyle = "white";
 		ctx2d.font = "bold 40px Sans";
 		const title = "Lista de jogadores online";
 		ctx2d.fillText(title, (width - ctx2d.measureText(title).width) / 2, padding + 40);
-
-		const groupColors: Record<string, string> = {
-			premium: "#00AA00",  
-			vip: "#FFFF55",      
-			professor: "#55FF55", 
-			admin: "#AA0000",    
-			dev: "#55FFFF",      
-			reitor: "#00AAAA",
-			ajuda: "#FFAA00"
-		};
 
 		const mcColors: Record<string, string> = {
 			"§0": "#000000", "§1": "#0000AA", "§2": "#00AA00", "§3": "#00AAAA",
@@ -77,33 +99,40 @@ export default class PlayerList extends Command {
 
 		ctx2d.font = "32px Sans";
 		players.forEach((player: any, i: number) => {
-			const group = player.group?.toLowerCase();
+			const group = player.group?.toLowerCase() || "default";
 			const groupColor = groupColors[group] || "white";
 
-			const groupFormatted = group ? group.charAt(0).toUpperCase() + group.slice(1) : "Jogador";
+			const groupFormatted = group !== "default"
+				? group.charAt(0).toUpperCase() + group.slice(1)
+				: null;
 
-			const tag = `[${groupFormatted}] `;
+			const tag = groupFormatted ? `[${groupFormatted}] ` : "";
 			const nick = player.nickname || player.username;
 
-			const totalWidth = ctx2d.measureText(tag).width +
+			const totalWidth =
+				ctx2d.measureText(tag).width +
 				nick.replace(/§./g, "").split("").reduce((acc, ch) => acc + ctx2d.measureText(ch).width, 0);
 
 			let xOffset = (width - totalWidth) / 2;
 			const y = baseHeight + i * lineHeight;
 
-			ctx2d.fillStyle = groupColor;
-			ctx2d.fillText(tag, xOffset, y);
-			xOffset += ctx2d.measureText(tag).width;
+			if (tag) {
+				ctx2d.fillStyle = groupColor;
+				ctx2d.fillText(tag, xOffset, y);
+				xOffset += ctx2d.measureText(tag).width;
+			}
 
 			drawColoredText(nick, xOffset, y);
 		});
 
+		// logo
 		const logo = await loadImage("https://i.imgur.com/S6tkD7r.jpeg");
 		ctx2d.drawImage(logo, 10, 10, 80, 80);
 
+		// total
 		ctx2d.fillStyle = "#888";
 		ctx2d.font = "20px Sans";
-		const totalText = `Total: ${players.length} jogadores online`;
+		const totalText = `Total: ${players.length} jogadores online (Com o /mapa ativo)`;
 		ctx2d.fillText(totalText, (width - ctx2d.measureText(totalText).width) / 2, height - padding);
 
 		const buffer = canvas.toBuffer();
