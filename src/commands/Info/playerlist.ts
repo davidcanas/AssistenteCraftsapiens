@@ -44,6 +44,7 @@ export default class PlayerList extends Command {
 
 
 		ctx2d.font = "32px Sans";
+		console.log(players)
 		players.forEach((player, i) => {
             console.log(player);
 			let xOffset = (width - ctx2d.measureText(player).width) / 2;
