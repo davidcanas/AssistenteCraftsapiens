@@ -17,9 +17,8 @@ export default class PlayerList extends Command {
 	async execute(ctx: CommandContext): Promise<void> {
 		await ctx.defer();
 
-		// agora a api retorna { data: { players: [...] } }
 		const response = await this.client.api.getPlayerList();
-		const players = response.data.players.filter((p: any) => p.status.online); // só os online
+		const players = response.data.players.filter((p: any) => p.status.online);
 
 		const padding = 20, lineHeight = 40, baseHeight = 140, width = 800;
 		const height = baseHeight + players.length * lineHeight + padding;
@@ -37,31 +36,72 @@ export default class PlayerList extends Command {
 		const title = "Lista de jogadores online";
 		ctx2d.fillText(title, (width - ctx2d.measureText(title).width) / 2, padding + 40);
 
-		// cores de grupos
+		// cores no padrão & do minecraft
 		const groupColors: Record<string, string> = {
-			admin: "red",
-			ajuda: "#FFD700",
-			reitor: "#00CED1",
-			dev: "#00FFFF",
-			professor: "#32CD32",
-			vip: "#FFA500",
-			premium: "#9370DB"
+			premium: "#00AA00",   // &2
+			vip: "#FFFF55",       // &e
+			professor: "#55FF55", // &a
+			admin: "#AA0000",     // &4
+			dev: "#55FFFF",       // &b
+			reitor: "#00AAAA"     // &3
 		};
+
+		// mapa §x → cor
+		const mcColors: Record<string, string> = {
+			"§0": "#000000", "§1": "#0000AA", "§2": "#00AA00", "§3": "#00AAAA",
+			"§4": "#AA0000", "§5": "#AA00AA", "§6": "#FFAA00", "§7": "#AAAAAA",
+			"§8": "#555555", "§9": "#5555FF", "§a": "#55FF55", "§b": "#55FFFF",
+			"§c": "#FF5555", "§d": "#FF55FF", "§e": "#FFFF55", "§f": "#FFFFFF",
+			"§r": "#FFFFFF" // reset → branco
+		};
+
+		// função para desenhar texto com cores do minecraft
+		function drawColoredText(text: string, x: number, y: number) {
+			let currentColor = "#FFFFFF";
+			let i = 0;
+			while (i < text.length) {
+				if (text[i] === "§" && i + 1 < text.length) {
+					const code = text.substring(i, i + 2);
+					if (mcColors[code]) {
+						currentColor = mcColors[code];
+						i += 2;
+						continue;
+					}
+				}
+				const char = text[i];
+				ctx2d.fillStyle = currentColor;
+				ctx2d.fillText(char, x, y);
+				x += ctx2d.measureText(char).width;
+				i++;
+			}
+			return x;
+		}
 
 		ctx2d.font = "32px Sans";
 		players.forEach((player: any, i: number) => {
-			const text = `${player.nickname || player.username} [${player.group}]`;
-			const color = groupColors[player.group.toLowerCase()] || "white";
-			const xOffset = (width - ctx2d.measureText(text).width) / 2;
+			const group = player.group?.toLowerCase();
+			const groupColor = groupColors[group] || "white";
 
-			// nick
-			ctx2d.fillStyle = "white";
-			ctx2d.fillText(player.nickname || player.username, xOffset, baseHeight + i * lineHeight);
+			// capitalizar grupo
+			const groupFormatted = group ? group.charAt(0).toUpperCase() + group.slice(1) : "Jogador";
 
-			// grupo
-			const nickWidth = ctx2d.measureText(player.nickname || player.username).width;
-			ctx2d.fillStyle = color;
-			ctx2d.fillText(` [${player.group}]`, xOffset + nickWidth, baseHeight + i * lineHeight);
+			const tag = `[${groupFormatted}] `;
+			const nick = player.nickname || player.username;
+
+			// calcular alinhamento central
+			const totalWidth = ctx2d.measureText(tag).width +
+				nick.replace(/§./g, "").split("").reduce((acc, ch) => acc + ctx2d.measureText(ch).width, 0);
+
+			let xOffset = (width - totalWidth) / 2;
+			const y = baseHeight + i * lineHeight;
+
+			// desenha tag
+			ctx2d.fillStyle = groupColor;
+			ctx2d.fillText(tag, xOffset, y);
+			xOffset += ctx2d.measureText(tag).width;
+
+			// desenha nickname com cores do Minecraft
+			drawColoredText(nick, xOffset, y);
 		});
 
 		// logo
