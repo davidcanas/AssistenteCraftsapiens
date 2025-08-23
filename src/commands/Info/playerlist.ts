@@ -107,6 +107,8 @@ export default class PlayerList extends Command {
 				: null;
 
 			const tag = groupFormatted ? `[${groupFormatted}] ` : "";
+			console.log(player.nickname);
+			console.log(player.username);
 			const nick = player.nickname || player.username;
 
 			const totalWidth =
@@ -132,7 +134,7 @@ export default class PlayerList extends Command {
 		// total
 		ctx2d.fillStyle = "#888";
 		ctx2d.font = "20px Sans";
-		const totalText = `Total: ${players.length} jogadores online (Com o /mapa ativo)`;
+		const totalText = `Total: ${players.length} jogadores online`;
 		ctx2d.fillText(totalText, (width - ctx2d.measureText(totalText).width) / 2, height - padding);
 
 		const buffer = canvas.toBuffer();
