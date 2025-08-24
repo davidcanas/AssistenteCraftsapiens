@@ -16,7 +16,7 @@
     .player-card {
       background-color: #333;
       border-radius: 10px;
-      padding: 8px; /* Reduzindo o preenchimento do card */
+      padding: 8px;
       margin-bottom: 10px;
       display: flex;
       justify-content: space-between;
@@ -28,16 +28,16 @@
     }
     .player-card h4 {
       color: #fff;
-      margin-bottom: 0; /* Removendo a margem inferior do nome do jogador */
-      font-size: 14px; /* Reduzindo o tamanho do nome do jogador */
+      margin-bottom: 0;
+      font-size: 14px;
       display: flex;
-      align-items: center; /* Alinhar verticalmente o texto e a vida */
+      align-items: center;
     }
     .player-card p {
-      margin-bottom: 0; /* Removendo a margem inferior da vida do jogador */
-      font-size: 14px; /* Mantendo o mesmo tamanho da fonte */
+      margin-bottom: 0;
+      font-size: 14px;
       display: flex;
-      align-items: center; /* Alinhar verticalmente o texto e a vida */
+      align-items: center;
     }
     .players-list {
       max-height: 60vh;
@@ -52,27 +52,42 @@
       color: red;
       margin-left: 1px;
     }
+
+    /* Cores dos cargos */
+    .tag.reitor { color: #00AAAA; }   /* &3 */
+    .tag.dev { color: #55FFFF; }      /* &b */
+    .tag.admin { color: #AA0000; }    /* &4 */
+    .tag.professor { color: #55FF55; }/* &a */
+    .tag.moderador { color: #FF55FF; }/* escolha (pode trocar) */
+    .tag.ajuda { color: #FF55AA; }    /* escolha */
+    .tag.premium { color: #00AA00; }  /* &2 */
+    .tag.vip { color: #FFFF55; }      /* &e */
   </style>
    <%- include('../partials/navbar.ejs') %>
 </head>
 <body>
   <% include('../partials/navbar.ejs') %>
   <div class="container-fluid p-5 bg-primary text-white text-center">
-    <h1>Informações ao vivo do Survival Geopolitico (atualizando a cada 5s)</h1>
-
+    <h1>Informações ao vivo do Survival Geopolitico 2 (atualizando a cada 5s)</h1>
   </div>
   
   <div class="container mt-4">
     <div class="row">
-      
         <h3 class="players-title mb-3"><i class="fas fa-user"></i> Lista de jogadores (<%=playerList.length%>)</h3>
         <div class="players-list">
-          <% playerList.forEach(function(player) { %>
+          <% playerList.forEach(function(player) { 
+               const role = highestRole(guild, player.name); 
+          %>
             <div class="player-card">
-              <% if (!highestRole(guild, player.name) || highestRole(guild, player.name) == "Alunos") { %>
+              <% if (!role || role.toLowerCase() === "default" || role.toLowerCase() === "alunos") { %>
+                <!-- Sem cargo (não mostra tag) -->
                 <h4><%= player.name %></h4>
               <% } else { %>
-              <h4><span class="tag <%=highestRole(guild, player.name).toLowerCase()%>">[<%=highestRole(guild, player.name)%>]</span> <%= player.name %></h4>
+                <!-- Com cargo (primeira letra maiúscula e cor) -->
+                <h4>
+                  <span class="tag <%= role.toLowerCase() %>">[<%= role.charAt(0).toUpperCase() + role.slice(1).toLowerCase() %>]</span> 
+                  <%= player.name %>
+                </h4>
               <% } %>
               <p><%= player.health %> <i class="fas fa-heart heart-icon"></i></p>
             </div>
@@ -85,6 +100,5 @@
   setTimeout(function(){
    window.location.reload(1);
 }, 5000);
-
 </script>
 </html>

@@ -76,7 +76,7 @@ app.get("/api/isLogged", async (req, res) => {
 
 app.get("/stats/survival", async (req, res) => {
   
-  // DEPRECATED:const playerList = await getDynmapPlayersVanilla();
+  const playerList = await client.api.getPlayerList().then(r => r.data.players);
 
 	res.status(200).render("stats_survival", { 
     user: req.user,
@@ -84,7 +84,7 @@ app.get("/stats/survival", async (req, res) => {
     avatar: client.users.get(req.user?.id)?.avatarURL(),
     guild: client.guilds.get("892472046729179136"),
     highestRole: client.getHighestRole,
-    //playerList,
+    playerList,
     
     });
 });
