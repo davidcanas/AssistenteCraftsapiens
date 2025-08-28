@@ -39,7 +39,12 @@ export default class cityinfo extends Command {
 				return;
 			}
 
-			const foundedDate = ctx.MsToDate(city.data.foundedAt);
+			const foundedDate = new Date(city.data.foundedAt).toLocaleDateString("pt-BR", {
+                day: "2-digit",
+                month: "2-digit",
+                year: "numeric",
+            });
+            
 			const residents = city.data.residents?.map(r => r.name) || [];
 
 			let residentList = "N/A";
