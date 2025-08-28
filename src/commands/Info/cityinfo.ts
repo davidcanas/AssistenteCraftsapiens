@@ -79,7 +79,7 @@ export default class cityinfo extends Command {
 		try {
 			const allCities = await this.client.api.getTownList();
 
-			const similarCities = allCities.filter(city =>
+			const similarCities = allCities.data.towns.filter(city =>
 				this.client.utils.levDistance(city.name.toLowerCase(), value.toLowerCase()) <= 2 ||
 				city.name.toLowerCase().includes(value.toLowerCase())
 			);
