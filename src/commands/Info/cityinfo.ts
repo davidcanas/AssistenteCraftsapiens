@@ -39,9 +39,8 @@ export default class cityinfo extends Command {
 				return;
 			}
 
-			const foundedDate = new Date(city.foundedAt).toLocaleDateString("pt-BR");
-			const residents = city.residents?.map(r => r.name) || [];
-			const habitantes_n = residents.length >= 36 ? "mais de 36" : residents.length.toString();
+			const foundedDate = ctx.MsToDate(city.data.founded);
+			const residents = city.data.residents?.map(r => r.name) || [];
 
 			let residentList = "N/A";
 			if (residents.length > 0) {
@@ -56,16 +55,18 @@ export default class cityinfo extends Command {
 
 			const embed = new this.client.embed()
 				.setTitle(`<:craftsapiens:905025137869463552> Informações da cidade ${city.name}`)
-				.addField("👑 Prefeito", city.mayor || "N/A", true)
-				.addField("🗺️ Nação", !city.nation || city.nation?.name === "null" ? "N/A" : city.nation.name, true)
-				.addField(`👥 Habitantes (${habitantes_n})`, residentList)
+				.addField("👑 Prefeito", city.data.mayor || "N/A", true)
+				.addField("🗺️ Nação", !city.data.nation || city.data.nation?.name === "null" ? "N/A" : city.data.nation.name, true)
+				.addField(`👥 Habitantes (${city.data.residentCount})`, residentList)
 				.addField("📅 Fundada em", foundedDate, true)
-				.addField("💰 Tesouro", `${city.balance.toLocaleString("pt-BR")} coins`, true)
-				.addField("📦 Terras", `${city.townBlocks} chunks`, true)
-				.addField("📍 Localização", `X: ${city.location.x} | Z: ${city.location.z}`, true)
+				.addField("💰 Banco", `${city.data.balance.toLocaleString("pt-BR")} coins`, true)
+				.addField("📦 Chunks", `${city.data.townBlocks} chunks`, true)
+				.addField("📍 Localização", `X: ${city.data.location.x} | Z: ${city.data.location.z}`, true)
+                .addField("🚩 Flags", `PVP: ${city.data.flags.pvp ? "✅" : "❌"} | Fogo: ${city.data.flags.fire ? "✅" : "❌"} | Explosões: ${city.data.flags.explosion ? "✅" : "❌"}`, true)
 				.setFooter("Assistente | Craftsapiens")
-				.setColor(parseInt(city.mapColor, 16))
-				.setThumbnail(`https://mineskin.eu/armor/bust/${city.mayor}/100.png`);
+				.setColor(parseInt(city.data.mapColor, 16))
+				.setThumbnail(`https://mineskin.eu/armor/bust/${city.data.mayor}/100.png`)
+				.setURL("http://jogar.craftsapiens.com.br:50024/mapa/iframe?cityName=" + city.name);
 
 			ctx.sendMessage({ embeds: [embed] });
 		} catch (err) {

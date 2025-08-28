@@ -22,9 +22,9 @@ interface Utils {
 
 interface Api {
   getTownInfo: (cityName: string) => Promise<any>;
-  getTownList: () => Promise<Array<string>>;
+  getTownList: () => Promise<Array<any>>;
   getPlayerInfo: (playerName: string) => Promise<any>;
-  getPlayerList: () => Promise<Array<string>>;
+  getPlayerList: () => Promise<Array<any>>;
   getServerInfo: () => Promise<any>;
 }
 interface InteractionOptions {
