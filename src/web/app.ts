@@ -3,7 +3,6 @@ import Strategy from "./lib/Strategy";
 import session from "express-session";
 import passport from "passport";
 import client from "../main";
-import isLogged from "./helpers/isLogged";
 import path from "path";
 import dash from "./routes/dash";
 import punicoes from "./routes/punicoes";

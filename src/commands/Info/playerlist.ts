@@ -18,6 +18,7 @@ export default class PlayerList extends Command {
 		await ctx.defer();
 
 		const response = await this.client.api.getPlayerList();
+
 		const players = response.data.players.filter((p: any) => p.status.online);
 
 		// hierarquia
