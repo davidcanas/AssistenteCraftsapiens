@@ -66,7 +66,7 @@ export default class cityinfo extends Command {
 				.setFooter("Assistente | Craftsapiens")
 				.setColor(parseInt(city.data.mapColor, 16))
 				.setThumbnail(`https://mineskin.eu/armor/bust/${city.data.mayor}/100.png`)
-				.setURL("http://jogar.craftsapiens.com.br:50024/mapa/iframe?cityName=" + city.name);
+				.setURL("http://jogar.craftsapiens.com.br:50024/mapa/iframe?cityName=" + city.data.name);
 
 			ctx.sendMessage({ embeds: [embed] });
 		} catch (err) {
