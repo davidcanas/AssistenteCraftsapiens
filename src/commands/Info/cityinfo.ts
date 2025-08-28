@@ -39,7 +39,7 @@ export default class cityinfo extends Command {
 				return;
 			}
 
-			const foundedDate = ctx.MsToDate(city.data.founded);
+			const foundedDate = ctx.MsToDate(city.data.foundedAt);
 			const residents = city.data.residents?.map(r => r.name) || [];
 
 			let residentList = "N/A";
@@ -54,12 +54,12 @@ export default class cityinfo extends Command {
 			}
 
 			const embed = new this.client.embed()
-				.setTitle(`<:craftsapiens:905025137869463552> Informações da cidade ${city.name}`)
+				.setTitle(`<:craftsapiens:905025137869463552> Informações da cidade ${city.data.name}`)
 				.addField("👑 Prefeito", city.data.mayor || "N/A", true)
 				.addField("🗺️ Nação", !city.data.nation || city.data.nation?.name === "null" ? "N/A" : city.data.nation.name, true)
 				.addField(`👥 Habitantes (${city.data.residentCount})`, residentList)
 				.addField("📅 Fundada em", foundedDate, true)
-				.addField("💰 Banco", `${city.data.balance.toLocaleString("pt-BR")} coins`, true)
+				.addField("💰 Banco", `${city.data.balance.toLocaleString("pt-BR")} Sapiens`, true)
 				.addField("📦 Chunks", `${city.data.townBlocks} chunks`, true)
 				.addField("📍 Localização", `X: ${city.data.location.x} | Z: ${city.data.location.z}`, true)
                 .addField("🚩 Flags", `PVP: ${city.data.flags.pvp ? "✅" : "❌"} | Fogo: ${city.data.flags.fire ? "✅" : "❌"} | Explosões: ${city.data.flags.explosion ? "✅" : "❌"}`, true)
