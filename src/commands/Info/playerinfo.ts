@@ -65,20 +65,20 @@ export default class playerinfo extends Command {
 			// Embed
 			const embed = new this.client.embed()
 				.setTitle(`👤 ${formattedName}`)
-				.setThumbnail(`https://mineskin.eu/armor/bust/${data.uuid}/100.png`)
+				.setThumbnail(`https://mineskin.eu/armor/bust/${data.username}/100.png`)
 				.addField("📝 Username", data.username || "N/A", true)
 				.addField("🌍 Cidade", data.towny?.townName || "N/A", true)
 				.addField("🏳️ Nação", data.towny?.nationName || "N/A", true)
 				.addField("⚔️ Kills", `${data.status?.kills ?? 0}`, true)
 				.addField("💀 Mortes", `${data.status?.deaths ?? 0}`, true)
-				.addField("❤️ Vida", `${data.status?.health ?? 0}`, true)
-				.addField("🍗 Fome", `${data.status?.hunger ?? 0}`, true)
 				.addField("💰 Dinheiro", `${data.status?.money?.toLocaleString("pt-PT")} sapiens`, true)
 				.setColor(groupColors[group] || "RANDOM")
 				.setFooter("Assistente | Craftsapiens");
 
 			if (data.status?.online) {
 				embed.setDescription("🟢 O jogador está **online** agora!");
+				embed.addField("❤️ Vida", `${data.status?.health ?? 0}`, true)
+				embed.addField("🍗 Fome", `${data.status?.hunger ?? 0}`, true)
 			} else {
 				embed.setDescription("🔴 O jogador está **offline**.");
 			}
