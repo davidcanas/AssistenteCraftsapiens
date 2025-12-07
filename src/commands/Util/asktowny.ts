@@ -6,6 +6,11 @@ import fs from "fs";
 import path from "path";
 import { Constants } from "oceanic.js";
 
+function extractText(candidate: any): string {
+    if (!candidate?.content?.parts?.length) return ""; // fallback se não houver parts
+    return candidate.content.parts[0].text || "";
+}
+
 export default class AskTowny extends Command {
     constructor(client: Client) {
         super(client, {
@@ -36,7 +41,7 @@ export default class AskTowny extends Command {
         // --- 1. Processamento de Imagem ---
         let imagePart: any = null;
         const attachmentOption = ctx.args[1];
-        const attachment = attachmentOption 
+        const attachment = attachmentOption
             ? ctx.attachments.find(a => a.id === attachmentOption)
             : ctx.attachments[0];
 
@@ -44,7 +49,7 @@ export default class AskTowny extends Command {
             try {
                 const response = await fetch(attachment.url);
                 if (!response.ok) throw new Error("Falha ao buscar a imagem");
-                
+
                 const mimeType = response.headers.get("content-type");
                 if (!mimeType?.startsWith("image/")) {
                     ctx.sendMessage("O arquivo fornecido não é uma imagem válida!");
@@ -76,7 +81,7 @@ export default class AskTowny extends Command {
 
         try {
             // Caminhos dos arquivos (assumindo pasta ../../data/)
-            const townyPath = path.resolve(__dirname, "../../data/config.yml"); 
+            const townyPath = path.resolve(__dirname, "../../data/config.yml");
             const eventWarPath = path.resolve(__dirname, "../../data/warconfig.yml");
             const docsPath = path.resolve(__dirname, "../../data/towny_docs.txt");
 
@@ -137,7 +142,7 @@ export default class AskTowny extends Command {
         }
 
         parts.push({ text: systemInstruction });
-        
+
         parts.push({ text: `=== INÍCIO DA DOCUMENTAÇÃO GERAL ===\n${townyDocsContent}\n=== FIM DA DOCUMENTAÇÃO ===` });
         parts.push({ text: `=== INÍCIO CONFIGURAÇÃO TÉCNICA (config.yml) ===\n${townyConfigContent}\n=== FIM CONFIG ===` });
         parts.push({ text: `=== INÍCIO CONFIGURAÇÃO GUERRA (warconfig.yml) ===\n${eventWarConfigContent}\n=== FIM CONFIG ===` });
@@ -152,7 +157,7 @@ export default class AskTowny extends Command {
             },
             "generationConfig": {
                 "maxOutputTokens": 800,
-                "temperature": 0.4 
+                "temperature": 0.4
             }
         };
 
@@ -165,7 +170,7 @@ export default class AskTowny extends Command {
             });
 
             const json = await response.json();
-            
+
             if (!json.candidates) {
                 console.log("Erro API AI (JSON):", JSON.stringify(json, null, 2));
                 ctx.sendMessage("Ocorreu um erro na IA. Verifique se os arquivos de configuração não são grandes demais para o modelo.");
@@ -173,10 +178,13 @@ export default class AskTowny extends Command {
             }
 
 
+
+            const text = extractText(json.candidates[0]);
+
             const embed = new this.client.embed()
-                .setColor("RANDOM") 
+                .setColor("RANDOM")
                 .setTitle("🏰 Assistente Towny")
-                .setDescription(json.candidates[0].content.parts[0].text)
+                .setDescription(text)
                 .setFooter("Baseado na Wiki e Configs do servidor");
 
             ctx.sendMessage({ embeds: [embed] });
