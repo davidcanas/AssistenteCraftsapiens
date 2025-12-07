@@ -2,5 +2,6 @@ node_modules
 .env
 yarn.lock
 src/data/*.txt
+src/data/*.yml
 package-lock.json
 package.json
