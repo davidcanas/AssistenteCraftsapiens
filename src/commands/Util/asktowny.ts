@@ -125,6 +125,15 @@ export default class AskTowny extends Command {
             1. DOCUMENTAÇÃO (towny_docs.txt): Use para explicar conceitos, comandos e como as coisas funcionam.
             2. CONFIGURAÇÕES (config.yml / eventwar.yml): Use para citar valores EXATOS do servidor (preços, limites, regras ativadas/desativadas).
 
+            REGRAS ABSOLUTAS DE RESPOSTA (ECONOMIA DE TOKENS):
+            1. SEJA CURTO E GROSSO: Não use saudações ("Olá", "Tudo bem"), não faça introduções e não faça despedidas.
+            2. VÁ DIRETO AO PONTO: Responda apenas a pergunta feita. Não dê contexto extra se não for pedido.
+            3. PRIORIDADE: Use os valores exatos dos arquivos 'yml' fornecidos.
+            4. ESTILO: Use tópicos simples. Se a resposta for um número/preço, diga apenas o valor.
+            
+            Exemplo Bom: "Para criar cidade: /t new [nome]. Custa X Sapiens."
+            Exemplo Ruim: "Olá! Para criar uma cidade no nosso servidor incrível, você deve usar o comando..." (PROIBIDO)
+
             DIRETRIZES:
             - Se o usuário perguntar um preço ou limite, IGNORE a documentação genérica e use OBRIGATORIAMENTE o valor que está no 'config.yml'.
             - Se a informação estiver na config, ela tem prioridade sobre a documentação.
