@@ -174,7 +174,7 @@ export default class AskTowny extends Command {
 
 
             const embed = new this.client.embed()
-                .setColor("GOLD") 
+                .setColor("RANDOM") 
                 .setTitle("🏰 Assistente Towny")
                 .setDescription(json.candidates[0].content.parts[0].text)
                 .setFooter("Baseado na Wiki e Configs do servidor");
