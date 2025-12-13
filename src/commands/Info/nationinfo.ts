@@ -14,7 +14,7 @@ export default class nationinfo extends Command {
             options: [
                 {
                     type: 3,
-                    name: "nação",
+                    name: "nation",
                     description: "Nome da nação",
                     focused: true,
                     autocomplete: true,
@@ -35,6 +35,7 @@ export default class nationinfo extends Command {
             }
 
             const nation = await this.client.api.getNationInfo(nationName);
+            console.log(nation)
             if (!nation) {
                 ctx.sendMessage(`Nação \`${nationName}\` não encontrada no banco de dados.`);
                 return;
