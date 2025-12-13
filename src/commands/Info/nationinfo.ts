@@ -70,7 +70,7 @@ export default class nationinfo extends Command {
                 .addField("🚩 Relações ", `🟢 Aliados: \`${nation.data.relations.allies.join(", ") || "N/A"}\` | 🔴 Inimigos: \`${nation.data.relations.enemies.join(", ") || "N/A"}\``, true)
                 .setFooter("Assistente | Craftsapiens")
                 .setColor(parseInt(nation.data.mapColor, 16))
-                .setThumbnail(`https://mineskin.eu/armor/bust/${nation.data.mayor}/100.png`)
+                .setThumbnail(`https://mineskin.eu/armor/bust/${nation.data.leader}/100.png`)
                 .setURL("http://jogar.craftsapiens.com.br:50024/mapa/iframe?nationName=" + nation.data.name);
 
             ctx.sendMessage({ embeds: [embed] });
