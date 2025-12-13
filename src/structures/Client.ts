@@ -86,6 +86,8 @@ export default class DGClient extends Client {
 			getTownList: this.getTownList,
 			getPlayerInfo: this.getPlayerInfo,
 			getPlayerList: this.getPlayerList,
+			getNationInfo: this.getNationInfo,
+			getNationList: this.getNationList,
 			getServerInfo: this.getServerInfo,
 		};
 		this.fetch = fetch;
@@ -316,6 +318,33 @@ export default class DGClient extends Client {
 
 		const data = await res.json();
 
+		return data;
+	}
+	async getNationInfo(nationName: string): Promise<any> {
+		const API_BASE = process.env.API;
+		const TOKEN = process.env.API_TOKEN;
+
+		const res = await fetch(`${API_BASE}/nations/${nationName}`, {
+			headers: {
+				"Authorization": `Bearer ${TOKEN}`,
+				"Content-Type": "application/json",
+			},
+		});
+
+		const data = await res.json();
+		return data;
+	}
+
+	async getNationList(): Promise<any> {
+		const API_BASE = process.env.API_URL;
+		const TOKEN = process.env.API_TOKEN;
+		const res = await fetch(`${API_BASE}/nations`, {
+			headers: {
+				"Authorization": `Bearer ${TOKEN}`,
+				"Content-Type": "application/json",
+			},
+		});
+		const data = await res.json();
 		return data;
 	}
 

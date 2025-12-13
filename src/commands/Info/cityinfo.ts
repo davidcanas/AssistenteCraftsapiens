@@ -27,15 +27,16 @@ export default class cityinfo extends Command {
 		try {
 			await ctx.defer();
 
-			const cityName = ctx.args[0];
+			let cityName = ctx.args[0];
+
 			if (!cityName) {
-				ctx.sendMessage("⚠️ Você precisa especificar uma cidade!");
-				return;
+				const playerInfo = await this.client.api.getPlayerInfo(ctx.member.nick || "");
+				cityName = playerInfo.data.towny?.townName;
 			}
 
 			const city = await this.client.api.getTownInfo(cityName);
 			if (!city) {
-				ctx.sendMessage("⚠️ Cidade não encontrada!");
+				ctx.sendMessage(`Cidade \`${cityName}\` não encontrada no banco de dados.`);
 				return;
 			}
 

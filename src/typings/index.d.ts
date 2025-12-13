@@ -26,6 +26,8 @@ interface Api {
   getPlayerInfo: (playerName: string) => Promise<any>;
   getPlayerList: () => Promise<Array<any>>;
   getServerInfo: () => Promise<any>;
+  getNationInfo: (nationName: string) => Promise<any>;
+  getNationList: () => Promise<Array<any>>;
 }
 interface InteractionOptions {
   name: string;

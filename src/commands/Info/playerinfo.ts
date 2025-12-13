@@ -14,7 +14,7 @@ export default class playerinfo extends Command {
 					type: 3,
 					name: "jogador",
 					description: "Nome do jogador",
-					required: true,
+					required: false,
 				}
 			]
 		});
@@ -24,15 +24,11 @@ export default class playerinfo extends Command {
 		try {
 			await ctx.defer();
 
-			const playerName = ctx.args[0];
-			if (!playerName) {
-				ctx.sendMessage("⚠️ Você precisa especificar um jogador!");
-				return;
-			}
+			const playerName = ctx.args[0] || ctx.member?.nick;
 
 			const playerInfo = await this.client.api.getPlayerInfo(playerName);
 			if (!playerInfo?.data) {
-				ctx.sendMessage("❌ Jogador não encontrado!");
+				ctx.sendMessage(`Jogador \`${playerName}\` não encontrado no banco de dados.`);
 				return;
 			}
 
@@ -77,8 +73,8 @@ export default class playerinfo extends Command {
 
 			if (data.status?.online) {
 				embed.setDescription("🟢 O jogador está **online** agora!");
-				embed.addField("❤️ Vida", `${data.status?.health ?? 0}`, true)
-				embed.addField("🍗 Fome", `${data.status?.hunger ?? 0}`, true)
+				embed.addField("❤️ Vida", `${data.status?.health ?? 0}`, true);
+				embed.addField("🍗 Fome", `${data.status?.hunger ?? 0}`, true);
 			} else {
 				embed.setDescription("🔴 O jogador está **offline**.");
 			}
