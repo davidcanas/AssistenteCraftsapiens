@@ -84,7 +84,7 @@ export default class nationinfo extends Command {
         try {
             const allNations = await this.client.api.getNationList();
 
-            const similarNations = allNations.data.filter(nation =>
+            const similarNations = allNations.data.nations.filter(nation =>
                 this.client.utils.levDistance(nation.name.toLowerCase(), value.toLowerCase()) <= 2 ||
                 nation.name.toLowerCase().includes(value.toLowerCase())
             );
