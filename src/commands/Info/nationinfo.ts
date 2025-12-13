@@ -67,7 +67,7 @@ export default class nationinfo extends Command {
                 .addField("📅 Fundada em", foundedDate, true)
                 .addField("💰 Banco", `${nation.data.balance.toLocaleString("pt-BR")} Sapiens`, true)
                 .addField("📦 Chunks", `${nation.data.nationBlocks} chunks`, true)
-                .addField("🚩 Relações ", `🟢 Aliados: \`${nation.data.relations.allies.join(", ") || "N/A"}\` | 🔴 Inimigos: \`${nation.data.relations.enemies.join(", ") || "N/A"}\``, true)
+                .addField("🚩 Relações ", `🟢 Aliados: \`${nation.data.relations.allies.join(", ") || "N/A"}\`\n🔴 Inimigos: \`${nation.data.relations.enemies.join(", ") || "N/A"}\``, true)
                 .setFooter("Assistente | Craftsapiens")
                 .setColor(parseInt(nation.data.mapColor, 16))
                 .setThumbnail(`https://mineskin.eu/armor/bust/${nation.data.leader}/100.png`)
