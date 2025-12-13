@@ -321,7 +321,7 @@ export default class DGClient extends Client {
 		return data;
 	}
 	async getNationInfo(nationName: string): Promise<any> {
-		const API_BASE = process.env.API;
+		const API_BASE = process.env.API_URL;
 		const TOKEN = process.env.API_TOKEN;
 
 		const res = await fetch(`${API_BASE}/nations/${nationName}`, {

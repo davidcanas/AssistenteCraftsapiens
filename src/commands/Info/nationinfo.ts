@@ -9,7 +9,7 @@ export default class nationinfo extends Command {
             name: "nationinfo",
             description: "Obtenha informações de uma nação do survival da craftsapiens",
             category: "Info",
-            aliases: ["cinfo"],
+            aliases: ["ninfo"],
             autocomplete: true,
             options: [
                 {
@@ -35,7 +35,6 @@ export default class nationinfo extends Command {
             }
 
             const nation = await this.client.api.getNationInfo(nationName);
-            console.log(nation)
             if (!nation) {
                 ctx.sendMessage(`Nação \`${nationName}\` não encontrada no banco de dados.`);
                 return;
