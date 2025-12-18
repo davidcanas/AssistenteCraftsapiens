@@ -116,6 +116,7 @@ export default class ReportCommand extends Command {
                     await message.delete();
                 }
 
+                console.log(result);
                 const motivoLimpo = result.replace(/\[sim\]/gi, "").trim();
 
                 const embed = new this.client.embed()
@@ -144,6 +145,7 @@ export default class ReportCommand extends Command {
             } else {
                 (ctx.msg as Message).createReaction("❌");
                 // envia o motivo para não punir
+                console.log(result);
                 ctx.sendMessage(`Motivo para não punir: ${result.replace(/\[não\]/gi, "").trim()}`);
                 return;
             }
