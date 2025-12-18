@@ -60,7 +60,7 @@ export default class ReportCommand extends Command {
             CRITÉRIOS PARA PUNIÇÃO (Responda [sim]):
             1. OFENSAS: Discurso de ódio, racismo, homofobia, ameaças reais ou bullying severo. (Ignore "KKK" ou insultos leves sem contexto discriminatório).
             2. DIVULGAÇÃO (ADS): Convites de outros servidores de Discord, IPs de outros servidores de Minecraft, links suspeitos, ou venda de serviços externos/contas.
-            
+            3. Exposição de dados pessoais (doxxing): Não tolere qualquer tentativa de compartilhar informações privadas sem consentimento de terceiros. Ex: endereços, CPF, números de telefone, etc.
             CRITÉRIOS DE SEGURANÇA (Responda [não]):
             - Se a divulgação for sobre a própria 'Craftsapiens', 'Lojasquare' ou parceiros oficiais, NÃO puna.
             - Dúvidas sobre o jogo não são infrações.
@@ -116,7 +116,7 @@ export default class ReportCommand extends Command {
                 const motivoLimpo = result.replace(/\[sim\]/gi, "").trim();
 
                 const embed = new this.client.embed()
-                    .setTitle("🚨 Infraçao Detectada")
+                    .setTitle("🚨 Infração Detectada")
                     .setDescription(`<:report:1307789599279546419> **Reportado por:** ${ctx.author.mention} (${ctx.author.id})\n\n <:Steve:905024599274684477> **Infrator**: ${message.author.mention} (${message.author.id}) \n\n<:canal:1307789443628793988> **Canal**: ${ctx.channel.mention}\n\n<:text:1308134831946862732> **Motivo da IA:**\n\`\`\`\n${motivoLimpo}\n\`\`\`\n<:message:1307790289343090738> **Mensagem Original** (<t:${Math.floor(new Date(message.timestamp).getTime() / 1000)}:R>):\n\`\`\`\n${message.content}\n\`\`\``)
                     .setColor("16711680") // Vermelho
                     .setFooter("Usuário silenciado automaticamente por 8h. Aguardando revisão da Staff.")
