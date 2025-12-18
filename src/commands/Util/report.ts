@@ -83,7 +83,7 @@ export default class ReportCommand extends Command {
             "contents": messages,
             "generationConfig": {
                 "temperature": 0.2,
-                "maxOutputTokens": 200,
+                "maxOutputTokens": 400,
                 "thinkingConfig": {
                     "thinkingLevel": "medium"
                 }
