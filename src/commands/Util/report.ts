@@ -67,7 +67,7 @@ export default class ReportCommand extends Command {
 
             FORMATO DA RESPOSTA:
             Responda estritamente com: "[sim] Com o Motivo para a punição" ou "[não] Com o Motivo para a punição".
-
+            Exemplo: "[sim] Divulgação de servidor externo" ou "[não] Mensagem inofensiva".
             Mensagem a analisar: "${message.content}"
         `;
 
@@ -140,7 +140,8 @@ export default class ReportCommand extends Command {
                 return;
             } else {
                 (ctx.msg as Message).createReaction("❌");
-                
+                // envia o motivo para não punir
+                ctx.sendMessage(`Motivo para não punir: ${result.replace(/\[não\]/gi, "").trim()}`);
                 return;
             }
 
