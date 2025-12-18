@@ -82,8 +82,11 @@ export default class ReportCommand extends Command {
             "model": process.env.AI_MODEL,
             "contents": messages,
             "generationConfig": {
-                "temperature": 0.0, // Zero para ser o mais objetivo possível
-                "maxOutputTokens": 60
+                "temperature": 0.2,
+                "maxOutputTokens": 60,
+                "thinkingConfig": {
+                    "thinkingLevel": "medium"
+                }
             }
         };
 
