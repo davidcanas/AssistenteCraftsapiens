@@ -66,8 +66,8 @@ export default class ReportCommand extends Command {
             - Dúvidas sobre o jogo não são infrações.
 
             FORMATO DA RESPOSTA:
-            Responda estritamente com: "[sim] Motivo curto" ou "[não] Motivo curto".
-            
+            Responda estritamente com: "[sim] Com o Motivo para a punição" ou "[não] Com o Motivo para a punição".
+
             Mensagem a analisar: "${message.content}"
         `;
 
