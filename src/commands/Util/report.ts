@@ -83,7 +83,7 @@ export default class ReportCommand extends Command {
             "contents": messages,
             "generationConfig": {
                 "temperature": 0.2,
-                "maxOutputTokens": 400,
+                "maxOutputTokens": 600,
                 "thinkingConfig": {
                     "thinkingLevel": "medium"
                 }
@@ -146,7 +146,7 @@ export default class ReportCommand extends Command {
                 (ctx.msg as Message).createReaction("❌");
                 // envia o motivo para não punir
                 console.log(result);
-                ctx.sendMessage(`Motivo para não punir: ${result.replace(/\[não\]/gi, "").trim()}`);
+                ctx.sendMessage(`\`${result.replace(/\[não\]/gi, "").trim()}\`\n-# Lembre-se que abusar do sistema de reportar poderá impedir você de fazer novas denúncias no futuro!`);
                 return;
             }
 
