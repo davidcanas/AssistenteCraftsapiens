@@ -121,7 +121,7 @@ export default class askGPT extends Command {
                 "maxOutputTokens": 600,
                 "temperature": 0.5,
                 "thinkingConfig": {
-                    "thinkingLevel": "low"
+                    "thinkingLevel": "minimum"
                 },
             },
         };
