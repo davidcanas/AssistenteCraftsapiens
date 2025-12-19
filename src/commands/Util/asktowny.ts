@@ -167,11 +167,9 @@ export default class AskTowny extends Command {
             "generationConfig": {
                 "maxOutputTokens": 2000,
                 "temperature": 0.4,
-                 "generationConfig": {
                     "thinkingConfig": {
                         "thinkingLevel": "low"
                     },
-                },
             }
         };
 
