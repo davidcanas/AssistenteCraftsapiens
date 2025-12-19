@@ -121,7 +121,7 @@ export default class askGPT extends Command {
                 "maxOutputTokens": 600,
                 "temperature": 0.5,
                 "thinkingConfig": {
-                    "thinkingLevel": "minimum"
+                    "thinkingLevel": "minimal"
                 },
             },
         };
@@ -135,7 +135,7 @@ export default class askGPT extends Command {
         const json = await response.json();
         console.log(json);
         if (!json.candidates) {
-            ctx.sendMessage(`Olá, ${ctx.member.nick || ctx.member.user.globalName}, ocorreu um erro ao tentar processar a sua pergunta. Provavelmente é algum problema com a OpenIA. Tente novamente mais tarde!`);
+            ctx.sendMessage(`Olá, ${ctx.member.nick || ctx.member.user.globalName}, ocorreu um erro ao tentar processar a sua pergunta. Tente novamente mais tarde!`);
             console.log(json.error.message);
             return;
         }
