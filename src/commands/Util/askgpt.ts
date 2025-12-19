@@ -35,7 +35,7 @@ export default class askGPT extends Command {
 
         let imagePart: any = null;
         const attachmentOption = ctx.args[1];
-        const attachment = attachmentOption 
+        const attachment = attachmentOption
             ? ctx.attachments.find(a => a.id === attachmentOption)
             : ctx.attachments[0];
 
@@ -43,7 +43,7 @@ export default class askGPT extends Command {
             try {
                 const response = await fetch(attachment.url);
                 if (!response.ok) throw new Error("Falha ao buscar a imagem");
-                
+
                 const mimeType = response.headers.get("content-type");
                 if (!mimeType?.startsWith("image/")) {
                     ctx.sendMessage("O arquivo fornecido não é uma imagem válida!");
@@ -119,32 +119,37 @@ export default class askGPT extends Command {
             },
             "generationConfig": {
                 "maxOutputTokens": 600,
-                "temperature": 0.5
-            }
+                "temperature": 0.5,
+                "generationConfig": {
+                    "thinkingConfig": {
+                        "thinkingLevel": "low"
+                    },
+                },
+            },
         };
 
-        const response = await fetch(process.env.AI_URL, {
-            method: "POST",
-            headers: headers,
-            body: JSON.stringify(data)
-        });
+            const response = await fetch(process.env.AI_URL, {
+                method: "POST",
+                headers: headers,
+                body: JSON.stringify(data)
+            });
 
-        const json = await response.json();
-        console.log(json);
-        if (!json.candidates) {
-            ctx.sendMessage(`Olá, ${ctx.member.nick || ctx.member.user.globalName}, ocorreu um erro ao tentar processar a sua pergunta. Provavelmente é algum problema com a OpenIA. Tente novamente mais tarde!`);
-            console.log(json.error.message);
-            return;
-        }
+            const json = await response.json();
+            console.log(json);
+            if(!json.candidates) {
+                ctx.sendMessage(`Olá, ${ctx.member.nick || ctx.member.user.globalName}, ocorreu um erro ao tentar processar a sua pergunta. Provavelmente é algum problema com a OpenIA. Tente novamente mais tarde!`);
+        console.log(json.error.message);
+        return;
+    }
 
-        if (json.candidates[0].content.parts[0].text.includes("timeout_member")) {
-            ctx.member.edit({ communicationDisabledUntil: new Date(Date.now() + 3600000).toISOString() });
-            json.candidates[0].content.parts[0].text = json.candidates[0].content.parts[0].text.replace("[timeout_member]", " ");
-        }
+    if(json.candidates[0].content.parts[0].text.includes("timeout_member")) {
+    ctx.member.edit({ communicationDisabledUntil: new Date(Date.now() + 3600000).toISOString() });
+    json.candidates[0].content.parts[0].text = json.candidates[0].content.parts[0].text.replace("[timeout_member]", " ");
+}
 
-        const embed = new this.client.embed()
-            .setColor("RANDOM")
-            .setDescription(json.candidates[0].content.parts[0].text);
-        ctx.sendMessage({ embeds: [embed] });
+const embed = new this.client.embed()
+    .setColor("RANDOM")
+    .setDescription(json.candidates[0].content.parts[0].text);
+ctx.sendMessage({ embeds: [embed] });
     }
 }
