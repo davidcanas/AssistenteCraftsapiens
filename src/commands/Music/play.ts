@@ -48,7 +48,7 @@ export default class play extends Command {
 		};
 
 		try {
-			const res = await this.client.music.search({query: `${ctx.args.join(" ")}`, source: "soundcloud"});
+			const res = await this.client.music.search(ctx.args.join(" "), {source: "soundcloud"});
 
 			if (res.loadType === "LOAD_FAILED") {
 				ctx.sendMessage(`Erro: \`${res.exception?.message}\``);
