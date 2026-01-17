@@ -47,7 +47,7 @@ export default class play extends Command {
 			return player;
 		};
 
-		try 
+		try {
 			const res = await this.client.music.search(ctx.args.join(" "));
 
 			if (res.loadType === "LOAD_FAILED") {
