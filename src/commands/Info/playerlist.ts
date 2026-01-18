@@ -3,6 +3,7 @@ import Client from "../../structures/Client";
 import CommandContext from "../../structures/CommandContext";
 import { createCanvas, loadImage, CanvasRenderingContext2D, Image } from "canvas";
 
+// Interfaces baseadas nos seus logs e necessidades
 interface Player {
     username: string;
     nickname?: string;
@@ -17,8 +18,8 @@ const CONSTANTS = {
         premium: "#00AA00", vip: "#FFFF55", professor: "#55FF55", admin: "#AA0000",
         dev: "#55FFFF", reitor: "#00AAAA", ajuda: "#FFAA00", moderador: "#FF5555",
         default: "#FFFFFF",
-        town: "#4fa3d1", // Azul cidade
-        discord: "#5865F2" // Discord Blurple
+        town: "#4fa3d1", 
+        discord: "#5865F2"
     } as Record<string, string>,
     MC_COLORS: {
         "0": "#000000", "1": "#0000AA", "2": "#00AA00", "3": "#00AAAA",
@@ -80,18 +81,34 @@ export default class PlayerList extends Command {
             // Imagem Minecraft
             const mcImage = await loadImage(`https://minotar.net/helm/${p.username}/64.png`).catch(() => null);
 
-            // Imagem Discord
+            // Dados do Discord
             const discordMember = this.client.getDiscordByNick(p.username); 
             let discordImage = null;
+            let discordUsername = null;
             
-            if (discordMember) {
-                const avatarUrl = discordMember.user?.avatarURL?.({ format: "png", size: 32 }) 
-                    || discordMember.avatarURL 
-                    || "https://cdn.discordapp.com/embed/avatars/0.png";
-                discordImage = await loadImage(avatarUrl).catch(() => null);
+            if (discordMember && discordMember.user) {
+                // CORREÇÃO AQUI: Passar strings/números diretamente, não um objeto
+                // Tenta pegar avatar do usuário, se não tiver, pega o default
+                const avatarUrl = discordMember.user.avatarURL("png", 32) || discordMember.user.defaultAvatarURL("png", 32);
+                
+                if (avatarUrl) {
+                    discordImage = await loadImage(avatarUrl).catch((e) => {
+                        console.error(`Erro ao carregar avatar Discord de ${p.username}:`, e);
+                        return null;
+                    });
+                }
+                
+                // Pega o username (ex: canasdev)
+                discordUsername = discordMember.user.username;
             }
 
-            return { player: p, mcImage, discordImage, isLinked: !!discordMember };
+            return { 
+                player: p, 
+                mcImage, 
+                discordImage, 
+                discordUsername,
+                isLinked: !!discordMember 
+            };
         }));
 
         // --- LOOP DE DESENHO ---
@@ -120,9 +137,9 @@ export default class PlayerList extends Command {
             // --- POSICIONAMENTO ---
             let textX = x + 65; 
             const line1Y = y + 26; // Nome Principal
-            const line2Y = y + 50; // Meta Info (User/Discord/Town)
+            const line2Y = y + 50; // Meta Info
 
-            // 1. Linha Superior: Rank + Nick (Cor do Minecraft)
+            // 1. Linha Superior: Rank + Nick
             const group = p.group?.toLowerCase() || "default";
             const groupName = group !== "default" ? group.charAt(0).toUpperCase() + group.slice(1) : "";
             const rawNickname = p.nickname || p.username;
@@ -144,37 +161,36 @@ export default class PlayerList extends Command {
             // --- A. Ícone do Discord (se linkado) ---
             if (data.isLinked) {
                 const discSize = 16;
-                const discY = line2Y - 12; // Centralizar verticalmente com o texto
+                const discY = line2Y - 12; 
 
                 if (data.discordImage) {
                     this.roundImage(ctx2d, data.discordImage as Image, metaX, discY, discSize, discSize, discSize/2);
                 } else {
-                    // Fallback bolinha roxa
+                    // Fallback bolinha roxa se imagem falhar
                     ctx2d.beginPath();
                     ctx2d.fillStyle = CONSTANTS.COLORS.discord;
                     ctx2d.arc(metaX + discSize/2, discY + discSize/2, discSize/2, 0, Math.PI * 2);
                     ctx2d.fill();
                 }
-                metaX += discSize + 5; // Espaço após o ícone
+                metaX += discSize + 5; 
             }
 
             // --- B. Username ---
             ctx2d.font = "14px Sans";
-            // Se tiver linkado, usa uma cor levemente destacada (ou mantém cinza, gosto pessoal)
-            // Vou usar cinza claro para leitura, mas a presença do ícone já indica o link.
             ctx2d.fillStyle = data.isLinked ? "#dedede" : "#72767d"; 
             
-            const userText = `@${p.username}`;
+            // Se tiver linkado, usa o username do Discord, se não, usa o do Minecraft
+            const displayUser = data.discordUsername || p.username;
+            const userText = `@${displayUser}`;
+            
             ctx2d.fillText(userText, metaX, line2Y);
             metaX += ctx2d.measureText(userText).width + 10;
 
             // --- C. Cidade (Separador + Nome) ---
             if (p.towny && p.towny.townName) {
-                // Barra vertical separadora
-                ctx2d.fillStyle = "#484B52"; // Cinza escuro
+                ctx2d.fillStyle = "#484B52"; 
                 ctx2d.fillRect(metaX - 6, line2Y - 9, 1.5, 11); 
 
-                // Ícone casa + Nome
                 ctx2d.fillStyle = CONSTANTS.COLORS.town;
                 const townText = `🏘️ ${p.towny.townName}`;
                 ctx2d.fillText(townText, metaX, line2Y);
@@ -206,7 +222,7 @@ export default class PlayerList extends Command {
         });
     }
 
-    // --- HELPERS (Mesmos de antes) ---
+    // --- HELPERS ---
 
     async drawHeader(ctx: CanvasRenderingContext2D, padding: number) {
         const logoSize = 80;
@@ -241,13 +257,11 @@ export default class PlayerList extends Command {
     drawMinecraftText(ctx: CanvasRenderingContext2D, text: string, x: number, y: number) {
         const parts = text.split("§");
         let currentX = x;
-        
         if (parts[0].length > 0) {
             ctx.fillStyle = "#FFFFFF";
             ctx.fillText(parts[0], currentX, y);
             currentX += ctx.measureText(parts[0]).width;
         }
-
         for (let i = 1; i < parts.length; i++) {
             const part = parts[i];
             if (part.length === 0) continue;
