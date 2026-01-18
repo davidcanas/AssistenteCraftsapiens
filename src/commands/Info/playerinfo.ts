@@ -3,7 +3,6 @@ import Client from "../../structures/Client";
 import CommandContext from "../../structures/CommandContext";
 import { createCanvas, loadImage, CanvasRenderingContext2D, Image } from "canvas";
 
-// Configurações de Estilo
 const CONSTANTS = {
     WIDTH: 900,
     BG_COLOR: "#23272A", 
@@ -18,12 +17,12 @@ const CONSTANTS = {
         default: "#AAAAAA"
     } as Record<string, string>,
     ICONS: {
-        money: "https://i.imgur.com/Zk4Gz0D.png",
-        kills: "https://i.imgur.com/Jk8X5Kj.png",
-        deaths: "https://i.imgur.com/9R7X2Lw.png",
-        town: "https://i.imgur.com/74o3G5E.png",
-        nation: "https://i.imgur.com/6E5F4Gz.png",
-        friends: "https://i.imgur.com/5D6E7F8.png"
+        money: "https://cdn-icons-png.flaticon.com/512/10384/10384161.png",
+        kills: "https://cdn-icons-png.flaticon.com/256/2736/2736398.png",
+        deaths: "https://cdn-icons-png.flaticon.com/512/521/521269.png",
+        town: "https://cdn-icons-png.freepik.com/256/2942/2942149.png",
+        nation: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQx9IUPp1oO1XdypfdIKt8-32tp-QeCPnBvxw&s",
+        friends: "https://cdn-icons-png.flaticon.com/512/880/880594.png"
     }
 };
 
@@ -43,12 +42,10 @@ export default class PlayerInfo extends Command {
         });
     }
 
-    // Remove códigos de cor (§a, §1...)
     stripColors(text: string): string {
         return text ? text.replace(/§[0-9A-FK-ORa-fk-or]/g, "") : "";
     }
 
-    // Formata números grandes: 1200 -> 1.2k, 1000000 -> 1M
     formatNumber(num: number): string {
         if (!num) return "0";
         if (num >= 1000000000) return (num / 1000000000).toFixed(1).replace(/\.0$/, '') + 'B';
@@ -69,26 +66,26 @@ export default class PlayerInfo extends Command {
             }
             const data = playerInfo.data;
 
-            // --- Preparação dos Dados ---
             const cleanNickname = this.stripColors(data.nickname || data.username);
             const username = data.username;
             const group = (data.group || "default").toLowerCase();
             const accentColor = CONSTANTS.GROUP_COLORS[group] || CONSTANTS.ACCENT_COLOR;
-            
-            // Formatação do Rank para exibição: [Admin]
             const rankName = group !== "default" ? group.charAt(0).toUpperCase() + group.slice(1) : "";
             const displayName = rankName ? `[${rankName}] ${cleanNickname}` : cleanNickname;
-
             const isOnline = data.status?.online ?? false;
             const friendsList = data.towny?.friends || [];
             const hasFriends = friendsList.length > 0;
 
-            // --- Cálculo de Altura ---
-            // Base: Header (100) + Card Identidade (380) + Padding (30) = ~510px mínimo
-            // Coluna Direita: 2 linhas de cards (80*2) + Gaps = ~200px ocupados
-            
-            let canvasHeight = 520; // Altura base segura
-            if (hasFriends) canvasHeight += 110; // Espaço extra para a caixa de amigos
+            // --- Dados do Discord ---
+            const discordMember = this.client.getDiscordByNick(username);
+            let discordAvatarUrl = null;
+            if (discordMember && discordMember.user) {
+                discordAvatarUrl = discordMember.user.avatarURL("png", 64) || discordMember.user.defaultAvatarURL("png", 64);
+            }
+
+            // --- Configuração Canvas ---
+            let canvasHeight = 520; 
+            if (hasFriends) canvasHeight += 110;
 
             const canvas = createCanvas(CONSTANTS.WIDTH, canvasHeight);
             const ctx2d = canvas.getContext("2d");
@@ -104,10 +101,12 @@ export default class PlayerInfo extends Command {
             
             const [
                 skinImage,
+                discordImage,
                 moneyIcon, killsIcon, deathsIcon,
                 townIcon, nationIcon, friendsIcon
             ] = await Promise.all([
                 loadImage(skinUrl).catch(() => null),
+                discordAvatarUrl ? loadImage(discordAvatarUrl).catch(() => null) : Promise.resolve(null),
                 loadImage(CONSTANTS.ICONS.money).catch(() => null),
                 loadImage(CONSTANTS.ICONS.kills).catch(() => null),
                 loadImage(CONSTANTS.ICONS.deaths).catch(() => null),
@@ -121,40 +120,35 @@ export default class PlayerInfo extends Command {
             const rightColX = CONSTANTS.PADDING + leftColWidth + CONSTANTS.PADDING;
             const startY = 110; 
 
-            // 1. Coluna Esquerda: Identidade (com [TAG] Nick)
-            this.drawIdentityCard(ctx2d, CONSTANTS.PADDING, startY, leftColWidth, 380, skinImage, displayName, username, accentColor, isOnline);
+            // 1. Identidade (com Discord Avatar)
+            this.drawIdentityCard(ctx2d, CONSTANTS.PADDING, startY, leftColWidth, 380, skinImage, discordImage, displayName, username, accentColor, isOnline);
 
-            // 2. Coluna Direita: Stats
-            // Agora temos apenas 4 cards principais (Money, Kills, Deaths, Town/Nation)
-            // Vamos fazer 2 linhas x 2 colunas
+            // 2. Stats Grid
             const cardW = 250;
             const cardH = 80;
             const gapX = 20;
             const gapY = 20;
             let gridY = startY; 
 
-            // Linha 1: Dinheiro e Kills
+            // Linha 1
             this.drawStatBox(ctx2d, rightColX, gridY, cardW, cardH, moneyIcon, "Dinheiro", `${this.formatNumber(data.status?.money)}`, accentColor);
             this.drawStatBox(ctx2d, rightColX + cardW + gapX, gridY, cardW, cardH, killsIcon, "Kills", `${this.formatNumber(data.status?.kills ?? 0)}`, "#FF5555");
             
-            // Linha 2: Mortes e Cidade
+            // Linha 2
             gridY += cardH + gapY;
             this.drawStatBox(ctx2d, rightColX, gridY, cardW, cardH, deathsIcon, "Mortes", `${this.formatNumber(data.status?.deaths ?? 0)}`, "#AAAAAA");
             this.drawStatBox(ctx2d, rightColX + cardW + gapX, gridY, cardW, cardH, townIcon, "Cidade", data.towny?.townName?.replace(/_/g, " ") || "N/A", "#55FFFF");
 
-            // Linha 3: Nação (sozinha ou ocupando largura dupla se preferir, mas vou manter o grid)
+            // Linha 3
             gridY += cardH + gapY;
             this.drawStatBox(ctx2d, rightColX, gridY, cardW, cardH, nationIcon, "Nação", data.towny?.nationName?.replace(/_/g, " ") || "N/A", "#FFFF55");
 
-            // 3. Rodapé: Amigos
-            // Calcula onde a caixa de amigos deve começar. 
-            // Deve ser abaixo do card de identidade OU dos stats, o que for maior.
+            // 3. Amigos (Smart Fit)
             const identityBottom = startY + 380;
             const statsBottom = gridY + cardH; 
             const friendsStartY = Math.max(identityBottom, statsBottom) + 30;
 
             if (hasFriends) {
-                // Desenha a caixa ocupando quase toda a largura
                 this.drawFriendsSection(ctx2d, CONSTANTS.PADDING, friendsStartY, CONSTANTS.WIDTH - (CONSTANTS.PADDING * 2), friendsList, friendsIcon);
             }
 
@@ -177,21 +171,19 @@ export default class PlayerInfo extends Command {
         ctx.font = "bold 32px Sans";
         ctx.textAlign = "left";
         ctx.fillText("CraftSapiens", CONSTANTS.PADDING, 50);
-        
         ctx.fillStyle = CONSTANTS.TEXT_SECONDARY;
         ctx.font = "24px Sans";
         ctx.fillText("| Informações do Jogador", CONSTANTS.PADDING + 240, 50);
-
         ctx.fillStyle = "#33363C";
         ctx.fillRect(CONSTANTS.PADDING, 75, CONSTANTS.WIDTH - (CONSTANTS.PADDING*2), 2);
     }
 
-    drawIdentityCard(ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, img: Image | null, displayName: string, user: string, accent: string, online: boolean) {
+    drawIdentityCard(ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, img: Image | null, discordImg: Image | null, displayName: string, user: string, accent: string, online: boolean) {
         ctx.fillStyle = CONSTANTS.CARD_BG;
         this.roundRect(ctx, x, y, w, h, 15);
         ctx.fill();
 
-        // Barra superior colorida
+        // Barra colorida topo
         ctx.fillStyle = accent;
         ctx.beginPath();
         ctx.roundRect(x, y, w, 10, [15, 15, 0, 0]);
@@ -200,7 +192,7 @@ export default class PlayerInfo extends Command {
         const centerX = x + w / 2;
         let currentY = y + 40;
 
-        // Skin
+        // Skin do Minecraft
         if (img) {
             const imgSize = 180;
             ctx.shadowColor = "rgba(0,0,0,0.3)";
@@ -217,7 +209,6 @@ export default class PlayerInfo extends Command {
         // Nome [TAG] Nick
         ctx.textAlign = "center";
         
-        // Ajuste dinâmico de fonte se o nome for muito longo
         let fontSize = 28;
         ctx.font = `bold ${fontSize}px Sans`;
         while (ctx.measureText(displayName).width > w - 20 && fontSize > 14) {
@@ -231,11 +222,37 @@ export default class PlayerInfo extends Command {
         ctx.fillText(displayName, centerX, currentY);
         ctx.shadowBlur = 0;
 
-        // Username
-        currentY += 30;
+        // --- Discord Avatar + @Username ---
+        currentY += 35;
+        const discSize = 24;
+        const discPadding = 8;
+        
         ctx.font = "italic 20px Sans";
+        const textWidth = ctx.measureText(`@${user}`).width;
+        
+        const totalBlockWidth = discordImg ? (discSize + discPadding + textWidth) : textWidth;
+        let startX = centerX - (totalBlockWidth / 2);
+
+        if (discordImg) {
+            ctx.save();
+            ctx.beginPath();
+            // Círculo para clip
+            ctx.arc(startX + discSize/2, currentY - 7, discSize/2, 0, Math.PI*2);
+            ctx.closePath();
+            ctx.clip();
+            // Desenha imagem
+            ctx.drawImage(discordImg, startX, currentY - 7 - discSize/2, discSize, discSize);
+            ctx.restore();
+            
+            // Avança o cursor
+            startX += discSize + discPadding;
+        }
+
+        // Desenha o Texto
+        ctx.textAlign = "left"; // Muda para left temporariamente para desenhar a partir do cálculo
         ctx.fillStyle = CONSTANTS.TEXT_SECONDARY;
-        ctx.fillText(`@${user}`, centerX, currentY);
+        ctx.fillText(`@${user}`, startX, currentY);
+        ctx.textAlign = "center"; // Volta para center
 
         // Status
         currentY += 45;
@@ -272,42 +289,55 @@ export default class PlayerInfo extends Command {
 
         ctx.fillStyle = CONSTANTS.TEXT_PRIMARY;
         ctx.font = "bold 22px Sans";
-        // Sem truncamento agressivo, pois os números agora são formatados (1.2M)
         ctx.fillText(value, x + 70, y + 55);
     }
 
     drawFriendsSection(ctx: CanvasRenderingContext2D, x: number, y: number, w: number, friends: string[], icon: Image | null) {
         const h = 80;
         
-        // Fundo
         ctx.fillStyle = CONSTANTS.CARD_BG;
         this.roundRect(ctx, x, y, w, h, 12);
         ctx.fill();
 
-        // Ícone
         if (icon) {
             ctx.drawImage(icon, x + 20, y + 28, 24, 24);
         }
 
-        // Título
+        // Título fixo
         ctx.fillStyle = CONSTANTS.TEXT_SECONDARY;
         ctx.font = "18px Sans";
-        ctx.fillText(`AMIGOS (${friends.length})`, x + 55, y + 46);
+        const titleText = `AMIGOS (${friends.length})`;
+        ctx.fillText(titleText, x + 55, y + 46);
 
-        // Lista de Amigos
+   
         ctx.fillStyle = CONSTANTS.TEXT_PRIMARY;
         ctx.font = "16px Sans";
-        
-        // Calcula quanto espaço o título ocupa para começar a lista depois dele
-        const titleWidth = ctx.measureText(`AMIGOS (${friends.length})`).width + 80; // 80 = margem esquerda + icon
-        
-        // Junta os nomes
-        const displayFriends = friends.slice(0, 8).join("  •  ");
-        let finalText = displayFriends;
-        if (friends.length > 8) finalText += ` (+${friends.length - 8})`;
 
-        // Desenha a lista à direita do título, verticalmente centralizada
-        ctx.fillText(finalText, x + titleWidth, y + 46);
+        const startTextX = x + 55 + ctx.measureText(titleText).width + 30; 
+        const maxTextWidth = (x + w) - startTextX - 20; 
+        
+        let finalText = "";
+        
+        for (let i = 0; i < friends.length; i++) {
+            const separator = finalText.length > 0 ? "  •  " : "";
+            const nextName = friends[i];
+            
+            const testString = finalText + separator + nextName;
+            
+            const potentialRest = friends.length - (i + 1);
+            const counterWidth = potentialRest > 0 ? ctx.measureText(`  (+${potentialRest})`).width : 0;
+            
+            if (ctx.measureText(testString).width + counterWidth < maxTextWidth) {
+                finalText = testString;
+            } else {
+              
+                const remaining = friends.length - i;
+                finalText += `  (+${remaining})`;
+                break; 
+            }
+        }
+
+        ctx.fillText(finalText, startTextX, y + 46);
     }
     
     roundRect(ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, r: number) {
