@@ -28,7 +28,7 @@ const CONSTANTS = {
         "r": "#FFFFFF"
     } as Record<string, string>,
     // Ícone de casa (Towny)
-    TOWN_ICON_URL: "https://i.imgur.com/74o3G5E.png" 
+    TOWN_ICON_URL: "https://cdn-icons-png.freepik.com/256/2942/2942149.png" 
 };
 
 export default class PlayerList extends Command {
