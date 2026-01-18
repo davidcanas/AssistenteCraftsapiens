@@ -3,7 +3,6 @@ import Client from "../../structures/Client";
 import CommandContext from "../../structures/CommandContext";
 import { createCanvas, loadImage, CanvasRenderingContext2D, Image } from "canvas";
 
-// Interfaces baseadas nos seus logs e necessidades
 interface Player {
     username: string;
     nickname?: string;
@@ -27,7 +26,9 @@ const CONSTANTS = {
         "8": "#555555", "9": "#5555FF", "a": "#55FF55", "b": "#55FFFF",
         "c": "#FF5555", "d": "#FF55FF", "e": "#FFFF55", "f": "#FFFFFF",
         "r": "#FFFFFF"
-    } as Record<string, string>
+    } as Record<string, string>,
+    // Ícone de casa (Towny)
+    TOWN_ICON_URL: "https://i.imgur.com/74o3G5E.png" 
 };
 
 export default class PlayerList extends Command {
@@ -74,6 +75,9 @@ export default class PlayerList extends Command {
         ctx2d.fillStyle = "#23272A";
         ctx2d.fillRect(0, 0, width, height);
 
+        // Carrega o ícone da cidade
+        const townIconImg = await loadImage(CONSTANTS.TOWN_ICON_URL).catch(() => null);
+
         await this.drawHeader(ctx2d, padding);
 
         // --- PREPARAÇÃO DOS DADOS ---
@@ -84,29 +88,25 @@ export default class PlayerList extends Command {
             // Dados do Discord
             const discordMember = this.client.getDiscordByNick(p.username); 
             let discordImage = null;
-            let discordUsername = null;
+            let discordNick = null;
             
             if (discordMember && discordMember.user) {
-                // CORREÇÃO AQUI: Passar strings/números diretamente, não um objeto
-                // Tenta pegar avatar do usuário, se não tiver, pega o default
+                // Tenta pegar avatar
                 const avatarUrl = discordMember.user.avatarURL("png", 32) || discordMember.user.defaultAvatarURL("png", 32);
                 
                 if (avatarUrl) {
-                    discordImage = await loadImage(avatarUrl).catch((e) => {
-                        console.error(`Erro ao carregar avatar Discord de ${p.username}:`, e);
-                        return null;
-                    });
+                    discordImage = await loadImage(avatarUrl).catch(() => null);
                 }
                 
-                // Pega o username (ex: canasdev)
-                discordUsername = discordMember.user.username;
+                // Pega o nick do servidor ou username
+                discordNick = discordMember.nick || discordMember.user.username;
             }
 
             return { 
                 player: p, 
                 mcImage, 
                 discordImage, 
-                discordUsername,
+                discordNick,
                 isLinked: !!discordMember 
             };
         }));
@@ -139,7 +139,7 @@ export default class PlayerList extends Command {
             const line1Y = y + 26; // Nome Principal
             const line2Y = y + 50; // Meta Info
 
-            // 1. Linha Superior: Rank + Nick
+            // 1. Linha Superior: Rank + Nick Minecraft
             const group = p.group?.toLowerCase() || "default";
             const groupName = group !== "default" ? group.charAt(0).toUpperCase() + group.slice(1) : "";
             const rawNickname = p.nickname || p.username;
@@ -155,44 +155,61 @@ export default class PlayerList extends Command {
             ctx2d.font = "bold 17px Sans";
             this.drawMinecraftText(ctx2d, rawNickname, textX, line1Y);
 
-            // 2. Linha Inferior: [AvatarDiscord] @Username | [Cidade]
+            // 2. Linha Inferior
             let metaX = x + 65;
+            let hasContentOnLeft = false;
             
-            // --- A. Ícone do Discord (se linkado) ---
-            if (data.isLinked) {
+            // --- A. Discord (Só aparece se estiver linkado) ---
+            if (data.isLinked && data.discordNick) {
                 const discSize = 16;
                 const discY = line2Y - 12; 
 
+                // Ícone Discord
                 if (data.discordImage) {
                     this.roundImage(ctx2d, data.discordImage as Image, metaX, discY, discSize, discSize, discSize/2);
                 } else {
-                    // Fallback bolinha roxa se imagem falhar
                     ctx2d.beginPath();
                     ctx2d.fillStyle = CONSTANTS.COLORS.discord;
                     ctx2d.arc(metaX + discSize/2, discY + discSize/2, discSize/2, 0, Math.PI * 2);
                     ctx2d.fill();
                 }
                 metaX += discSize + 5; 
+
+                // Nome (Nick do Discord)
+                ctx2d.font = "14px Sans";
+                ctx2d.fillStyle = "#dedede"; // Cor clara
+                const nickText = `@${data.discordNick}`;
+                ctx2d.fillText(nickText, metaX, line2Y);
+                
+                metaX += ctx2d.measureText(nickText).width + 10;
+                hasContentOnLeft = true;
             }
 
-            // --- B. Username ---
-            ctx2d.font = "14px Sans";
-            ctx2d.fillStyle = data.isLinked ? "#dedede" : "#72767d"; 
-            
-            // Se tiver linkado, usa o username do Discord, se não, usa o do Minecraft
-            const displayUser = data.discordUsername || p.username;
-            const userText = `@${displayUser}`;
-            
-            ctx2d.fillText(userText, metaX, line2Y);
-            metaX += ctx2d.measureText(userText).width + 10;
-
-            // --- C. Cidade (Separador + Nome) ---
+            // --- B. Cidade (Towny) ---
             if (p.towny && p.towny.townName) {
-                ctx2d.fillStyle = "#484B52"; 
-                ctx2d.fillRect(metaX - 6, line2Y - 9, 1.5, 11); 
+                // Separador se tiver discord antes
+                if (hasContentOnLeft) {
+                    ctx2d.fillStyle = "#484B52"; 
+                    ctx2d.fillRect(metaX - 6, line2Y - 9, 1.5, 11); 
+                }
 
+                const townIconSize = 14;
+                const townIconY = line2Y - 11;
+
+                // Desenha Ícone da Cidade
+                if (townIconImg) {
+                    ctx2d.drawImage(townIconImg as Image, metaX, townIconY, townIconSize, townIconSize);
+                } else {
+                    ctx2d.fillStyle = CONSTANTS.COLORS.town;
+                    ctx2d.fillRect(metaX, townIconY, townIconSize, townIconSize);
+                }
+
+                metaX += townIconSize + 5;
+
+                // Nome da cidade (AQUI ESTÁ A CORREÇÃO DO REPLACE)
+                ctx2d.font = "14px Sans";
                 ctx2d.fillStyle = CONSTANTS.COLORS.town;
-                const townText = `🏘️ ${p.towny.townName}`;
+                const townText = p.towny.townName.replace(/_/g, " "); // Troca _ por espaço
                 ctx2d.fillText(townText, metaX, line2Y);
             }
         }
