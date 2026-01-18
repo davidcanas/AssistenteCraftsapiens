@@ -85,7 +85,7 @@ export default class PlayerList extends Command {
             let discordImage = null;
             
             if (discordMember) {
-                const avatarUrl = discordMember.user?.displayAvatarURL?.({ extension: 'png', size: 32 }) 
+                const avatarUrl = discordMember.user?.avatarURL?.({ format: "png", size: 32 }) 
                     || discordMember.avatarURL 
                     || "https://cdn.discordapp.com/embed/avatars/0.png";
                 discordImage = await loadImage(avatarUrl).catch(() => null);
