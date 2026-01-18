@@ -4,4 +4,5 @@ yarn.lock
 src/data/*.txt
 src/data/*.yml
 package-lock.json
-package.jsondist/
+package.json
+dist/
