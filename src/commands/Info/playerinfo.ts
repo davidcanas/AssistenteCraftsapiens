@@ -21,7 +21,7 @@ const CONSTANTS = {
         kills: "https://cdn-icons-png.flaticon.com/256/2736/2736398.png",
         deaths: "https://cdn-icons-png.flaticon.com/512/521/521269.png",
         town: "https://cdn-icons-png.freepik.com/256/2942/2942149.png",
-        nation: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQx9IUPp1oO1XdypfdIKt8-32tp-QeCPnBvxw&s",
+        nation: "https://cdn-icons-png.flaticon.com/512/2110/2110488.png",
         friends: "https://cdn-icons-png.flaticon.com/512/880/880594.png"
     }
 };
