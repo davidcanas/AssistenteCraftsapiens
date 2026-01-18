@@ -187,6 +187,7 @@ export default class PlayerList extends Command {
                 ctx2d.font = "14px Sans";
                 ctx2d.fillStyle = "#dedede"; // Cor clara
                 ctx2d.fillText("Não vinculado", metaX, line2Y);
+				metaX += ctx2d.measureText("Não vinculado").width + 10;
 				hasContentOnLeft = true;
             }
 
