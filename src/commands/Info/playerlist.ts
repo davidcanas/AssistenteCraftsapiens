@@ -183,6 +183,11 @@ export default class PlayerList extends Command {
                 
                 metaX += ctx2d.measureText(nickText).width + 10;
                 hasContentOnLeft = true;
+            } else {
+                ctx2d.font = "14px Sans";
+                ctx2d.fillStyle = "#dedede"; // Cor clara
+                ctx2d.fillText("Não vinculado", metaX, line2Y);
+				hasContentOnLeft = true;
             }
 
             // --- B. Cidade (Towny) ---
