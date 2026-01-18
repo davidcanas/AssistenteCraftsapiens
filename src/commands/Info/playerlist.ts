@@ -3,21 +3,22 @@ import Client from "../../structures/Client";
 import CommandContext from "../../structures/CommandContext";
 import { createCanvas, loadImage, CanvasRenderingContext2D, Image } from "canvas";
 
-// Interfaces para tipagem
 interface Player {
     username: string;
     nickname?: string;
     group?: string;
     status: { online: boolean };
+    towny?: { townName: string };
 }
 
-// Configurações de estilo
 const CONSTANTS = {
     HIERARCHY: ["reitor", "dev", "admin", "professor", "moderador", "ajuda", "premium", "vip", "default"],
     COLORS: {
         premium: "#00AA00", vip: "#FFFF55", professor: "#55FF55", admin: "#AA0000",
         dev: "#55FFFF", reitor: "#00AAAA", ajuda: "#FFAA00", moderador: "#FF5555",
-        default: "#FFFFFF"
+        default: "#FFFFFF",
+        town: "#4fa3d1", // Azul cidade
+        discord: "#5865F2" // Discord Blurple
     } as Record<string, string>,
     MC_COLORS: {
         "0": "#000000", "1": "#0000AA", "2": "#00AA00", "3": "#00AAAA",
@@ -32,16 +33,11 @@ export default class PlayerList extends Command {
     constructor(client: Client) {
         super(client, {
             name: "playerlist",
-            description: "Obtenha a lista de jogadores online com detalhes.",
+            description: "Lista de jogadores online.",
             category: "Info",
             aliases: ["tab", "pllist", "pl"],
             options: [],
         });
-    }
-
-    // Helper para remover códigos de cor do Minecraft (§a, §1, etc) para comparação
-    stripColors(text: string): string {
-        return text.replace(/§./g, "");
     }
 
     async execute(ctx: CommandContext): Promise<void> {
@@ -49,20 +45,19 @@ export default class PlayerList extends Command {
 
         const response = await this.client.api.getPlayerList();
         
-        // Filtragem e Ordenação
         const players: Player[] = response.data.players
             .filter((p: any) => p.status.online)
             .sort((a: any, b: any) => {
                 const rankA = CONSTANTS.HIERARCHY.indexOf(a.group?.toLowerCase() || "default");
                 const rankB = CONSTANTS.HIERARCHY.indexOf(b.group?.toLowerCase() || "default");
-                return rankA - rankB; // Menor índice = maior hierarquia
+                return rankA - rankB;
             });
 
         // Configuração do Canvas
-        const cols = 2; // Número de colunas
-        const cardHeight = 60;
-        const cardWidth = 380; // Largura de cada slot de jogador
-        const gap = 15; // Espaço entre cards
+        const cols = 2;
+        const cardHeight = 65;
+        const cardWidth = 400; 
+        const gap = 15;
         const headerHeight = 120;
         const footerHeight = 50;
         const padding = 20;
@@ -74,116 +69,125 @@ export default class PlayerList extends Command {
         const canvas = createCanvas(width, height);
         const ctx2d = canvas.getContext("2d");
 
-        // --- Fundo ---
-        ctx2d.fillStyle = "#23272A"; // Dark discord theme
+        // Fundo
+        ctx2d.fillStyle = "#23272A";
         ctx2d.fillRect(0, 0, width, height);
 
-        // --- Header (Logo e Título) ---
-        const logoSize = 80;
-        try {
-            const logo = await loadImage("https://i.imgur.com/S6tkD7r.jpeg");
-            // Desenha logo circular
-            ctx2d.save();
-            ctx2d.beginPath();
-            ctx2d.arc(padding + logoSize / 2, padding + logoSize / 2, logoSize / 2, 0, Math.PI * 2, true);
-            ctx2d.closePath();
-            ctx2d.clip();
-            ctx2d.drawImage(logo, padding, padding, logoSize, logoSize);
-            ctx2d.restore();
-        } catch (e) {
-            console.error("Erro ao carregar logo", e);
-        }
+        await this.drawHeader(ctx2d, padding);
 
-        ctx2d.fillStyle = "#FFFFFF";
-        ctx2d.font = "bold 36px Sans";
-        ctx2d.textAlign = "left";
-        ctx2d.fillText("CraftSapiens", padding + logoSize + 20, padding + 50);
-        
-        ctx2d.fillStyle = "#AAAAAA";
-        ctx2d.font = "24px Sans";
-        ctx2d.fillText("Jogadores Online", padding + logoSize + 20, padding + 85);
+        // --- PREPARAÇÃO DOS DADOS ---
+        const preparedData = await Promise.all(players.map(async (p) => {
+            // Imagem Minecraft
+            const mcImage = await loadImage(`https://minotar.net/helm/${p.username}/64.png`).catch(() => null);
 
-        // --- Renderização dos Jogadores ---
-        
-        // Pré-carregar avatares (opcional, mas recomendado para visual)
-        // Se houver muitos players, isso pode demorar. Use com cautela ou limite.
-        const avatarPromises = players.map(p => 
-            loadImage(`https://minotar.net/helm/${p.username}/64.png`).catch(() => null)
-        );
-        const avatars = await Promise.all(avatarPromises);
+            // Imagem Discord
+            const discordMember = this.client.getDiscordByNick(p.username); 
+            let discordImage = null;
+            
+            if (discordMember) {
+                const avatarUrl = discordMember.user?.displayAvatarURL?.({ extension: 'png', size: 32 }) 
+                    || discordMember.avatarURL 
+                    || "https://cdn.discordapp.com/embed/avatars/0.png";
+                discordImage = await loadImage(avatarUrl).catch(() => null);
+            }
 
-        for (let i = 0; i < players.length; i++) {
-            const player = players[i];
+            return { player: p, mcImage, discordImage, isLinked: !!discordMember };
+        }));
+
+        // --- LOOP DE DESENHO ---
+        for (let i = 0; i < preparedData.length; i++) {
+            const data = preparedData[i];
+            const p = data.player;
+            
             const col = i % cols;
             const row = Math.floor(i / cols);
-
             const x = padding + (col * (cardWidth + gap));
             const y = headerHeight + (row * (cardHeight + gap));
 
-            // Fundo do Card do Jogador
-            ctx2d.fillStyle = "#2C2F33"; // Um pouco mais claro que o fundo
+            // Fundo do Card
+            ctx2d.fillStyle = "#2C2F33";
             this.roundRect(ctx2d, x, y, cardWidth, cardHeight, 10);
             ctx2d.fill();
 
-            // Avatar
-            const avatarImg = avatars[i];
-            if (avatarImg) {
-                ctx2d.drawImage(avatarImg as Image, x + 10, y + 10, 40, 40);
+            // Avatar Minecraft (Esquerda)
+            if (data.mcImage) {
+                this.roundImage(ctx2d, data.mcImage as Image, x + 10, y + 10, 45, 45, 5);
             } else {
-                // Placeholder se falhar
                 ctx2d.fillStyle = "#99AAB5";
-                ctx2d.fillRect(x + 10, y + 10, 40, 40);
+                ctx2d.fillRect(x + 10, y + 10, 45, 45);
             }
 
-            // Dados do Texto
-            const group = player.group?.toLowerCase() || "default";
-            const groupColor = CONSTANTS.COLORS[group] || "#FFFFFF";
+            // --- POSICIONAMENTO ---
+            let textX = x + 65; 
+            const line1Y = y + 26; // Nome Principal
+            const line2Y = y + 50; // Meta Info (User/Discord/Town)
+
+            // 1. Linha Superior: Rank + Nick (Cor do Minecraft)
+            const group = p.group?.toLowerCase() || "default";
             const groupName = group !== "default" ? group.charAt(0).toUpperCase() + group.slice(1) : "";
-            
-            const rawNickname = player.nickname || player.username;
-            const cleanNick = this.stripColors(rawNickname);
-            const realUsername = player.username;
-            
-            // Lógica Sutil: Mostrar username se for diferente do nick
-            const showRealUsername = cleanNick !== realUsername;
+            const rawNickname = p.nickname || p.username;
 
-            let textX = x + 60; // Posição X do texto (depois do avatar)
-            let textY = y + 28; // Posição Y da linha principal
-
-            // 1. Desenhar Rank (Tag)
             if (groupName) {
-                ctx2d.font = "bold 16px Sans";
-                ctx2d.fillStyle = groupColor;
+                ctx2d.font = "bold 15px Sans";
+                ctx2d.fillStyle = CONSTANTS.COLORS[group] || "#FFFFFF";
                 const tagText = `[${groupName}] `;
-                ctx2d.fillText(tagText, textX, textY);
+                ctx2d.fillText(tagText, textX, line1Y);
                 textX += ctx2d.measureText(tagText).width;
             }
 
-            // 2. Desenhar Nickname (Colorido)
-            ctx2d.font = "bold 18px Sans";
-            this.drawMinecraftText(ctx2d, rawNickname, textX, textY);
+            ctx2d.font = "bold 17px Sans";
+            this.drawMinecraftText(ctx2d, rawNickname, textX, line1Y);
 
-            // 3. Desenhar Username Real (Sutil)
-            if (showRealUsername) {
-                ctx2d.fillStyle = "#72767d"; // Cinza discord escuro
-                ctx2d.font = "italic 14px Sans";
-                // Desenha embaixo do nick principal
-                ctx2d.fillText(`@${realUsername}`, x + 60, y + 50);
-            } else {
-                 // Se não tiver username diferente, centraliza verticalmente melhor o nick
-                 // (Opcional: Ajuste fino de layout se quiser)
+            // 2. Linha Inferior: [AvatarDiscord] @Username | [Cidade]
+            let metaX = x + 65;
+            
+            // --- A. Ícone do Discord (se linkado) ---
+            if (data.isLinked) {
+                const discSize = 16;
+                const discY = line2Y - 12; // Centralizar verticalmente com o texto
+
+                if (data.discordImage) {
+                    this.roundImage(ctx2d, data.discordImage as Image, metaX, discY, discSize, discSize, discSize/2);
+                } else {
+                    // Fallback bolinha roxa
+                    ctx2d.beginPath();
+                    ctx2d.fillStyle = CONSTANTS.COLORS.discord;
+                    ctx2d.arc(metaX + discSize/2, discY + discSize/2, discSize/2, 0, Math.PI * 2);
+                    ctx2d.fill();
+                }
+                metaX += discSize + 5; // Espaço após o ícone
+            }
+
+            // --- B. Username ---
+            ctx2d.font = "14px Sans";
+            // Se tiver linkado, usa uma cor levemente destacada (ou mantém cinza, gosto pessoal)
+            // Vou usar cinza claro para leitura, mas a presença do ícone já indica o link.
+            ctx2d.fillStyle = data.isLinked ? "#dedede" : "#72767d"; 
+            
+            const userText = `@${p.username}`;
+            ctx2d.fillText(userText, metaX, line2Y);
+            metaX += ctx2d.measureText(userText).width + 10;
+
+            // --- C. Cidade (Separador + Nome) ---
+            if (p.towny && p.towny.townName) {
+                // Barra vertical separadora
+                ctx2d.fillStyle = "#484B52"; // Cinza escuro
+                ctx2d.fillRect(metaX - 6, line2Y - 9, 1.5, 11); 
+
+                // Ícone casa + Nome
+                ctx2d.fillStyle = CONSTANTS.COLORS.town;
+                const townText = `🏘️ ${p.towny.townName}`;
+                ctx2d.fillText(townText, metaX, line2Y);
             }
         }
 
-        // --- Footer ---
-        const footerY = height - 15;
+        // Footer Total
         ctx2d.fillStyle = "#888";
         ctx2d.font = "18px Sans";
         ctx2d.textAlign = "center";
         const totalText = `Total: ${players.length} jogadores conectados`;
-        ctx2d.fillText(totalText, width / 2, footerY);
+        ctx2d.fillText(totalText, width / 2, height - 15);
 
-        // Enviar
         const buffer = canvas.toBuffer();
         
         await ctx.sendMessage({
@@ -202,12 +206,42 @@ export default class PlayerList extends Command {
         });
     }
 
-    // Função utilitária para desenhar texto com cores do Minecraft
+    // --- HELPERS (Mesmos de antes) ---
+
+    async drawHeader(ctx: CanvasRenderingContext2D, padding: number) {
+        const logoSize = 80;
+        try {
+            const logo = await loadImage("https://i.imgur.com/S6tkD7r.jpeg");
+            this.roundImage(ctx, logo, padding, padding, logoSize, logoSize, logoSize/2);
+        } catch {}
+
+        ctx.fillStyle = "#FFFFFF";
+        ctx.font = "bold 36px Sans";
+        ctx.textAlign = "left";
+        ctx.fillText("CraftSapiens", padding + logoSize + 20, padding + 50);
+        ctx.fillStyle = "#AAAAAA";
+        ctx.font = "24px Sans";
+        ctx.fillText("Jogadores Online", padding + logoSize + 20, padding + 85);
+    }
+
+    roundImage(ctx: CanvasRenderingContext2D, img: Image, x: number, y: number, w: number, h: number, r: number) {
+        ctx.save();
+        ctx.beginPath();
+        ctx.moveTo(x + r, y);
+        ctx.arcTo(x + w, y, x + w, y + h, r);
+        ctx.arcTo(x + w, y + h, x, y + h, r);
+        ctx.arcTo(x, y + h, x, y, r);
+        ctx.arcTo(x, y, x + w, y, r);
+        ctx.closePath();
+        ctx.clip();
+        ctx.drawImage(img, x, y, w, h);
+        ctx.restore();
+    }
+
     drawMinecraftText(ctx: CanvasRenderingContext2D, text: string, x: number, y: number) {
         const parts = text.split("§");
         let currentX = x;
         
-        // Desenha a primeira parte (antes do primeiro §, geralmente vazia ou texto padrão)
         if (parts[0].length > 0) {
             ctx.fillStyle = "#FFFFFF";
             ctx.fillText(parts[0], currentX, y);
@@ -217,19 +251,14 @@ export default class PlayerList extends Command {
         for (let i = 1; i < parts.length; i++) {
             const part = parts[i];
             if (part.length === 0) continue;
-
             const colorCode = part.charAt(0);
             const content = part.substring(1);
-            
-            // Define a cor
             ctx.fillStyle = CONSTANTS.MC_COLORS[colorCode] || "#FFFFFF";
-            
             ctx.fillText(content, currentX, y);
             currentX += ctx.measureText(content).width;
         }
     }
 
-    // Função para desenhar retângulo arredondado
     roundRect(ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, r: number) {
         if (w < 2 * r) r = w / 2;
         if (h < 2 * r) r = h / 2;
