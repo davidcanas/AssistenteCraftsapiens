@@ -84,7 +84,7 @@ export default class Effect extends Command {
                 currPlayer.slowed = true;
                 currPlayer.speedup = false; // Garante que o speedup esteja desligado
 
-                ctx.sendMessage("uD83EuDD71 O efeito **Slowed** foi ativado!");
+                ctx.sendMessage("◀️ O efeito **Slowed** foi ativado!");
             } else {
                 // Desativa Slowed
                 currPlayer.filters.clear();
