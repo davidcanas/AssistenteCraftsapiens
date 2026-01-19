@@ -15,7 +15,11 @@ export default class ready {
 		];
 
 		let i = 0;
-		setInterval(async () => {
+		// Clear existing interval to prevent memory leaks on reconnect
+		if (this.client.statusInterval) {
+			clearInterval(this.client.statusInterval);
+		}
+		this.client.statusInterval = setInterval(async () => {
 			this.client.editStatus("online", [
 				{
 					name: `${activities[i++ % activities.length]}`,

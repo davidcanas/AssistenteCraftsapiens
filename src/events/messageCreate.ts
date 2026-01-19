@@ -40,7 +40,11 @@ export default class MessageCreate {
 
         const userData = this.userMessages.get(userId);
 
-        userData.timestamps = userData.timestamps.filter(timestamp => now - timestamp < 3000);
+        // Optimize: Only remove old timestamps when adding a new one
+        // This reduces filtering operations from every message to only when checking limits
+        while (userData.timestamps.length > 0 && now - userData.timestamps[0] >= 3000) {
+            userData.timestamps.shift();
+        }
 
         if (userData.timestamps.length >= 3) {
             message.member.edit({ communicationDisabledUntil: new Date(Date.now() + 20000).toISOString() });
@@ -91,16 +95,20 @@ export default class MessageCreate {
 			const dbFind = await db.findOne({ id: message.guild.id });
 			if (!dbFind) return;
 			const whitelisted = dbFind.whitelistedUrl;
+			const linkRegex = /(www\.|http:|https:)+[^\s]+[\w]/;
 
-			const found = words.filter(word => {
-				const linkRegex = new RegExp(/(www\.|http:|https:)+[^\s]+[\w]/);
-				if (whitelisted.some(whitelisted => word.includes(whitelisted))) {
-					return false;
+			// Optimize: Only test words that look like links
+			for (const word of words) {
+				if (linkRegex.test(word)) {
+					// Check if this link is whitelisted
+					const isWhitelisted = whitelisted.some(whitelisted => word.includes(whitelisted));
+					if (!isWhitelisted) {
+						return true; // Found a non-whitelisted link
+					}
 				}
-				return linkRegex.test(word);
-			});
+			}
 
-			return found.length > 0;
+			return false;
 		}
     
 		if (!this.client.allowedUsers.includes(message.author.id) && message.channel.parentID !== "939954056040947812" && message.channel.parentID !== "1019395077497434222" && message.channel.parentID !== null) {
