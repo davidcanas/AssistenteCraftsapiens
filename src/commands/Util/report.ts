@@ -42,26 +42,25 @@ export default class ReportCommand extends Command {
         await ctx.defer(); // Defer pois o processo de imagem + IA pode demorar
 
         let imageParts: any[] = [];
-        let ocrText = "";
 
-        // Verificação de anexo para OCR
-        const attachment = message.attachments?.[0];
-        console.log("Anexo encontrado:", attachment);
-        console.log(message)
+        const attachment = message.attachments.values().next().value as Attachment | undefined;
 
         if (attachment && attachment.contentType?.startsWith("image/")) {
             try {
                 const response = await fetch(attachment.url);
+
+                if (!response.ok) throw new Error("Não foi possível baixar a imagem");
+
                 const buffer = await response.buffer();
                 const base64Data = buffer.toString("base64");
-                
+
                 imageParts.push({
                     inlineData: {
                         mimeType: attachment.contentType,
                         data: base64Data
                     }
                 });
-                console.log("Imagem convertida para base64:", base64Data);
+                console.log(`Imagem capturada com sucesso: ${attachment.filename}`);
             } catch (err) {
                 console.error("Erro ao baixar imagem para OCR:", err);
             }
@@ -129,7 +128,7 @@ export default class ReportCommand extends Command {
             // LÓGICA DE PUNIÇÃO: MUTE (Ofensas)
             if (result.toLowerCase().includes("[sim]")) {
                 const motivo = result.replace(/\[sim\]/gi, "").trim();
-                
+
                 await message.member?.edit({ communicationDisabledUntil: new Date(Date.now() + 28800000).toISOString() });
                 if (message) await message.delete();
 
