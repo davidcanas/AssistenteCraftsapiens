@@ -103,7 +103,7 @@ export default class ReportCommand extends Command {
             }],
             "generationConfig": {
                 "temperature": 0.1,
-                "maxOutputTokens": 400
+                "maxOutputTokens": 500
             }
         };
 
