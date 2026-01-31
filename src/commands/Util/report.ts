@@ -93,7 +93,7 @@ export default class ReportCommand extends Command {
         `;
 
         const data = {
-            "model": process.env.AI_MODEL, // Recomendo gemini-1.5-flash pela velocidade
+            "model": process.env.AI_MODEL,
             "contents": [{
                 "role": "user",
                 "parts": [
@@ -102,7 +102,7 @@ export default class ReportCommand extends Command {
                 ]
             }],
             "generationConfig": {
-                "temperature": 0.2,
+                "temperature": 0.1,
                 "maxOutputTokens": 400
             }
         };
