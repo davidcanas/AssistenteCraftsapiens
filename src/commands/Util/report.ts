@@ -46,6 +46,9 @@ export default class ReportCommand extends Command {
 
         // Verificação de anexo para OCR
         const attachment = message.attachments?.[0];
+        console.log("Anexo encontrado:", attachment);
+        console.log(message)
+
         if (attachment && attachment.contentType?.startsWith("image/")) {
             try {
                 const response = await fetch(attachment.url);
@@ -58,6 +61,7 @@ export default class ReportCommand extends Command {
                         data: base64Data
                     }
                 });
+                console.log("Imagem convertida para base64:", base64Data);
             } catch (err) {
                 console.error("Erro ao baixar imagem para OCR:", err);
             }
@@ -83,7 +87,7 @@ export default class ReportCommand extends Command {
 
             FORMATO DA RESPOSTA:
             Responda APENAS: "[ban] motivo", "[sim] motivo" ou "[não] motivo".
-            Mensagem de texto a analisar: "${message.content || "Sem texto"}"
+            Mensagem de texto: "${message.content || "Sem texto"}"
         `;
 
         const data = {
@@ -118,7 +122,7 @@ export default class ReportCommand extends Command {
                 });
 
                 this.sendLogs(ctx, message, "BANIMENTO PERMANENTE", motivo, "16711680");
-                ctx.sendMessage(`🚨 O usuário **${message.author.tag}** foi BANIDO permanentemente por Divulgação/Vendas.\n**Motivo:** \`${motivo}\``);
+                ctx.sendMessage(`🚨 O usuário **${message.author.tag}** foi BANIDO permanentemente.\n**Motivo:** \`${motivo}\``);
                 return;
             }
 
