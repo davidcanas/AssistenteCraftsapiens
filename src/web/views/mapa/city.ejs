@@ -19,45 +19,59 @@
             top: 0;
             left: 0;
         }
+        
+        /* --- ESTILOS DA BARRA DE PESQUISA --- */
         .search-box {
             position: absolute;
             top: 10px;
             left: 50%;
             transform: translateX(-50%);
             z-index: 10;
-            background-color: rgba(0, 0, 0, 0.5);
-            padding: 10px;
+            background-color: rgba(0, 0, 0, 0.6);
+            padding: 8px;
             border-radius: 5px;
+            display: flex;
+            gap: 5px;
+            transition: top 0.3s ease; /* Animação suave se mudar de posição */
         }
+
+        .search-box form {
+            display: flex;
+            gap: 5px;
+        }
+
         .search-box input[type="text"] {
-            padding: 5px;
+            padding: 6px;
             border-radius: 3px;
             border: 1px solid #ccc;
+            outline: none;
         }
-        /* Estilos quando desativado (Geo1) */
+
+        .search-box input[type="submit"] {
+            background-color: #007bff;
+            border: none;
+            color: white;
+            padding: 6px 12px;
+            border-radius: 3px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .search-box input[type="submit"]:hover { background-color: #0056b3; }
+        
+        /* Estilos desativados (Geo1) */
         .search-box input:disabled {
             background-color: #e9ecef;
             color: #6c757d;
             cursor: not-allowed;
             border-color: #d6d8db;
         }
-        .search-box input[type="submit"] {
-            background-color: #007bff;
-            border: none;
-            color: white;
-            padding: 5px 10px;
-            border-radius: 3px;
-            cursor: pointer;
-        }
-        .search-box input[type="submit"]:hover {
-            background-color: #0056b3;
-        }
         .search-box input[type="submit"]:disabled {
             background-color: #6c757d;
             opacity: 0.7;
-            cursor: not-allowed;
         }
 
+        /* --- ESTILOS DOS BOTÕES DO TOPO --- */
         .top-button {
             position: absolute;
             top: 10px;
@@ -68,12 +82,24 @@
             padding: 8px 12px;
             cursor: pointer;
             color: white;
-            font-size: 16px;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.3);
         }
+        
         .info-button { left: 10px; }
-        .server-button { left: 60px; background-color: #28a745; }
+        
+        /* O botão do servidor fica logo após o botão de info */
+        .server-button { 
+            left: 55px; 
+            background-color: #28a745; 
+        }
+        
         .server-button.geo1-active { background-color: #dc3545; }
 
+        /* --- MODAL --- */
         .modal {
             display: none;
             position: fixed;
@@ -90,8 +116,10 @@
             background: white;
             padding: 20px;
             border-radius: 5px;
-            width: 300px;
+            width: 90%;
+            max-width: 300px;
             text-align: center;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
         }
         .modal-content button {
             background-color: #007bff;
@@ -100,18 +128,56 @@
             padding: 10px 20px;
             border-radius: 5px;
             cursor: pointer;
+            margin-top: 15px;
+        }
+
+        /* --- RESPONSIVIDADE (MOBILE) --- */
+        @media (max-width: 600px) {
+            /* No celular, movemos a caixa de pesquisa para baixo dos botões */
+            .search-box {
+                top: 55px; 
+                width: 90%; /* Ocupa quase toda a largura */
+                justify-content: center;
+            }
+            
+            .search-box form {
+                width: 100%;
+            }
+
+            .search-box input[type="text"] {
+                flex-grow: 1; /* O input cresce para ocupar o espaço */
+                width: 100%;
+            }
+
+            /* Ajuste fino da posição do botão de servidor para não colar no de info */
+            .server-button {
+                left: 60px; 
+            }
         }
     </style>
 </head>
 <body>
 
-    <button class="top-button info-button" title="Informações"><i class="fas fa-info-circle"></i></button>
-    <button class="top-button server-button" id="serverToggle" title="Alternar Mapa"><i class="fas fa-globe-americas"></i> <span id="serverLabel">Geo2</span></button>
+    <button class="top-button info-button" title="Informações">
+        <i class="fas fa-info-circle"></i>
+    </button>
+
+    <button class="top-button server-button" id="serverToggle" title="Alternar Mapa">
+        <i class="fas fa-globe-americas"></i> 
+        <span id="serverLabel">Geo2</span>
+    </button>
 
     <div class="modal" id="infoModal">
         <div class="modal-content">
-            <h2>Informações</h2>
-            <p>Mapa do Survival Geopolítico Craftsapiens.<br>Use o botão no topo para alternar entre <b>Geo2</b> e <b>Geo1 (Antigo)</b>.<br><br>Feito por DG0837.</p>
+            <h2><i class="fas fa-info-circle"></i> Informações</h2>
+            <p>
+                Mapa do Survival Geopolítico Craftsapiens.
+                <br><br>
+                Use o botão verde/vermelho no topo para alternar entre:
+                <br><b>Geo2 (Atual)</b> e <b>Geo1 (Antigo)</b>.
+                <br><br>
+                Criado por <a href="https://github.com/davidcanas" target="_blank">DG0837</a>.
+            </p>
             <button onclick="closeModal()">Fechar</button>
         </div>
     </div>
@@ -130,11 +196,12 @@
 
         function updateIframe() {
             var cityName = document.getElementById('cityName').value;
-            // Envia o parametro server para o iframe
+            // Envia o parametro server e nome da cidade
             var iframeSrc = `http://jogar.craftsapiens.com.br:50024/mapa/iframe?cityName=${encodeURIComponent(cityName)}&server=${currentServer}`;
             document.getElementById('cityIframe').src = iframeSrc;
         }
 
+        // Lógica do Botão de Alternar Servidor
         document.getElementById('serverToggle').addEventListener('click', function() {
             var btn = this;
             var label = document.getElementById('serverLabel');
@@ -142,41 +209,49 @@
             var searchBtn = document.getElementById('searchBtn');
             
             if (currentServer === 'geo2') {
-                // Mudar para Geo1
+                // Mudar para Geo1 (Memorial)
                 currentServer = 'geo1';
-                label.innerText = 'Geo1 (Antigo)';
+                label.innerText = 'Geo1'; // Texto mais curto para caber no mobile
                 btn.classList.add('geo1-active');
                 
-                // Desativar busca
+                // Desativar e limpar busca
                 cityInput.value = '';
-                cityInput.placeholder = 'Busca indisponível no Geo1';
+                cityInput.placeholder = 'Busca indisponível no (Geo1)';
                 cityInput.disabled = true;
                 searchBtn.disabled = true;
+                
             } else {
-                // Mudar para Geo2
+                // Mudar para Geo2 (Atual)
                 currentServer = 'geo2';
                 label.innerText = 'Geo2';
                 btn.classList.remove('geo1-active');
 
-                // Ativar busca
+                // Reativar busca
                 cityInput.placeholder = 'Digite o nome da cidade';
                 cityInput.disabled = false;
                 searchBtn.disabled = false;
             }
+            
             updateIframe();
         });
 
         document.querySelector('form').addEventListener('submit', function(e) {
             e.preventDefault();
-            if (currentServer === 'geo2') updateIframe();
+            if (currentServer === 'geo2') {
+                updateIframe();
+            }
         });
 
+        // Botão de Info
         document.querySelector('.info-button').addEventListener('click', function() {
             document.getElementById('infoModal').style.display = 'flex';
         });
-        function closeModal() { document.getElementById('infoModal').style.display = 'none'; }
-        
-        // Iniciar mapa
+
+        function closeModal() {
+            document.getElementById('infoModal').style.display = 'none';
+        }
+
+        // Inicia o mapa
         updateIframe();
     </script>
 </body>
