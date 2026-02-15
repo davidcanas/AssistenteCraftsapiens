@@ -17,7 +17,7 @@ const CONSTANTS = {
         premium: "#00AA00", vip: "#FFFF55", professor: "#55FF55", admin: "#AA0000",
         dev: "#55FFFF", reitor: "#00AAAA", ajuda: "#FFAA00", moderador: "#FF5555",
         default: "#FFFFFF",
-        town: "#4fa3d1", 
+        town: "#4fa3d1",
         discord: "#5865F2"
     } as Record<string, string>,
     MC_COLORS: {
@@ -28,7 +28,7 @@ const CONSTANTS = {
         "r": "#FFFFFF"
     } as Record<string, string>,
     // Ícone de casa (Towny)
-    TOWN_ICON_URL: "https://cdn-icons-png.freepik.com/256/2942/2942149.png" 
+    TOWN_ICON_URL: "https://cdn-icons-png.freepik.com/256/2942/2942149.png"
 };
 
 export default class PlayerList extends Command {
@@ -46,7 +46,7 @@ export default class PlayerList extends Command {
         await ctx.defer();
 
         const response = await this.client.api.getPlayerList();
-        
+
         const players: Player[] = response.data.players
             .filter((p: any) => p.status.online)
             .sort((a: any, b: any) => {
@@ -58,7 +58,7 @@ export default class PlayerList extends Command {
         // Configuração do Canvas
         const cols = 2;
         const cardHeight = 65;
-        const cardWidth = 400; 
+        const cardWidth = 400;
         const gap = 15;
         const headerHeight = 120;
         const footerHeight = 50;
@@ -86,28 +86,28 @@ export default class PlayerList extends Command {
             const mcImage = await loadImage(`https://minotar.net/helm/${p.username}/64.png`).catch(() => null);
 
             // Dados do Discord
-            const discordMember = this.client.getDiscordByNick(p.username); 
+            const discordMember = this.client.getDiscordByNick(p.username);
             let discordImage = null;
             let discordNick = null;
-            
+
             if (discordMember && discordMember.user) {
                 // Tenta pegar avatar
                 const avatarUrl = discordMember.user.avatarURL("png", 32) || discordMember.user.defaultAvatarURL("png", 32);
-                
+
                 if (avatarUrl) {
                     discordImage = await loadImage(avatarUrl).catch(() => null);
                 }
-                
+
                 // Pega o nick do servidor ou username
                 discordNick = discordMember.nick || discordMember.user.username;
             }
 
-            return { 
-                player: p, 
-                mcImage, 
-                discordImage, 
+            return {
+                player: p,
+                mcImage,
+                discordImage,
                 discordNick,
-                isLinked: !!discordMember 
+                isLinked: !!discordMember
             };
         }));
 
@@ -115,7 +115,7 @@ export default class PlayerList extends Command {
         for (let i = 0; i < preparedData.length; i++) {
             const data = preparedData[i];
             const p = data.player;
-            
+
             const col = i % cols;
             const row = Math.floor(i / cols);
             const x = padding + (col * (cardWidth + gap));
@@ -135,7 +135,7 @@ export default class PlayerList extends Command {
             }
 
             // --- POSICIONAMENTO ---
-            let textX = x + 65; 
+            let textX = x + 65;
             const line1Y = y + 26; // Nome Principal
             const line2Y = y + 50; // Meta Info
 
@@ -158,45 +158,45 @@ export default class PlayerList extends Command {
             // 2. Linha Inferior
             let metaX = x + 65;
             let hasContentOnLeft = false;
-            
+
             // --- A. Discord (Só aparece se estiver linkado) ---
             if (data.isLinked && data.discordNick) {
                 const discSize = 16;
-                const discY = line2Y - 12; 
+                const discY = line2Y - 12;
 
                 // Ícone Discord
                 if (data.discordImage) {
-                    this.roundImage(ctx2d, data.discordImage as Image, metaX, discY, discSize, discSize, discSize/2);
+                    this.roundImage(ctx2d, data.discordImage as Image, metaX, discY, discSize, discSize, discSize / 2);
                 } else {
                     ctx2d.beginPath();
                     ctx2d.fillStyle = CONSTANTS.COLORS.discord;
-                    ctx2d.arc(metaX + discSize/2, discY + discSize/2, discSize/2, 0, Math.PI * 2);
+                    ctx2d.arc(metaX + discSize / 2, discY + discSize / 2, discSize / 2, 0, Math.PI * 2);
                     ctx2d.fill();
                 }
-                metaX += discSize + 5; 
+                metaX += discSize + 5;
 
                 // Nome (Nick do Discord)
                 ctx2d.font = "14px Sans";
                 ctx2d.fillStyle = "#dedede"; // Cor clara
                 const nickText = `@${data.discordNick}`;
                 ctx2d.fillText(nickText, metaX, line2Y);
-                
+
                 metaX += ctx2d.measureText(nickText).width + 10;
                 hasContentOnLeft = true;
             } else {
                 ctx2d.font = "14px Sans";
                 ctx2d.fillStyle = "#dedede"; // Cor clara
                 ctx2d.fillText("Não vinculado", metaX, line2Y);
-				metaX += ctx2d.measureText("Não vinculado").width + 10;
-				hasContentOnLeft = true;
+                metaX += ctx2d.measureText("Não vinculado").width + 10;
+                hasContentOnLeft = true;
             }
 
             // --- B. Cidade (Towny) ---
             if (p.towny && p.towny.townName) {
                 // Separador se tiver discord antes
                 if (hasContentOnLeft) {
-                    ctx2d.fillStyle = "#484B52"; 
-                    ctx2d.fillRect(metaX - 6, line2Y - 9, 1.5, 11); 
+                    ctx2d.fillStyle = "#484B52";
+                    ctx2d.fillRect(metaX - 6, line2Y - 9, 1.5, 11);
                 }
 
                 const townIconSize = 14;
@@ -228,7 +228,7 @@ export default class PlayerList extends Command {
         ctx2d.fillText(totalText, width / 2, height - 15);
 
         const buffer = canvas.toBuffer();
-        
+
         await ctx.sendMessage({
             content: `📊 **Lista de Jogadores** | ${ctx.author.mention}`,
             files: [{ contents: buffer, name: "playerlist.png" }],
@@ -240,7 +240,15 @@ export default class PlayerList extends Command {
                     customID: "confirm_read",
                     label: "Fechar",
                     emoji: { id: "1300170561607172096", name: "lixo" }
-                }]
+                },
+                {
+                    type: 2,
+                    style: 5,
+                    label: "Ver online",
+                    url: "http://jogar.craftsapiens.com.br:50024/stats/survival",
+                    emoji: { name: "👀" },
+                },
+                ]
             }]
         });
     }
@@ -251,8 +259,8 @@ export default class PlayerList extends Command {
         const logoSize = 80;
         try {
             const logo = await loadImage("https://i.imgur.com/S6tkD7r.jpeg");
-            this.roundImage(ctx, logo, padding, padding, logoSize, logoSize, logoSize/2);
-        } catch {}
+            this.roundImage(ctx, logo, padding, padding, logoSize, logoSize, logoSize / 2);
+        } catch { }
 
         ctx.fillStyle = "#FFFFFF";
         ctx.font = "bold 36px Sans";

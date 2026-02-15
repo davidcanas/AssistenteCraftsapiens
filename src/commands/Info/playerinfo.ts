@@ -5,7 +5,7 @@ import { createCanvas, loadImage, CanvasRenderingContext2D, Image } from "canvas
 
 const CONSTANTS = {
     WIDTH: 900,
-    BG_COLOR: "#23272A", 
+    BG_COLOR: "#23272A",
     CARD_BG: "#2C2F33",
     TEXT_PRIMARY: "#FFFFFF",
     TEXT_SECONDARY: "#AAAAAA",
@@ -48,9 +48,9 @@ export default class PlayerInfo extends Command {
 
     formatNumber(num: number): string {
         if (!num) return "0";
-        if (num >= 1000000000) return (num / 1000000000).toFixed(1).replace(/\.0$/, '') + 'B';
-        if (num >= 1000000) return (num / 1000000).toFixed(1).replace(/\.0$/, '') + 'M';
-        if (num >= 1000) return (num / 1000).toFixed(1).replace(/\.0$/, '') + 'k';
+        if (num >= 1000000000) return (num / 1000000000).toFixed(1).replace(/\.0$/, "") + "B";
+        if (num >= 1000000) return (num / 1000000).toFixed(1).replace(/\.0$/, "") + "M";
+        if (num >= 1000) return (num / 1000).toFixed(1).replace(/\.0$/, "") + "k";
         return num.toString();
     }
 
@@ -84,7 +84,7 @@ export default class PlayerInfo extends Command {
             }
 
             // --- Configuração Canvas ---
-            let canvasHeight = 520; 
+            let canvasHeight = 520;
             if (hasFriends) canvasHeight += 110;
 
             const canvas = createCanvas(CONSTANTS.WIDTH, canvasHeight);
@@ -98,7 +98,7 @@ export default class PlayerInfo extends Command {
 
             // --- Carregamento de Imagens ---
             const skinUrl = `https://mineskin.eu/armor/bust/${username}/180.png`;
-            
+
             const [
                 skinImage,
                 discordImage,
@@ -118,7 +118,7 @@ export default class PlayerInfo extends Command {
             // --- Layout ---
             const leftColWidth = 300;
             const rightColX = CONSTANTS.PADDING + leftColWidth + CONSTANTS.PADDING;
-            const startY = 110; 
+            const startY = 110;
 
             // 1. Identidade (com Discord Avatar)
             this.drawIdentityCard(ctx2d, CONSTANTS.PADDING, startY, leftColWidth, 380, skinImage, discordImage, displayName, username, accentColor, isOnline);
@@ -128,12 +128,12 @@ export default class PlayerInfo extends Command {
             const cardH = 80;
             const gapX = 20;
             const gapY = 20;
-            let gridY = startY; 
+            let gridY = startY;
 
             // Linha 1
             this.drawStatBox(ctx2d, rightColX, gridY, cardW, cardH, moneyIcon, "Dinheiro", `${this.formatNumber(data.status?.money)}`, accentColor);
             this.drawStatBox(ctx2d, rightColX + cardW + gapX, gridY, cardW, cardH, killsIcon, "Kills", `${this.formatNumber(data.status?.kills ?? 0)}`, "#FF5555");
-            
+
             // Linha 2
             gridY += cardH + gapY;
             this.drawStatBox(ctx2d, rightColX, gridY, cardW, cardH, deathsIcon, "Mortes", `${this.formatNumber(data.status?.deaths ?? 0)}`, "#AAAAAA");
@@ -145,7 +145,7 @@ export default class PlayerInfo extends Command {
 
             // 3. Amigos (Smart Fit)
             const identityBottom = startY + 380;
-            const statsBottom = gridY + cardH; 
+            const statsBottom = gridY + cardH;
             const friendsStartY = Math.max(identityBottom, statsBottom) + 30;
 
             if (hasFriends) {
@@ -155,8 +155,21 @@ export default class PlayerInfo extends Command {
             const buffer = canvas.toBuffer();
             await ctx.sendMessage({
                 content: `👤 Informações de **${cleanNickname}** | ${ctx.author.mention}`,
-                files: [{ contents: buffer, name: "playerinfo.png" }]
+                files: [{ contents: buffer, name: "playerinfo.png" }],
+                components: [
+                    {
+                        type: 1,
+                        components: [{
+                            type: 2,
+                            style: 5,
+                            label: "Ver perfil online",
+                            url: "http://jogar.craftsapiens.com.br:50024/player/" + username,
+                            emoji: { name: "🔗" },
+                        }],
+                    }
+                ]
             });
+
 
         } catch (err) {
             console.error(err);
@@ -175,7 +188,7 @@ export default class PlayerInfo extends Command {
         ctx.font = "24px Sans";
         ctx.fillText("| Informações do Jogador", CONSTANTS.PADDING + 240, 50);
         ctx.fillStyle = "#33363C";
-        ctx.fillRect(CONSTANTS.PADDING, 75, CONSTANTS.WIDTH - (CONSTANTS.PADDING*2), 2);
+        ctx.fillRect(CONSTANTS.PADDING, 75, CONSTANTS.WIDTH - (CONSTANTS.PADDING * 2), 2);
     }
 
     drawIdentityCard(ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, img: Image | null, discordImg: Image | null, displayName: string, user: string, accent: string, online: boolean) {
@@ -208,7 +221,7 @@ export default class PlayerInfo extends Command {
 
         // Nome [TAG] Nick
         ctx.textAlign = "center";
-        
+
         let fontSize = 28;
         ctx.font = `bold ${fontSize}px Sans`;
         while (ctx.measureText(displayName).width > w - 20 && fontSize > 14) {
@@ -226,10 +239,10 @@ export default class PlayerInfo extends Command {
         currentY += 35;
         const discSize = 24;
         const discPadding = 8;
-        
+
         ctx.font = "italic 20px Sans";
         const textWidth = ctx.measureText(`@${user}`).width;
-        
+
         const totalBlockWidth = discordImg ? (discSize + discPadding + textWidth) : textWidth;
         let startX = centerX - (totalBlockWidth / 2);
 
@@ -237,13 +250,13 @@ export default class PlayerInfo extends Command {
             ctx.save();
             ctx.beginPath();
             // Círculo para clip
-            ctx.arc(startX + discSize/2, currentY - 7, discSize/2, 0, Math.PI*2);
+            ctx.arc(startX + discSize / 2, currentY - 7, discSize / 2, 0, Math.PI * 2);
             ctx.closePath();
             ctx.clip();
             // Desenha imagem
-            ctx.drawImage(discordImg, startX, currentY - 7 - discSize/2, discSize, discSize);
+            ctx.drawImage(discordImg, startX, currentY - 7 - discSize / 2, discSize, discSize);
             ctx.restore();
-            
+
             // Avança o cursor
             startX += discSize + discPadding;
         }
@@ -258,12 +271,12 @@ export default class PlayerInfo extends Command {
         currentY += 45;
         const statusColor = online ? "#43B581" : "#747F8D";
         const statusText = online ? "ONLINE AGORA" : "OFFLINE";
-        
+
         ctx.beginPath();
         ctx.fillStyle = statusColor;
-        ctx.arc(centerX - (ctx.measureText(statusText).width/2) - 15, currentY - 7, 8, 0, Math.PI*2);
+        ctx.arc(centerX - (ctx.measureText(statusText).width / 2) - 15, currentY - 7, 8, 0, Math.PI * 2);
         ctx.fill();
-        
+
         ctx.font = "bold 18px Sans";
         ctx.fillStyle = statusColor;
         ctx.fillText(statusText, centerX, currentY);
@@ -294,7 +307,7 @@ export default class PlayerInfo extends Command {
 
     drawFriendsSection(ctx: CanvasRenderingContext2D, x: number, y: number, w: number, friends: string[], icon: Image | null) {
         const h = 80;
-        
+
         ctx.fillStyle = CONSTANTS.CARD_BG;
         this.roundRect(ctx, x, y, w, h, 12);
         ctx.fill();
@@ -309,37 +322,37 @@ export default class PlayerInfo extends Command {
         const titleText = `AMIGOS (${friends.length})`;
         ctx.fillText(titleText, x + 55, y + 46);
 
-   
+
         ctx.fillStyle = CONSTANTS.TEXT_PRIMARY;
         ctx.font = "16px Sans";
 
-        const startTextX = x + 55 + ctx.measureText(titleText).width + 30; 
-        const maxTextWidth = (x + w) - startTextX - 20; 
-        
+        const startTextX = x + 55 + ctx.measureText(titleText).width + 30;
+        const maxTextWidth = (x + w) - startTextX - 20;
+
         let finalText = "";
-        
+
         for (let i = 0; i < friends.length; i++) {
             const separator = finalText.length > 0 ? "  •  " : "";
             const nextName = friends[i];
-            
+
             const testString = finalText + separator + nextName;
-            
+
             const potentialRest = friends.length - (i + 1);
             const counterWidth = potentialRest > 0 ? ctx.measureText(`  (+${potentialRest})`).width : 0;
-            
+
             if (ctx.measureText(testString).width + counterWidth < maxTextWidth) {
                 finalText = testString;
             } else {
-              
+
                 const remaining = friends.length - i;
                 finalText += `  (+${remaining})`;
-                break; 
+                break;
             }
         }
 
         ctx.fillText(finalText, startTextX, y + 46);
     }
-    
+
     roundRect(ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, r: number) {
         if (w < 2 * r) r = w / 2;
         if (h < 2 * r) r = h / 2;
