@@ -1,31 +1,82 @@
 <style>
     /* --- CORES DOS CARGOS (Mantidas do teu código) --- */
-    .tag { font-weight: bold; font-size: 13px; padding: 2px 6px; border-radius: 4px; text-transform: uppercase; letter-spacing: 0.5px; }
-    .tag::first-letter { text-transform: uppercase; } /* Força uppercase em tudo para ficar estilo badge */
-    
-    .admin { color: #AA0000; background: rgba(170, 0, 0, 0.1); }
-    .dev { color: #55FFFF; background: rgba(85, 255, 255, 0.1); }
-    .reitor { color: #5555FF; background: rgba(85, 85, 255, 0.1); }
-    .moderador { color: #FF5555; background: rgba(255, 85, 85, 0.1); }
-    .ajuda { color: #FFAA00; background: rgba(255, 170, 0, 0.1); }
-    .premium { color: #55AA55; background: rgba(85, 170, 85, 0.1); }
-    .vip { color: #FFFF55; background: rgba(255, 255, 85, 0.1); }
-    .booster { color: #FF55FF; background: rgba(255, 85, 255, 0.1); }
-    .alunos { color: #bcaee6; }
-    .monitoria { color: #FE7310; }
+    .tag {
+        font-weight: bold;
+        font-size: 13px;
+        padding: 2px 6px;
+        border-radius: 4px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .tag::first-letter {
+        text-transform: uppercase;
+    }
+
+    /* Força uppercase em tudo para ficar estilo badge */
+
+    .admin {
+        color: #AA0000;
+        background: rgba(170, 0, 0, 0.1);
+    }
+
+    .dev {
+        color: #55FFFF;
+        background: rgba(85, 255, 255, 0.1);
+    }
+
+    .reitor {
+        color: #5555FF;
+        background: rgba(85, 85, 255, 0.1);
+    }
+
+    .moderador {
+        color: #FF5555;
+        background: rgba(255, 85, 85, 0.1);
+    }
+
+    .ajuda {
+        color: #FFAA00;
+        background: rgba(255, 170, 0, 0.1);
+    }
+
+    .premium {
+        color: #55AA55;
+        background: rgba(85, 170, 85, 0.1);
+    }
+
+    .vip {
+        color: #FFFF55;
+        background: rgba(255, 255, 85, 0.1);
+    }
+
+    .booster {
+        color: #FF55FF;
+        background: rgba(255, 85, 255, 0.1);
+    }
+
+    .alunos {
+        color: #bcaee6;
+    }
+
+    .monitoria {
+        color: #FE7310;
+    }
 
     /* --- ESTILOS DA NAVBAR --- */
     .navbar-custom {
-        background-color: rgba(44, 47, 51, 0.95); /* Cor Discord Dark */
+        background-color: rgba(44, 47, 51, 0.95);
+        /* Cor Discord Dark */
         backdrop-filter: blur(10px);
         border-bottom: 1px solid #23272A;
         padding: 0.8rem 1rem;
-        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     }
 
     .navbar-brand img {
         transition: transform 0.3s;
     }
+
     .navbar-brand:hover img {
         transform: rotate(10deg);
     }
@@ -39,12 +90,17 @@
         margin: 0 2px;
     }
 
-    .nav-link:hover, .nav-link.active {
+    .nav-link:hover,
+    .nav-link.active {
         color: #fff !important;
-        background-color: rgba(255,255,255,0.05);
+        background-color: rgba(255, 255, 255, 0.05);
     }
 
-    .nav-icon { margin-right: 6px; width: 20px; text-align: center; }
+    .nav-icon {
+        margin-right: 6px;
+        width: 20px;
+        text-align: center;
+    }
 
     /* Input de Pesquisa na Navbar */
     .nav-search-input {
@@ -57,6 +113,7 @@
         width: 200px;
         transition: width 0.3s, border-color 0.3s;
     }
+
     .nav-search-input:focus {
         background-color: #000;
         border-color: #7289DA;
@@ -73,35 +130,45 @@
         margin-right: 8px;
         border: 2px solid transparent;
     }
+
     .nav-item.dropdown:hover .user-avatar {
         border-color: #7289DA;
     }
-    
+
     .dropdown-menu-dark {
         background-color: #2C2F33;
         border: 1px solid #23272A;
     }
-    .dropdown-item { color: #dcddde; }
-    .dropdown-item:hover { background-color: #7289DA; color: white; }
+
+    .dropdown-item {
+        color: #dcddde;
+    }
+
+    .dropdown-item:hover {
+        background-color: #7289DA;
+        color: white;
+    }
 </style>
 
 <script src="https://kit.fontawesome.com/7785636dc6.js" crossorigin="anonymous"></script>
-<script src="https://code.jquery.com/jquery-3.6.0.js" integrity="sha256-H+K7U5CnXl1h5ywQfKtSj8PCmoN9aaq30gDh27Xc0jk=" crossorigin="anonymous"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.js" integrity="sha256-H+K7U5CnXl1h5ywQfKtSj8PCmoN9aaq30gDh27Xc0jk="
+    crossorigin="anonymous"></script>
 
 <nav class="navbar navbar-expand-lg navbar-dark navbar-custom sticky-top">
     <div class="container">
-        
+
         <a class="navbar-brand d-flex align-items-center" href="/">
             <img src="https://i.imgur.com/H6irxn1.jpg" width="45" height="45" class="rounded-circle shadow-sm">
             <span class="ms-2 fw-bold d-none d-sm-block">CraftSapiens</span>
         </a>
 
-        <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#collapsibleNavbar">
+        <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse"
+            data-bs-target="#collapsibleNavbar">
             <span class="navbar-toggler-icon"></span>
         </button>
 
         <div class="collapse navbar-collapse" id="collapsibleNavbar">
-            
+
             <ul class="navbar-nav me-auto mb-2 mb-lg-0 align-items-center">
                 <li class="nav-item">
                     <a class="nav-link" href="/"><i class="fa-solid fa-house nav-icon"></i> Inicio</a>
@@ -109,66 +176,83 @@
                 <li class="nav-item">
                     <a class="nav-link" href="/mapa"><i class="fa-solid fa-map nav-icon"></i> Mapa</a>
                 </li>
-                
+
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
                         <i class="fa-solid fa-chart-pie nav-icon"></i> Estatísticas
                     </a>
                     <ul class="dropdown-menu dropdown-menu-dark shadow">
-                        <li><a class="dropdown-item" href="/stats/survival"><i class="fa-solid fa-chart-line me-2"></i>Jogadores online</a></li>
-                        <li><a class="dropdown-item" href="/stats/topcall"><i class="fa-solid fa-trophy me-2"></i> Top Call</a></li>
+                        <li><a class="dropdown-item" href="/stats/survival"><i
+                                    class="fa-solid fa-chart-line me-2"></i>Jogadores online</a></li>
+                        <li><a class="dropdown-item" href="/stats/topcall"><i class="fa-solid fa-trophy me-2"></i> Top
+                                Call</a></li>
                     </ul>
                 </li>
 
                 <li class="nav-item">
-                    <a class="nav-link" href="/player"><i class="fa-solid fa-magnifying-glass nav-icon"></i> Jogadores</a>
+                    <a class="nav-link" href="/player"><i class="fa-solid fa-magnifying-glass nav-icon"></i>
+                        Jogadores</a>
                 </li>
             </ul>
 
             <div class="d-flex align-items-center gap-3 flex-column flex-lg-row">
-                
+
                 <form id="navSearchForm" class="d-flex" role="search">
                     <div class="position-relative">
-                        <input class="nav-search-input" id="navSearchInput" type="search" placeholder="Pesquisar Jogador..." aria-label="Search">
-                        <button style="right: 12px; top: 10px; color: #888; font-size: 12px;" type="submit"><i class="fa-solid fa-magnifying-glass position-absolute"></i></button>
+                        <input class="nav-search-input" id="navSearchInput" type="search"
+                            placeholder="Pesquisar Jogador..." aria-label="Search">
+                        <button type="submit"
+                            style="position: absolute; right: 5px; top: 50%; transform: translateY(-50%); background: none; border: none; color: #888; cursor: pointer;">
+                            <i class="fa-solid fa-magnifying-glass"></i>
+                        </button>
                     </div>
                 </form>
 
                 <ul class="navbar-nav">
                     <% if (user) { %>
-                        <% const roleClass = highestRole(guild, member.nick).toLowerCase(); %>
-                        <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" role="button" data-bs-toggle="dropdown">
-                                <img src="<%=avatar%>" class="user-avatar">
-                                <div class="d-flex flex-column align-items-start" style="line-height: 1;">
-                                    <span style="font-size: 14px;"><%= member.nick %></span>
-                                    <span class="tag <%=roleClass%>" style="font-size: 10px; padding: 1px 4px; margin-top: 2px;">
-                                        <%= highestRole(guild, member.nick) %>
-                                    </span>
-                                </div>
-                            </a>
-                            <ul class="dropdown-menu dropdown-menu-dark dropdown-menu-end shadow">
-                                <li><a class="dropdown-item" href="/dash"><i class="fas fa-cogs me-2"></i> Dashboard</a></li>
-                                <li><hr class="dropdown-divider bg-secondary"></li>
-                                <li><a class="dropdown-item text-danger" href="/logout"><i class="fa-solid fa-right-from-bracket me-2"></i> Sair</a></li>
-                            </ul>
-                        </li>
-                    <% } else { %>
-                        <li class="nav-item">
-                            <a class="btn btn-primary fw-bold btn-sm px-3" href="/login" style="background-color: #5865F2; border: none;">
-                                <i class="fa-brands fa-discord me-2"></i> Entrar
-                            </a>
-                        </li>
-                    <% } %>
+                        <% const roleClass=highestRole(guild, member.nick).toLowerCase(); %>
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" role="button"
+                                    data-bs-toggle="dropdown">
+                                    <img src="<%=avatar%>" class="user-avatar">
+                                    <div class="d-flex flex-column align-items-start" style="line-height: 1;">
+                                        <span style="font-size: 14px;">
+                                            <%= member.nick %>
+                                        </span>
+                                        <span class="tag <%=roleClass%>"
+                                            style="font-size: 10px; padding: 1px 4px; margin-top: 2px;">
+                                            <%= highestRole(guild, member.nick) %>
+                                        </span>
+                                    </div>
+                                </a>
+                                <ul class="dropdown-menu dropdown-menu-dark dropdown-menu-end shadow">
+                                    <li><a class="dropdown-item" href="/dash"><i class="fas fa-cogs me-2"></i>
+                                            Dashboard</a></li>
+                                    <li>
+                                        <hr class="dropdown-divider bg-secondary">
+                                    </li>
+                                    <li><a class="dropdown-item text-danger" href="/logout"><i
+                                                class="fa-solid fa-right-from-bracket me-2"></i> Sair</a></li>
+                                </ul>
+                            </li>
+                            <% } else { %>
+                                <li class="nav-item">
+                                    <a class="btn btn-primary fw-bold btn-sm px-3" href="/login"
+                                        style="background-color: #5865F2; border: none;">
+                                        <i class="fa-brands fa-discord me-2"></i> Entrar
+                                    </a>
+                                </li>
+                                <% } %>
                 </ul>
 
             </div>
         </div>
     </div>
 </nav>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
 <script>
-    document.getElementById('navSearchForm').addEventListener('submit', function(e) {
+    document.getElementById('navSearchForm').addEventListener('submit', function (e) {
         e.preventDefault();
         const nick = document.getElementById('navSearchInput').value.trim();
         if (nick) {
