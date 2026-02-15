@@ -1,21 +1,14 @@
 <!DOCTYPE html>
-
 <html>
-
 <head>
-
     <title>City</title>
-
     <style>
-        html,
-        body {
+        html, body {
             margin: 0;
             padding: 0;
             height: 100%;
             overflow: hidden;
-
         }
-
         iframe {
             width: 100%;
             height: 100%;
@@ -24,7 +17,6 @@
             top: 0;
             left: 0;
         }
-
         .error-message {
             position: absolute;
             top: 50%;
@@ -35,8 +27,8 @@
             padding: 10px;
             display: none;
             z-index: 1000;
+            border-radius: 5px;
         }
-
         .success-message {
             position: absolute;
             top: 50%;
@@ -47,89 +39,88 @@
             padding: 10px;
             display: none;
             z-index: 1000;
-
+            border-radius: 5px;
         }
     </style>
-
 </head>
-
 <body>
 
     <% if (cityName && cityInfo) {%>
 
-
-        <iframe src="http://jogar.craftsapiens.com.br:30009/?worldname=Earth&zoom=4&x=<%=cityInfo.data.location.x%>&z=<%=cityInfo.data.location.z%>"
-            id="cityIframe"></iframe>
-
-
-        <iframe
-            src="http://jogar.craftsapiens.com.br:30009/?worldname=Earth&zoom=4&x=<%=cityInfo.data.location.x%>&z=<%=cityInfo.data.location.z%>"
-            id="cityIframe"></iframe>
+        <iframe src="http://jogar.craftsapiens.com.br:30009/?worldname=Earth&zoom=4&x=<%=cityInfo.data.location.x%>&z=<%=cityInfo.data.location.z%>" id="cityIframe"></iframe>
 
         <div class="success-message" id="successMessage">
             <%= cityName %> (<%= cityInfo.data.mayor %>)
         </div>
 
+    <% } else { %>
 
+        <iframe src="http://jogar.craftsapiens.com.br:30009/?worldname=Earth&zoom=0.3&x=3680&z=-16254" id="cityIframe"></iframe>
 
-        <% } else { %>
+        <div class="error-message" id="errorMessage">
+            <%= cityName %> não encontrada
+        </div>
 
-            <iframe src="http://jogar.craftsapiens.com.br:30009/?worldname=Earth&zoom=0.3&x=3680&z=-16254" id="cityIframe"></iframe>
+    <% } %>
 
-            <div class="error-message" id="errorMessage">
-                <%= cityName %> não encontrada
-            </div>
+    <div id="cityNameData" data-cityname="<%= cityName %>"></div>
+    <div id="cityInfoData" data-cityinfo="<%= cityInfo %>"></div>
 
-            <% } %>
+    <script>
+        // --- LÓGICA DE TROCA DE MAPA (GEO1 vs GEO2) ---
+        (function() {
+            // Pega os parâmetros da URL atual (do iframe)
+            var urlParams = new URLSearchParams(window.location.search);
+            var serverType = urlParams.get('server'); // Pega o valor de 'server'
 
-                <div id="cityNameData" data-cityname="<%= cityName %>"></div>
-                <div id="cityInfoData" data-cityinfo="<%= cityInfo %>"></div>
-                <script>
-                    function showErrorMessage() {
+            // Se o servidor for geo1, alteramos a porta no src do iframe
+            if (serverType === 'geo1') {
+                var iframe = document.getElementById('cityIframe');
+                var currentSrc = iframe.src;
+                
+                // Substitui a porta 30009 (Geo2) pela 2053 (Geo1)
+                // Usamos replace para manter as coordenadas caso existam
+                var newSrc = currentSrc.replace(':30009', ':2053');
+                
+                // Se a busca falhou (tela de erro), o backend pode ter mandado coordenadas padrão do Geo2.
+                // Talvez queira forçar uma coordenada padrão do Geo1 se não houver cidade:
+                // if (currentSrc.includes('x=3680')) { newSrc = 'http://jogar.craftsapiens.com.br:2053/'; }
 
-                        var errorMessage = document.getElementById('errorMessage');
+                iframe.src = newSrc;
+                
+                // Opcional: Alterar a mensagem de sucesso para indicar que as coords podem estar erradas
+                // pois as cidades do Geo2 não existem no mesmo lugar no Geo1
+            }
+        })();
+        // ----------------------------------------------
 
-                        errorMessage.style.display = 'block';
+        function showErrorMessage() {
+            var errorMessage = document.getElementById('errorMessage');
+            errorMessage.style.display = 'block';
+            setTimeout(function () {
+                errorMessage.style.display = 'none';
+            }, 3000);
+        }
 
-                        setTimeout(function () {
+        var cityName = document.getElementById('cityNameData').getAttribute('data-cityname');
+        var cityInfo = document.getElementById('cityInfoData').getAttribute('data-cityinfo');
 
-                            errorMessage.style.display = 'none';
+        if (!cityInfo && cityName) {
+            showErrorMessage();
+        }
 
-                        }, 3000);
+        function showSuccessMessage() {
+            var successMessage = document.getElementById('successMessage');
+            successMessage.style.display = 'block';
+            setTimeout(function () {
+                successMessage.style.display = 'none';
+            }, 2000);
+        }
 
-                    }
-
-                    var cityName = document.getElementById('cityNameData').getAttribute('data-cityname');
-                    var cityInfo = document.getElementById('cityInfoData').getAttribute('data-cityinfo');
-
-
-                    if (!cityInfo && cityName) {
-
-                        showErrorMessage();
-
-                    }
-
-
-
-                    function showSuccessMessage() {
-
-                        var successMessage = document.getElementById('successMessage');
-
-                        successMessage.style.display = 'block';
-
-                        setTimeout(function () {
-                            successMessage.style.display = 'none';
-
-                        }, 2000);
-
-                    }
-
-                    if (cityInfo) {
-                        showSuccessMessage();
-                    }
-
-                </script>
+        if (cityInfo) {
+            showSuccessMessage();
+        }
+    </script>
 
 </body>
-
 </html>
