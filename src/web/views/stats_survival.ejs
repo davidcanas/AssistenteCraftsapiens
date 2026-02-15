@@ -6,57 +6,106 @@
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
   
   <style>
-    body { background-color: #23272A; color: white; }
+    body { 
+        background-color: #23272A; 
+        color: white; 
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
     
-    /* Card estilo Discord */
-    .player-card {
-        background-color: #2C2F33;
-        border-radius: 8px;
-        padding: 10px;
-        margin-bottom: 10px;
-        display: flex;
-        align-items: center;
-        border-left: 4px solid transparent; /* Borda lateral para destaque */
+    /* --- ANIMAÇÕES --- */
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translate3d(0, 30px, 0);
+        }
+        to {
+            opacity: 1;
+            transform: translate3d(0, 0, 0);
+        }
     }
 
+    /* Card Base */
+    .player-card {
+        background-color: #2C2F33;
+        border-radius: 12px;
+        padding: 12px;
+        margin-bottom: 15px;
+        display: flex;
+        align-items: center;
+        border-left: 4px solid transparent;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        
+        /* Transições Suaves */
+        transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), 
+                    box-shadow 0.3s ease, 
+                    background-color 0.3s ease;
+        
+        /* Configuração da animação de entrada (executada via style inline no loop) */
+        animation-duration: 0.5s;
+        animation-fill-mode: both;
+        opacity: 0; /* Começa invisível para a animação funcionar */
+    }
+
+    /* Efeito Hover (Mouse em cima) */
+    .player-card:hover {
+        transform: translateY(-5px) scale(1.02);
+        background-color: #35393e;
+        box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+        border-left-color: #5865F2; /* Cor destaque ao passar o mouse */
+    }
+
+    /* Cabeça do Minecraft */
     .mc-head {
-        width: 48px;
-        height: 48px;
-        border-radius: 8px;
+        width: 52px;
+        height: 52px;
+        border-radius: 10px;
         margin-right: 15px;
         box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+        transition: transform 0.4s ease;
+    }
+
+    /* Gira a cabeça levemente ao passar o mouse no card */
+    .player-card:hover .mc-head {
+        transform: rotate(-10deg) scale(1.1);
     }
 
     .player-info h5 {
         margin: 0;
         font-size: 16px;
-        font-weight: bold;
+        font-weight: 700;
         display: flex;
         align-items: center;
         gap: 6px;
+        letter-spacing: 0.3px;
     }
 
     .player-meta {
-        margin: 0;
+        margin-top: 4px;
         font-size: 13px;
         color: #b9bbbe;
         display: flex;
         align-items: center;
         gap: 8px;
+        font-weight: 500;
     }
 
     .meta-icon {
         width: 16px;
         height: 16px;
         border-radius: 50%;
+        transition: transform 0.2s;
+    }
+    
+    .player-card:hover .meta-icon {
+        transform: scale(1.2);
     }
     
     .divider { width: 1px; height: 12px; background-color: #4f545c; }
 
     /* Cores dos Cargos */
-    .rank-reitor { color: #00AAAA; }
-    .rank-dev { color: #55FFFF; }
-    .rank-admin { color: #AA0000; }
+    .rank-reitor { color: #00AAAA; text-shadow: 0 0 5px rgba(0, 170, 170, 0.3); }
+    .rank-dev { color: #55FFFF; text-shadow: 0 0 5px rgba(85, 255, 255, 0.3); }
+    .rank-admin { color: #AA0000; text-shadow: 0 0 5px rgba(170, 0, 0, 0.3); }
     .rank-professor { color: #55FF55; }
     .rank-moderador { color: #FF5555; }
     .rank-ajuda { color: #FFAA00; }
@@ -64,31 +113,79 @@
     .rank-vip { color: #FFFF55; }
     .rank-default { color: #FFFFFF; }
     .rank-town { color: #4fa3d1; }
+
+    /* Span gerado pelo conversor de cores */
+    .mc-color-span { text-shadow: 1px 1px 0px rgba(0,0,0,0.5); }
   </style>
 </head>
 <body>
+
+<% 
+    // --- FUNÇÃO AUXILIAR PARA CORES MINECRAFT ---
+    // Colocamos isso aqui para poder usar dentro do loop
+    function formatMinecraftText(text) {
+        if (!text) return "";
+        
+        // Mapa de cores
+        const mcColors = {
+            '0': '#000000', '1': '#0000AA', '2': '#00AA00', '3': '#00AAAA',
+            '4': '#AA0000', '5': '#AA00AA', '6': '#FFAA00', '7': '#AAAAAA',
+            '8': '#555555', '9': '#5555FF', 'a': '#55FF55', 'b': '#55FFFF',
+            'c': '#FF5555', 'd': '#FF55FF', 'e': '#FFFF55', 'f': '#FFFFFF',
+            'r': '#FFFFFF' // Reset
+        };
+
+        // Se não tiver '§', retorna o texto puro
+        if (!text.includes('§')) return text;
+
+        let parts = text.split('§');
+        let html = parts[0]; // Texto antes da primeira cor
+
+        for (let i = 1; i < parts.length; i++) {
+            let colorCode = parts[i].charAt(0);
+            let content = parts[i].substring(1);
+            
+            if (mcColors[colorCode]) {
+                html += `<span style="color: ${mcColors[colorCode]}" class="mc-color-span">${content}</span>`;
+            } else {
+                // Se for código de formatação (k, l, m, n, o) ignoramos a cor mas mantemos texto
+                // Para simplificar, apenas removemos o código e mostramos o texto
+                html += content;
+            }
+        }
+        return html;
+    }
+%>
+
 <%- include('../partials/navbar.ejs') %>
+
 <div class="container mt-5">
-    <h2 class="mb-4 text-center">Jogadores Online (<%= playerList.length %>)</h2>
+    <h2 class="mb-4 text-center fw-bold text-uppercase" style="letter-spacing: 2px;">
+        <i class="fas fa-users me-2"></i> Jogadores Online (<%= playerList.length %>)
+    </h2>
     
     <div class="row">
-        <% playerList.forEach(function(player) { 
-             // Formatação simples de variaveis visuais
+        <% playerList.forEach(function(player, index) { 
              const group = (player.group || "default").toLowerCase();
              const groupDisplay = group !== "default" ? group.charAt(0).toUpperCase() + group.slice(1) : "";
              const townName = player.towny && player.towny.townName ? player.towny.townName.replace(/_/g, " ") : null;
+             
+             // Define o atraso da animação baseado no index (0.1s, 0.2s, 0.3s...)
+             const animDelay = (index * 0.05) + "s";
         %>
         
         <div class="col-md-6 col-lg-4">
-            <div class="player-card">
-                <img src="https://minotar.net/helm/<%= player.username %>/64.png" class="mc-head">
+            <div class="player-card" style="animation-name: fadeInUp; animation-delay: <%= animDelay %>;">
+                
+                <img src="https://minotar.net/helm/<%= player.username %>/64.png" class="mc-head" alt="Head">
                 
                 <div class="player-info w-100">
                     <h5>
                         <% if(groupDisplay) { %>
                             <span class="rank-<%= group %>">[<%= groupDisplay %>]</span>
                         <% } %>
-                        <%= player.nickname || player.username %>
+                        
+                        <span><%- formatMinecraftText(player.nickname || player.username) %></span>
                     </h5>
                     
                     <div class="player-meta">
@@ -96,10 +193,10 @@
                         <% if (player.discord) { %>
                             <div title="Discord Vinculado" style="display: flex; align-items: center;">
                                 <img src="<%= player.discord.avatar %>" class="meta-icon me-1">
-                                <span><%= player.discord.tag %></span>
+                                <span style="color: #dcddde;"><%= player.discord.tag %></span>
                             </div>
                         <% } else { %>
-                            <span style="opacity: 0.5; font-size: 11px;">Não vinculado</span>
+                            <span style="opacity: 0.5; font-size: 11px;"><i class="fas fa-unlink"></i> Off</span>
                         <% } %>
 
                         <% if (townName) { %>
