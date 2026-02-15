@@ -120,6 +120,103 @@ app.get("/players", async (req, res) => {
   });
 });
 
+const CONSTANTS = {
+    GROUP_COLORS: {
+        reitor: "#008B8B", dev: "#00BFFF", admin: "#8B0000", professor: "#00FF7F",
+        moderador: "#FF4500", ajuda: "#9370DB", premium: "#228B22", vip: "#FFD700",
+        default: "#AAAAAA"
+    },
+    ACCENT_COLOR: "#7289DA",
+    ICONS: {
+        money: "https://cdn-icons-png.flaticon.com/512/10384/10384161.png",
+        kills: "https://cdn-icons-png.flaticon.com/256/2736/2736398.png",
+        deaths: "https://cdn-icons-png.flaticon.com/512/521/521269.png",
+        town: "https://cdn-icons-png.freepik.com/256/2942/2942149.png",
+        nation: "https://cdn-icons-png.flaticon.com/512/6313/6313937.png",
+        friends: "https://cdn-icons-png.flaticon.com/512/880/880594.png"
+    }
+};
+
+// Função auxiliar para formatar números (1k, 1M, etc)
+function formatNumber(num) {
+    if (!num) return "0";
+    if (num >= 1000000000) return (num / 1000000000).toFixed(1).replace(/\.0$/, '') + 'B';
+    if (num >= 1000000) return (num / 1000000).toFixed(1).replace(/\.0$/, '') + 'M';
+    if (num >= 1000) return (num / 1000).toFixed(1).replace(/\.0$/, '') + 'k';
+    return num.toString();
+}
+// Rota 1: Página de pesquisa (sem nick)
+app.get("/player", (req, res) => {
+    res.render("playerinfo", {
+        user: req.user,
+        playerData: null, // Sem dados
+        targetName: "",
+        error: null,
+        icons: CONSTANTS.ICONS
+    });
+});
+
+// Rota 2: Perfil do Jogador (/player/DG0837)
+app.get("/player/:nick", async (req, res) => {
+    // AQUI ESTÁ A MUDANÇA: req.params.nick em vez de req.query.player
+    const targetName = req.params.nick; 
+    
+    let playerData = null;
+    let error = null;
+
+    try {
+        const playerInfo = await client.api.getPlayerInfo(targetName);
+        
+        if (playerInfo && playerInfo.data) {
+            const data = playerInfo.data;
+            const username = data.username;
+            const group = (data.group || "default").toLowerCase();
+            
+            // Lógica do Discord
+            const discordMember = client.getDiscordByNick(username);
+            let discordData = null;
+            if (discordMember) {
+                discordData = {
+                    tag: discordMember.displayName || discordMember.user.username,
+                    avatar: discordMember.displayAvatarURL({ format: 'png', size: 64 })
+                };
+            }
+
+            playerData = {
+                username: data.username,
+                nickname: data.nickname || data.username,
+                cleanNickname: (data.nickname || data.username).replace(/§[0-9A-FK-ORa-fk-or]/g, ""),
+                groupDisplay: group !== "default" ? group.charAt(0).toUpperCase() + group.slice(1) : "",
+                accentColor: CONSTANTS.GROUP_COLORS[group] || CONSTANTS.ACCENT_COLOR,
+                isOnline: data.status?.online ?? false,
+                stats: {
+                    money: formatNumber(data.status?.money),
+                    kills: formatNumber(data.status?.kills),
+                    deaths: formatNumber(data.status?.deaths),
+                    town: data.towny?.townName ? data.towny.townName.replace(/_/g, " ") : "N/A",
+                    nation: data.towny?.nationName ? data.towny.nationName.replace(/_/g, " ") : "N/A"
+                },
+                friends: data.towny?.friends || [],
+                discord: discordData,
+                skinUrl: `https://mineskin.eu/armor/bust/${username}/180.png`
+            };
+        } else {
+            error = `O jogador ${targetName} não foi encontrado.`;
+        }
+    } catch (err) {
+        console.error(err);
+        error = "Erro ao processar dados.";
+    }
+
+    res.render("playerinfo", {
+        user: req.user,
+        playerData,
+        targetName,
+        error,
+        icons: CONSTANTS.ICONS
+    });
+});
+
 app.get("/stats/topcall", async (req, res) => {
   const db = client.db;
   const topUsers = await db.users.find({}).sort({ totalTimeInCall: -1 }).exec();
