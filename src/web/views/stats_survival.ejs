@@ -1,88 +1,59 @@
 <!DOCTYPE html>
 <html lang="pt">
 <head>
-  <title>Lista de Jogadores | Craftsapiens</title>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  
+  <title>Stats Survival</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
   
   <style>
-    body {
-      background-color: #23272A; /* Cor de fundo igual ao Canvas do Discord */
-      color: #fff;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    }
-
-    /* --- ESTILOS DOS CARDS --- */
+    body { background-color: #23272A; color: white; }
+    
+    /* Card estilo Discord */
     .player-card {
-      background-color: #2C2F33; /* Cor do fundo do card */
-      border-radius: 10px;
-      padding: 10px;
-      margin-bottom: 15px;
-      display: flex;
-      align-items: center;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-      transition: transform 0.2s;
+        background-color: #2C2F33;
+        border-radius: 8px;
+        padding: 10px;
+        margin-bottom: 10px;
+        display: flex;
+        align-items: center;
+        border-left: 4px solid transparent; /* Borda lateral para destaque */
     }
 
-    .player-card:hover {
-      transform: translateY(-2px);
-      background-color: #33363b;
-    }
-
-    /* Imagem do Minecraft */
     .mc-head {
-      width: 45px;
-      height: 45px;
-      border-radius: 5px;
-      margin-right: 15px;
+        width: 48px;
+        height: 48px;
+        border-radius: 8px;
+        margin-right: 15px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.3);
     }
 
-    /* Container de Texto */
-    .player-info {
-      flex-grow: 1;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      line-height: 1.2;
+    .player-info h5 {
+        margin: 0;
+        font-size: 16px;
+        font-weight: bold;
+        display: flex;
+        align-items: center;
+        gap: 6px;
     }
 
-    /* Linha 1: Nome e Rank */
-    .line-main {
-      font-size: 16px;
-      font-weight: bold;
-      margin-bottom: 4px;
+    .player-meta {
+        margin: 0;
+        font-size: 13px;
+        color: #b9bbbe;
+        display: flex;
+        align-items: center;
+        gap: 8px;
     }
 
-    /* Linha 2: Discord e Towny */
-    .line-meta {
-      font-size: 13px;
-      color: #dedede;
-      display: flex;
-      align-items: center;
-      flex-wrap: wrap;
-      gap: 10px;
-    }
-
-    /* Ícones pequenos (Discord/Towny) */
     .meta-icon {
-      width: 14px;
-      height: 14px;
-      margin-right: 4px;
-      border-radius: 50%;
+        width: 16px;
+        height: 16px;
+        border-radius: 50%;
     }
+    
+    .divider { width: 1px; height: 12px; background-color: #4f545c; }
 
-    .separator {
-      width: 1px;
-      height: 12px;
-      background-color: #484B52;
-      display: inline-block;
-    }
-
-    /* --- CORES DOS CARGOS (Baseado nas tuas constantes) --- */
+    /* Cores dos Cargos */
     .rank-reitor { color: #00AAAA; }
     .rank-dev { color: #55FFFF; }
     .rank-admin { color: #AA0000; }
@@ -91,104 +62,60 @@
     .rank-ajuda { color: #FFAA00; }
     .rank-premium { color: #00AA00; }
     .rank-vip { color: #FFFF55; }
-    .rank-default, .rank-alunos { color: #FFFFFF; }
-    
-    .town-text { color: #4fa3d1; }
-    .discord-text { color: #dedede; }
-
+    .rank-default { color: #FFFFFF; }
+    .rank-town { color: #4fa3d1; }
   </style>
 </head>
 <body>
-  
-  <%- include('../partials/navbar.ejs') %>
 
-  <div class="container-fluid p-5 text-white text-center" style="background-color: #2c2f33; border-bottom: 1px solid #444;">
-    <div class="d-flex justify-content-center align-items-center gap-3">
-        <div>
-            <h1 class="fw-bold">CraftSapiens</h1>
-            <h5 style="color: #aaa;">Jogadores Online (<%= playerList.length %>)</h5>
-        </div>
-    </div>
-  </div>
-  
-  <div class="container mt-4">
+<div class="container mt-5">
+    <h2 class="mb-4 text-center">Jogadores Online (<%= playerList.length %>)</h2>
     
-    <% 
-       // --- LÓGICA DE ORDENAÇÃO (Igual ao Bot) ---
-       const hierarchy = ["reitor", "dev", "admin", "professor", "moderador", "ajuda", "premium", "vip", "default"];
-       
-       // Filtra offline (caso venha algum) e ordena
-       let sortedPlayers = playerList.filter(p => p.status.online).sort((a, b) => {
-           let rankA = hierarchy.indexOf((a.group || "default").toLowerCase());
-           let rankB = hierarchy.indexOf((b.group || "default").toLowerCase());
-           // Se rank não existir na lista, joga pro final
-           if (rankA === -1) rankA = 99;
-           if (rankB === -1) rankB = 99;
-           return rankA - rankB;
-       });
-    %>
-
     <div class="row">
-        <% sortedPlayers.forEach(function(player) { 
-             // Prepara variáveis para simplificar o HTML
+        <% playerList.forEach(function(player) { 
+             // Formatação simples de variaveis visuais
              const group = (player.group || "default").toLowerCase();
-             const groupDisplay = group !== "default" && group !== "alunos" 
-                                  ? group.charAt(0).toUpperCase() + group.slice(1) 
-                                  : "";
-             const townName = player.towny && player.towny.townName 
-                              ? player.towny.townName.replace(/_/g, " ") 
-                              : null;
+             const groupDisplay = group !== "default" ? group.charAt(0).toUpperCase() + group.slice(1) : "";
+             const townName = player.towny && player.towny.townName ? player.towny.townName.replace(/_/g, " ") : null;
         %>
-            
-            <div class="col-12 col-md-6">
-                <div class="player-card">
+        
+        <div class="col-md-6 col-lg-4">
+            <div class="player-card">
+                <img src="https://minotar.net/helm/<%= player.username %>/64.png" class="mc-head">
+                
+                <div class="player-info w-100">
+                    <h5>
+                        <% if(groupDisplay) { %>
+                            <span class="rank-<%= group %>">[<%= groupDisplay %>]</span>
+                        <% } %>
+                        <%= player.nickname || player.username %>
+                    </h5>
                     
-                    <img src="https://minotar.net/helm/<%= player.username %>/64.png" class="mc-head" alt="Skin">
-                    
-                    <div class="player-info">
+                    <div class="player-meta">
                         
-                        <div class="line-main">
-                            <% if (groupDisplay) { %>
-                                <span class="rank-<%= group %>">[<%= groupDisplay %>]</span>
-                            <% } %>
-                            <span style="color: #fff;"><%= player.nickname || player.username %></span>
-                        </div>
+                        <% if (player.discord) { %>
+                            <div title="Discord Vinculado" style="display: flex; align-items: center;">
+                                <img src="<%= player.discord.avatar %>" class="meta-icon me-1">
+                                <span><%= player.discord.tag %></span>
+                            </div>
+                        <% } else { %>
+                            <span style="opacity: 0.5; font-size: 11px;">Não vinculado</span>
+                        <% } %>
 
-                        <div class="line-meta">
-                            
-                            <% if (player.discord) { %>
-                                <div class="d-flex align-items-center" title="Vinculado ao Discord">
-                                    <% if (player.discord.avatar) { %>
-                                        <img src="<%= player.discord.avatar %>" class="meta-icon">
-                                    <% } else { %>
-                                        <i class="fab fa-discord meta-icon" style="color: #5865F2;"></i>
-                                    <% } %>
-                                    <span class="discord-text">@<%= player.discord.nick || player.discord.username %></span>
-                                </div>
-                            <% } else { %>
-                                <span class="discord-text" style="opacity: 0.5; font-size: 12px;">Não vinculado</span>
-                            <% } %>
-
-                            <% if (townName) { %>
-                                <% if (player.discord) { %> <div class="separator"></div> <% } %>
-                                
-                                <div class="d-flex align-items-center">
-                                    <img src="https://cdn-icons-png.freepik.com/256/2942/2942149.png" class="meta-icon" alt="Town">
-                                    <span class="town-text"><%= townName %></span>
-                                </div>
-                            <% } %>
-
-                        </div> </div> </div>
+                        <% if (townName) { %>
+                            <% if (player.discord) { %> <div class="divider"></div> <% } %>
+                            <div title="Cidade" style="display: flex; align-items: center;">
+                                <img src="https://cdn-icons-png.freepik.com/256/2942/2942149.png" class="meta-icon me-1">
+                                <span class="rank-town"><%= townName %></span>
+                            </div>
+                        <% } %>
+                    </div>
+                </div>
             </div>
+        </div>
         <% }); %>
     </div>
-  </div>
+</div>
 
-<script>
-  // Recarrega a página a cada 10 segundos (5s pode ser muito agressivo para web)
-  setTimeout(function(){
-   window.location.reload();
-  }, 10000);
-</script>
 </body>
 </html>

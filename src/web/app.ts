@@ -75,17 +75,49 @@ app.get("/api/isLogged", async (req, res) => {
 
 app.get("/stats/survival", async (req, res) => {
   
-  const playerList = await client.api.getPlayerList().then(r => r.data.players);
+  const response = await client.api.getPlayerList();
+  const rawPlayers = response.data.players || [];
 
-	res.status(200).render("stats_survival", { 
+  const HIERARCHY = ["reitor", "dev", "admin", "professor", "moderador", "ajuda", "premium", "vip", "default"];
+
+  const processedList = rawPlayers
+    .filter(p => p.status.online) // Só quem está online
+    .map(player => {
+        const discordMember = client.getDiscordByNick(player.username);
+        
+        let discordData = null;
+        if (discordMember) {
+            discordData = {
+                tag: discordMember.displayName || discordMember.user.username,
+                avatar: discordMember.avatarURL()
+            };
+        }
+
+        return {
+            ...player, 
+            discord: discordData, 
+            sortGroup: (player.group || "default").toLowerCase() 
+        };
+    })
+    .sort((a, b) => {
+        let rankA = HIERARCHY.indexOf(a.sortGroup);
+        let rankB = HIERARCHY.indexOf(b.sortGroup);
+
+        if (rankA === -1) rankA = 99;
+        if (rankB === -1) rankB = 99;
+        
+        return rankA - rankB;
+    });
+
+  // 4. Renderiza enviando a lista JÁ PRONTA
+  res.status(200).render("players", { 
     user: req.user,
-    member: client.guilds.get("892472046729179136").members.get(req.user?.id),
+    member: client.guilds.get("892472046729179136")?.members.get(req.user?.id), 
     avatar: client.users.get(req.user?.id)?.avatarURL(),
     guild: client.guilds.get("892472046729179136"),
-    highestRole: client.getHighestRole,
-    playerList,
     
-    });
+    playerList: processedList
+  });
 });
 
 app.get("/stats/topcall", async (req, res) => {
