@@ -149,7 +149,7 @@ function formatNumber(num) {
 app.get("/player", (req, res) => {
     res.render("playerinfo", {
         user: req.user,
-        avatar: client.users.get(req.user.id).avatarURL(),
+        avatar: client.users.get(req.user?.id)?.avatarURL(),
         playerData: null, // Sem dados
         targetName: "",
         error: null,
@@ -211,6 +211,7 @@ app.get("/player/:nick", async (req, res) => {
 
     res.render("playerinfo", {
         user: req.user,
+        avatar: client.users.get(req.user?.id)?.avatarURL(),
         playerData,
         targetName,
         error,
