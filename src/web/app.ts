@@ -152,6 +152,8 @@ app.get("/player", (req, res) => {
         avatar: client.users.get(req.user?.id)?.avatarURL(),
         highestRole: client.getHighestRole,
         playerData: null, // Sem dados
+        guild: client.guilds.get("892472046729179136"),
+        member: client.guilds.get("892472046729179136").members.get(req.user?.id),
         targetName: "",
         error: null,
         icons: CONSTANTS.ICONS
@@ -214,6 +216,8 @@ app.get("/player/:nick", async (req, res) => {
         user: req.user,
         avatar: client.users.get(req.user?.id)?.avatarURL(),
         highestRole: client.getHighestRole,
+        guild: client.guilds.get("892472046729179136"),
+        member: client.guilds.get("892472046729179136").members.get(req.user?.id),
         playerData,
         targetName,
         error,
