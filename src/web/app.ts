@@ -73,7 +73,7 @@ app.get("/api/isLogged", async (req, res) => {
   }
 });
 
-app.get("/stats/survival", async (req, res) => {
+app.get("/players", async (req, res) => {
   
   const response = await client.api.getPlayerList();
   const rawPlayers = response.data.players || [];
@@ -110,7 +110,7 @@ app.get("/stats/survival", async (req, res) => {
     });
 
   // 4. Renderiza enviando a lista JÁ PRONTA
-  res.status(200).render("players", { 
+  res.status(200).render("stats_survival", { 
     user: req.user,
     member: client.guilds.get("892472046729179136")?.members.get(req.user?.id), 
     avatar: client.users.get(req.user?.id)?.avatarURL(),
