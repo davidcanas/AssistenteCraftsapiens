@@ -73,7 +73,7 @@ app.get("/api/isLogged", async (req, res) => {
   }
 });
 
-app.get("/players", async (req, res) => {
+app.get("/stats/survival", async (req, res) => {
   
   const response = await client.api.getPlayerList();
   const rawPlayers = response.data.players || [];
@@ -149,6 +149,7 @@ function formatNumber(num) {
 app.get("/player", (req, res) => {
     res.render("playerinfo", {
         user: req.user,
+        avatar: client.users.get(req.user.id).avatarURL(),
         playerData: null, // Sem dados
         targetName: "",
         error: null,
