@@ -28,15 +28,19 @@
             background-color: rgba(0, 0, 0, 0.5);
             padding: 10px;
             border-radius: 5px;
-            transition: opacity 0.3s;
         }
-        
         .search-box input[type="text"] {
             padding: 5px;
             border-radius: 3px;
             border: 1px solid #ccc;
         }
-
+        /* Estilos quando desativado (Geo1) */
+        .search-box input:disabled {
+            background-color: #e9ecef;
+            color: #6c757d;
+            cursor: not-allowed;
+            border-color: #d6d8db;
+        }
         .search-box input[type="submit"] {
             background-color: #007bff;
             border: none;
@@ -44,25 +48,16 @@
             padding: 5px 10px;
             border-radius: 3px;
             cursor: pointer;
-            transition: background-color 0.3s, opacity 0.3s;
         }
         .search-box input[type="submit"]:hover {
             background-color: #0056b3;
         }
-
-        /* Estilos para quando a busca está desativada (Geo1) */
-        .search-box input:disabled {
-            background-color: #e9ecef;
-            color: #6c757d;
-            cursor: not-allowed;
-            border-color: #d6d8db;
-        }
         .search-box input[type="submit"]:disabled {
             background-color: #6c757d;
             opacity: 0.7;
+            cursor: not-allowed;
         }
-        
-        /* Botões do Topo */
+
         .top-button {
             position: absolute;
             top: 10px;
@@ -74,24 +69,10 @@
             cursor: pointer;
             color: white;
             font-size: 16px;
-            transition: background-color 0.3s;
         }
-        .top-button:hover {
-            background-color: #555;
-        }
-
-        .info-button {
-            left: 10px;
-        }
-        
-        .server-button {
-            left: 60px;
-            background-color: #28a745; /* Verde para Geo2 */
-        }
-        
-        .server-button.geo1-active {
-            background-color: #dc3545; /* Vermelho para Geo1 */
-        }
+        .info-button { left: 10px; }
+        .server-button { left: 60px; background-color: #28a745; }
+        .server-button.geo1-active { background-color: #dc3545; }
 
         .modal {
             display: none;
@@ -120,42 +101,24 @@
             border-radius: 5px;
             cursor: pointer;
         }
-        .modal-content button:hover {
-            background-color: #0056b3;
-        }
     </style>
 </head>
 <body>
 
-    <button class="top-button info-button" title="Informações">
-        <i class="fas fa-info-circle"></i>
-    </button>
-
-    <button class="top-button server-button" id="serverToggle" title="Alternar entre Geo2 (Atual) e Geo1 (Memorial)">
-        <i class="fas fa-globe-americas"></i> <span id="serverLabel">Geo2</span>
-    </button>
+    <button class="top-button info-button" title="Informações"><i class="fas fa-info-circle"></i></button>
+    <button class="top-button server-button" id="serverToggle" title="Alternar Mapa"><i class="fas fa-globe-americas"></i> <span id="serverLabel">Geo2</span></button>
 
     <div class="modal" id="infoModal">
         <div class="modal-content">
-            <h2><i class="fas fa-info-circle"></i> Informações</h2>
-            <p>
-                Este é o mapa do servidor Survival Geopolítico da Craftsapiens.
-                <br>
-                Use o botão no topo para alternar entre o <b>Geo2 (Atual)</b> e o <b>Geo1 (Memorial)</b>.
-                <br><br>
-                Dica: Caso queira se ocultar do mapa utilize o comando <code>/dynmap hide</code>, para aparecer novamente utilize <code>/dynmap show</code>.
-                <br><br>
-                <code>
-                Criado com <i class="fas fa-heart" style="color: red;"></i> por <a href="https://github.com/davidcanas" target="_blank">DG0837</a>.
-            </code>
-            </p>
+            <h2>Informações</h2>
+            <p>Mapa do Survival Geopolítico Craftsapiens.<br>Use o botão no topo para alternar entre <b>Geo2</b> e <b>Geo1 (Memorial)</b>.<br><br>Feito por DG0837.</p>
             <button onclick="closeModal()">Fechar</button>
         </div>
     </div>
 
     <div class="search-box">
         <form action="">
-            <input type="text" id="cityName" name="cityName" placeholder="Digite o nome da cidade" >
+            <input type="text" id="cityName" name="cityName" placeholder="Digite o nome da cidade">
             <input type="submit" id="searchBtn" value="Procurar">
         </form>
     </div>
@@ -163,17 +126,15 @@
     <iframe src="about:blank" id="cityIframe"></iframe>
 
     <script>
-        // Variável de estado para saber qual servidor está ativo
-        var currentServer = 'geo2'; // geo2 (padrão) ou geo1
+        var currentServer = 'geo2';
 
         function updateIframe() {
             var cityName = document.getElementById('cityName').value;
-            // Adicionamos o parametro server= na URL
+            // Envia o parametro server para o iframe
             var iframeSrc = `http://jogar.craftsapiens.com.br:50024/mapa/iframe?cityName=${encodeURIComponent(cityName)}&server=${currentServer}`;
             document.getElementById('cityIframe').src = iframeSrc;
         }
 
-        // Lógica do botão de alternar servidor
         document.getElementById('serverToggle').addEventListener('click', function() {
             var btn = this;
             var label = document.getElementById('serverLabel');
@@ -181,53 +142,42 @@
             var searchBtn = document.getElementById('searchBtn');
             
             if (currentServer === 'geo2') {
-                // MUDAR PARA GEO 1 (MEMORIAL)
+                // Mudar para Geo1
                 currentServer = 'geo1';
                 label.innerText = 'Geo1 (Memorial)';
                 btn.classList.add('geo1-active');
                 
-                // Desativar a busca
-                cityInput.value = ''; // Limpa o texto
+                // Desativar busca
+                cityInput.value = '';
                 cityInput.placeholder = 'Busca indisponível no Geo1';
                 cityInput.disabled = true;
                 searchBtn.disabled = true;
-                searchBtn.value = 'X'; // Opcional: muda o texto do botão
-
             } else {
-                // MUDAR PARA GEO 2 (ATUAL)
+                // Mudar para Geo2
                 currentServer = 'geo2';
                 label.innerText = 'Geo2';
                 btn.classList.remove('geo1-active');
 
-                // Reativar a busca
+                // Ativar busca
                 cityInput.placeholder = 'Digite o nome da cidade';
                 cityInput.disabled = false;
                 searchBtn.disabled = false;
-                searchBtn.value = 'Procurar';
             }
-            
-            // Atualiza o iframe com o novo servidor (e sem nome de cidade se for geo1)
             updateIframe();
         });
 
-        document.querySelector('form').addEventListener('submit', function(event) {
-            event.preventDefault();
-            // Prevenção extra: não deixa submeter se estiver no geo1
-            if (currentServer === 'geo2') {
-                updateIframe();
-            }
+        document.querySelector('form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            if (currentServer === 'geo2') updateIframe();
         });
-
-        // Inicializa o mapa
-        updateIframe();
 
         document.querySelector('.info-button').addEventListener('click', function() {
             document.getElementById('infoModal').style.display = 'flex';
         });
-
-        function closeModal() {
-            document.getElementById('infoModal').style.display = 'none';
-        }
+        function closeModal() { document.getElementById('infoModal').style.display = 'none'; }
+        
+        // Iniciar mapa
+        updateIframe();
     </script>
 </body>
 </html>
