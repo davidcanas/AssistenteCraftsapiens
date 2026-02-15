@@ -178,7 +178,7 @@ app.get("/player/:nick", async (req, res) => {
             if (discordMember) {
                 discordData = {
                     tag: discordMember.displayName || discordMember.user.username,
-                    avatar: discordMember.displayAvatarURL({ format: 'png', size: 64 })
+                    avatar: discordMember.avatarURL()
                 };
             }
 
