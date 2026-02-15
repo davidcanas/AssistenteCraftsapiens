@@ -115,7 +115,7 @@ app.get("/stats/survival", async (req, res) => {
     member: client.guilds.get("892472046729179136")?.members.get(req.user?.id), 
     avatar: client.users.get(req.user?.id)?.avatarURL(),
     guild: client.guilds.get("892472046729179136"),
-    
+    highestRole: client.getHighestRole,
     playerList: processedList
   });
 });
@@ -150,6 +150,7 @@ app.get("/player", (req, res) => {
     res.render("playerinfo", {
         user: req.user,
         avatar: client.users.get(req.user?.id)?.avatarURL(),
+        highestRole: client.getHighestRole,
         playerData: null, // Sem dados
         targetName: "",
         error: null,
@@ -212,6 +213,7 @@ app.get("/player/:nick", async (req, res) => {
     res.render("playerinfo", {
         user: req.user,
         avatar: client.users.get(req.user?.id)?.avatarURL(),
+        highestRole: client.getHighestRole,
         playerData,
         targetName,
         error,
