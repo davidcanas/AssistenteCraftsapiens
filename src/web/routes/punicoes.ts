@@ -12,7 +12,8 @@ router.use(isLogged);
 router.use(isAdmin);
 
 router.get("/", async (req, res) => {
-  const users = await client.db.users.find({});
+  // Use projection to only fetch needed fields
+  const users = await client.db.users.find({}, { id: 1, nick: 1, punicoes: 1 });
   const user = req.user;
   const member = client.guilds.get("892472046729179136").members.get(user.id);
   res.render("punicoes/listar", {

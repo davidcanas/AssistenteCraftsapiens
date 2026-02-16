@@ -50,6 +50,7 @@ export default class DGClient extends Client {
 	guildID: string;
 	allowedUsers: Array<string>;
 	ignoreRoles: string[];
+	statusInterval?: NodeJS.Timeout;
 
 	constructor(token: string) {
 		const clientOptions: ClientOptions = {

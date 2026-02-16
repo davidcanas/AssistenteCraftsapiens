@@ -227,7 +227,8 @@ app.get("/player/:nick", async (req, res) => {
 
 app.get("/stats/topcall", async (req, res) => {
   const db = client.db;
-  const topUsers = await db.users.find({}).sort({ totalTimeInCall: -1 }).exec();
+  // Use projection to only fetch needed fields for better performance
+  const topUsers = await db.users.find({}, { id: 1, nick: 1, totalTimeInCall: 1 }).sort({ totalTimeInCall: -1 }).exec();
   res.render("topcall", { 
     user: req.user,
     member: client.guilds.get("892472046729179136").members.get(req.user?.id),
