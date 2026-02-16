@@ -16,3 +16,7 @@
 ## Licença
 
 > Assistente Craftsapiens © 2026 por davidcanas para Craftsapiens está licenciado sob CC BY-NC-ND 4.0. Para ver uma cópia desta licença, [clique aqui](http://creativecommons.org/licenses/by-nc-nd/4.0/).
+</br>
+<div align="center">
+  <sub>Made with ❤️ by David Guerreiro</sub>
+</div>
