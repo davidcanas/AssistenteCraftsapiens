@@ -1,5 +1,4 @@
-import dotenv from "dotenv";
-dotenv.config();
+import "dotenv/config";
 
 import DGClient from "./structures/Client";
 import database from "mongoose";
