@@ -16,11 +16,14 @@ O novo sistema mantém a aparência que jogadores e staff já conhecem (um canal
 3. Ficha do jogador para a staff (conta vinculada, dados da API, punições anteriores).
 4. Botão "Assumir" mostrando quem atende.
 5. Fechamento com transcrição salva e canal apagado depois de um prazo.
+6. Avaliação **secreta** do atendimento pelo jogador: 3 perguntas rápidas, um clique cada. Fica só no banco, mais um resumo mensal.
 
 **Não-objetivos (ficam para versões futuras)**
 - IA respondendo dúvidas antes da staff.
 - DM ao jogador, lembrete de ticket parado, auto-fechamento por inatividade.
-- Página de tickets no painel web, métricas, avaliação 1–5.
+- Página de tickets no painel web e métricas além do resumo mensal.
+- Comentário escrito na avaliação (o dono pediu avaliação rápida, só clique).
+- Reenviar o resumo mensal se o bot estiver desligado na hora agendada.
 - Reabrir ticket, transferir atendimento, adicionar outros membros ao ticket.
 - Migrar tickets do bot antigo.
 
@@ -93,6 +96,32 @@ O novo sistema mantém a aparência que jogadores e staff já conhecem (um canal
    - marca o ticket como fechado, com o horário em que o canal deve ser apagado.
 3. Depois de `TICKETS_DELETE_AFTER_HOURS`, o canal é apagado. A verificação roda a cada 10 minutos e também ao iniciar o bot, então sobrevive a reinicializações.
 
+### 5.6 Avaliação do atendimento (secreta, um clique por pergunta)
+Perguntas, nesta ordem (lista fixa no código, então dá para mudar ou acrescentar uma 4ª editando só os dados):
+
+| # | id | Pergunta | Botões (valor gravado) |
+|---|---|---|---|
+| 1 | `resolved` | Seu problema foi resolvido? | Sim (2) · Em parte (1) · Não (0) |
+| 2 | `service` | Como você avalia o atendimento? | 1 · 2 · 3 · 4 · 5 |
+| 3 | `speed` | E o tempo até ser atendido? | 1 · 2 · 3 · 4 · 5 |
+
+1. Logo depois de fechar, o bot publica no canal `closed-NNNN` a pergunta 1 com os botões, e o aviso "Suas respostas são anônimas para a staff (1/3)". O jogador perdeu a permissão de escrever, mas ainda consegue clicar em botões.
+2. Cada clique grava a resposta e **troca a mesma mensagem** pela próxima pergunta (2/3, 3/3). Depois da última, a mensagem vira "Avaliação registrada. Obrigado!". A mensagem **nunca mostra a resposta anterior**, porque a staff também vê o canal.
+3. **Só quem abriu o ticket** responde. Cada pergunta é gravada uma vez só e na ordem (gravação atômica: só grava a pergunta N se já houver exatamente N−1 respostas). Clique duplicado ou fora de ordem é ignorado. Para os outros, a resposta é efêmera.
+4. Se o jogador parar no meio, as respostas dadas ficam gravadas.
+5. As respostas **não aparecem em nenhum lugar no Discord por ticket**: nem no log, nem no canal.
+6. A avaliação fica aberta enquanto o canal existir, até ele ser apagado pelo prazo. Fica ligada ao ticket, e por ele a quem assumiu (`claimedBy`).
+
+### 5.7 Resumo mensal
+- No dia 1 de cada mês, às 09:00 (America/Sao_Paulo), o bot publica no canal `TICKETS_SUMMARY_CHANNEL_ID` o resumo do mês anterior, com base nos tickets **fechados** naquele mês:
+  - total de tickets fechados e quantos por tipo;
+  - quantos tiveram pelo menos uma resposta; % de "resolvido" (Sim = 100%, Em parte = 50%, Não = 0%); média de atendimento e média de tempo (1–5);
+  - por staff que assumiu: tickets atendidos, quantos avaliados, % resolvido, média de atendimento e média de tempo. Os sem atendente ficam numa linha "Sem atendente".
+  - Médias consideram só quem respondeu aquela pergunta. Sem respostas, aparece `—`.
+- O resumo **não mostra notas individuais nem jogadores**.
+- Usa `node-cron`, que o projeto já usa, num agendamento próprio do módulo. O agendamento existente em `main.ts` não é tocado.
+- Sem `TICKETS_SUMMARY_CHANNEL_ID`, o resumo não é enviado, mas as avaliações continuam sendo gravadas.
+
 ## 6. Arquitetura
 
 ### 6.1 Módulo novo
@@ -104,15 +133,16 @@ src/modules/tickets/
   service.ts       regras: abrir, assumir, fechar, limpar (usa o client)
   views.ts         embeds, botões, modais (funções puras)
   transcript.ts    formata a transcrição (função pura)
+  survey.ts        perguntas da avaliação e cálculo do resumo mensal (funções puras)
   handlers.ts      roteia customIDs "ticket:*" para o service
   scheduler.ts     apaga canais fechados vencidos
   index.ts         API pública: isTicketInteraction, handleTicketInteraction, startTickets
 ```
-- Os IDs de componentes seguem o formato `ticket:<ação>[:<id>]`, por exemplo `ticket:open:<tipo>`, `ticket:modal:<tipo>`, `ticket:claim:<ticketId>`, `ticket:close:<ticketId>`, `ticket:close-confirm:<ticketId>`, `ticket:profile:<ticketId>`.
+- Os IDs de componentes seguem o formato `ticket:<ação>[:<id>]`, por exemplo `ticket:open:<tipo>`, `ticket:modal:<tipo>`, `ticket:claim:<ticketId>`, `ticket:close:<ticketId>`, `ticket:close-confirm:<ticketId>`, `ticket:profile:<ticketId>`, `ticket:rate:<ticketId>:<índice da pergunta>:<valor>`.
 - Todo handler roda dentro de `try/catch`. Um erro é logado com o prefixo `[TICKETS]` e o usuário recebe uma resposta efêmera "Não foi possível…". Nada sobe para o processo.
 
 ### 6.2 Dados (`model.ts`)
-- **Ticket:** `number`, `guildId`, `channelId`, `userId`, `category`, `answers` (pares campo/resposta), `status` (`open` | `closed`), `claimedBy`, `closedBy`, `createdAt`, `claimedAt`, `closedAt`, `deleteAt`, `transcript` (lista de `{ authorId, authorTag, content, attachments[], createdAt }`).
+- **Ticket:** `number`, `guildId`, `channelId`, `userId`, `category`, `answers` (pares campo/resposta), `status` (`open` | `closed`), `claimedBy`, `closedBy`, `createdAt`, `claimedAt`, `closedAt`, `deleteAt`, `survey` (lista ordenada de `{ questionId, value, answeredAt }`), `transcript` (lista de `{ authorId, authorTag, content, attachments[], createdAt }`).
   - Índice em `{ guildId, userId, status }` para a regra de um ticket aberto por jogador.
 - **Contador:** documento `{ _id: "ticket", seq }`, incrementado com `findOneAndUpdate({ $inc })`. Ao iniciar, o módulo faz `seq = max(seq, TICKETS_START_NUMBER - 1)`. O valor **só sobe, nunca desce**, então mudar a variável para um número maior pula a numeração, e um número menor é ignorado.
 
@@ -125,7 +155,7 @@ src/modules/tickets/
 1. **`src/events/interactionCreate.ts`:** no início de `run`, se `TICKETS_ENABLED` e `isTicketInteraction(interaction)`, repassa para `handleTicketInteraction` e retorna. `isTicketInteraction` verifica o **prefixo `ticket:` do customID**, tanto em componentes (que o arquivo já trata, como `confirm_ban…`) quanto em envios de modal (que o arquivo hoje não trata). Qualquer outro customID segue o fluxo atual sem mudança.
 2. **`src/structures/Client.ts`, `updateSlash()`:** troca o ID fixo por `process.env.GUILD_ID || "892472046729179136"`.
 3. **`src/events/ready.ts`:** se `TICKETS_ENABLED`, chama `startTickets(client)`, que inicia o scheduler.
-4. **`src/commands/Mod/ticket.ts`** (arquivo novo, carregado pelo auto-loader): comando `/ticket` com o subcomando `painel`. A permissão é checada dentro do `execute` (membro com cargo de staff ou permissão Gerenciar Servidor), porque o `updateSlash()` atual não repassa `default_member_permissions` ao Discord. Se o módulo estiver desligado, responde "Sistema de tickets desativado".
+4. **`src/commands/Mod/ticket.ts`** (arquivo novo, carregado pelo auto-loader): comando `/ticket` com os subcomandos `painel` e `resumo`. O `resumo` envia na hora o resumo do mês anterior para o canal da gestão e exige a permissão Gerenciar Servidor. A permissão do `painel` é checada dentro do `execute` (membro com cargo de staff ou permissão Gerenciar Servidor), porque o `updateSlash()` atual não repassa `default_member_permissions` ao Discord. Se o módulo estiver desligado, responde "Sistema de tickets desativado".
 
 5. **`package.json`:** scripts `seed:test` e `test:tickets`.
 6. **`src/scripts/seed-test.ts`** (arquivo novo): fica dentro de `src/` porque o `tsconfig.json` tem `rootDir: ./src`. Fora de `src/`, o `npm run build` quebra.
@@ -139,6 +169,7 @@ Com `TICKETS_ENABLED` ausente ou falso, o comportamento é idêntico ao da `mast
 | `TICKETS_ENABLED` | liga o módulo | `false` |
 | `TICKETS_STAFF_ROLE_IDS` | cargos de staff, separados por vírgula | obrigatório se ligado |
 | `TICKETS_LOG_CHANNEL_ID` | canal de log e transcrições da staff | obrigatório se ligado |
+| `TICKETS_SUMMARY_CHANNEL_ID` | canal **só da gestão** para o resumo mensal de avaliações | opcional (sem ele, não há resumo) |
 | `TICKETS_START_NUMBER` | primeiro número do contador | `8917` |
 | `TICKETS_DELETE_AFTER_HOURS` | prazo para apagar canal fechado | `24` |
 
@@ -169,6 +200,8 @@ Se o módulo estiver ligado e faltar uma variável obrigatória, o `config.ts` l
 - [ ] Assumir atualiza a mensagem, e segundo clique informa quem atende.
 - [ ] Fechar renomeia, bloqueia o jogador, posta log com transcrição.
 - [ ] Canal fechado é apagado após o prazo, inclusive se o bot reiniciar no meio.
+- [ ] Após fechar, o jogador responde as 3 perguntas com 1 clique cada. A mensagem avança 1/3 → 2/3 → 3/3 → "Avaliação registrada" sem mostrar respostas, e nada aparece no log. Outra conta não consegue responder. Clique duplo não grava duas vezes.
+- [ ] O resumo mensal, disparado à mão no teste, mostra totais e médias por staff, sem notas individuais nem jogadores.
 - [ ] Com `TICKETS_ENABLED=false`, nada do ticket roda.
 - [ ] Comandos, moderação automática e música existentes funcionam como antes (etapa 2).
 
@@ -181,6 +214,8 @@ Se o módulo estiver ligado e faltar uma variável obrigatória, o `config.ts` l
 6. Sem configuração de categoria: os tickets ficam sempre fora de categorias. Colocar numa categoria faria o filtro de links apagar provas.
 7. Ficha: "3 últimas punições" usa a ordem do array, porque o banco não guarda a data em formato ordenável.
 8. O handler existente de denúncia em canais `ticket-…` continua rodando também nos tickets novos. Ele pode repetir o pedido de provas num ticket de Denúncia, e isso é aceito na v1.
+9. Avaliação: as 3 perguntas e seus valores (tabela 5.6), feitas em sequência na mesma mensagem para não expor respostas à staff no canal.
+10. Resumo mensal: dia 1 às 09:00 (America/Sao_Paulo), em canal próprio só da gestão, sem notas individuais nem jogadores.
 
 ## 9. Deixado para quem implementar
 - Textos exatos de embeds e mensagens, cores e emojis.
