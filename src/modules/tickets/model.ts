@@ -1,5 +1,6 @@
 import { Schema, model, type Document, type Model } from "mongoose";
 import { TICKET_CATEGORIES, type TicketCategoryId } from "./categories";
+import type { SurveyAnswer } from "./survey";
 import type { TranscriptEntry } from "./transcript";
 import type { TicketAnswer } from "./views";
 
@@ -19,6 +20,7 @@ export interface TicketDoc extends Document {
 	deleteAt: Date | null;
 	channelDeletedAt: Date | null;
 	transcript: TranscriptEntry[];
+	survey: SurveyAnswer[];
 }
 
 const answerSchema = new Schema<TicketAnswer>(
@@ -40,6 +42,15 @@ const transcriptEntrySchema = new Schema<TranscriptEntry>(
 	{ _id: false },
 );
 
+const surveyAnswerSchema = new Schema<SurveyAnswer>(
+	{
+		questionId: { type: String, required: true },
+		value: { type: Number, required: true },
+		answeredAt: { type: Date, required: true },
+	},
+	{ _id: false },
+);
+
 const ticketSchema = new Schema<TicketDoc>(
 	{
 		number: { type: Number, required: true },
@@ -57,6 +68,7 @@ const ticketSchema = new Schema<TicketDoc>(
 		deleteAt: { type: Date, default: null },
 		channelDeletedAt: { type: Date, default: null },
 		transcript: { type: [transcriptEntrySchema], default: [] },
+		survey: { type: [surveyAnswerSchema], default: [] },
 	},
 	{ versionKey: false },
 );

@@ -65,3 +65,24 @@ test("summary embed fallbacks", () => {
 	assert.ok(json.includes("—"));
 	assert.ok(json.includes("Resumo de tickets — outubro de 2026"));
 });
+
+test("summary embed splits staff lines into fields of at most 1024 chars", () => {
+	const many = Array.from({ length: 30 }, (_, i) => ({
+		claimedBy: `1000000000000000${String(i).padStart(2, "0")}`,
+		category: "duvida",
+		survey: [{ questionId: "resolved", value: 2 }, { questionId: "service", value: 5 }, { questionId: "speed", value: 4 }],
+	}));
+	const embed = monthlySummaryEmbed(summarizeMonth(many), "outubro de 2026");
+	const fields = embed.fields ?? [];
+	for (const field of fields) {
+		assert.ok(field.value.length <= 1024, `${field.name}: ${field.value.length}`);
+	}
+	const staffFields = fields.filter((f) => f.name.startsWith("Por staff"));
+	assert.ok(staffFields.length > 1);
+	assert.equal(staffFields[0].name, "Por staff");
+	assert.equal(staffFields[1].name, "Por staff (cont.)");
+	const text = staffFields.map((f) => f.value).join("\n");
+	for (const ticket of many) {
+		assert.ok(text.includes(`<@${ticket.claimedBy}>`));
+	}
+});

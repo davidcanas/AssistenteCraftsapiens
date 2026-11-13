@@ -9,6 +9,7 @@ import { parseCustomId } from "./customIds";
 import { isStaff, type TicketsConfig } from "./config";
 import type { TicketDoc } from "./model";
 import {
+	answerSurvey,
 	buildPlayerProfile,
 	claimTicket,
 	closeTicket,
@@ -19,6 +20,7 @@ import {
 	type CloseResult,
 	type OpenResult,
 } from "./service";
+import { surveyDoneMessage, surveyQuestionMessage } from "./survey";
 import { categoryModal, closeConfirmMessage, profileEmbed, welcomeMessage, type TicketAnswer } from "./views";
 
 const GENERIC_ERROR = "Não foi possível concluir agora. Tente novamente em alguns minutos.";
@@ -184,6 +186,29 @@ async function handleCloseConfirmButton(
 	await interaction.editOriginal({ content: closeResultText(result), components: [] });
 }
 
+async function handleRateButton(interaction: ComponentInteraction, arg: string | null): Promise<void> {
+	const parts = arg === null ? [] : arg.split(":");
+	const index = Number(parts[1]);
+	const value = Number(parts[2]);
+	if (parts.length !== 3 || !Number.isInteger(index) || !Number.isInteger(value)) {
+		await replyEphemeral(interaction, GENERIC_ERROR);
+		return;
+	}
+
+	const result = await answerSurvey(parts[0], interaction.user.id, index, value);
+	if ("reason" in result) {
+		if (result.reason === "not-owner") {
+			await replyEphemeral(interaction, "Só quem abriu o ticket pode avaliar.");
+		} else {
+			await interaction.deferUpdate();
+		}
+		return;
+	}
+
+	const { content, components } = result.next === null ? surveyDoneMessage() : surveyQuestionMessage(parts[0], result.next);
+	await interaction.editParent({ content, components });
+}
+
 async function handleModalSubmit(
 	client: DGClient,
 	config: TicketsConfig,
@@ -242,6 +267,8 @@ export async function routeTicketInteraction(
 				await handleCloseButton(config, interaction, parsed.arg);
 			} else if (parsed.action === "close-confirm") {
 				await handleCloseConfirmButton(client, config, interaction, parsed.arg);
+			} else if (parsed.action === "rate") {
+				await handleRateButton(interaction, parsed.arg);
 			}
 			return;
 		}

@@ -22,6 +22,7 @@ export const SURVEY_QUESTIONS: readonly SurveyQuestion[] = [
 	{ id: "speed", text: "E o tempo até ser atendido?", options: scale() },
 ];
 
+const FIELD_LIMIT = 1024;
 const COLOR_SUMMARY = 0x5865f2;
 const EMPTY = "—";
 const SP_OFFSET_HOURS = 3;
@@ -106,13 +107,30 @@ function statsLine(s: StaffStats): string {
 	return `${s.handled} atendidos · ${s.rated} avaliados · resolvido ${fmtPct(s.resolvedPct)} · atendimento ${fmtAvg(s.serviceAvg)} · tempo ${fmtAvg(s.speedAvg)}`;
 }
 
+function chunkLines(lines: string[], limit: number): string[] {
+	const chunks: string[] = [];
+	let current = "";
+	for (const line of lines) {
+		const text = line.length > limit ? line.slice(0, limit) : line;
+		if (current !== "" && current.length + 1 + text.length > limit) {
+			chunks.push(current);
+			current = text;
+		} else {
+			current = current === "" ? text : `${current}\n${text}`;
+		}
+	}
+	if (current !== "") {
+		chunks.push(current);
+	}
+	return chunks;
+}
+
 export function monthlySummaryEmbed(s: MonthSummary, label: string): EmbedOptions {
 	const categories = Object.entries(s.byCategory)
 		.map(([id, count]) => `${getCategory(id)?.label ?? id}: ${count}`)
 		.join("\n");
-	const staff = s.perStaff
-		.map((p) => `${p.staffId === null ? "Sem atendente" : `<@${p.staffId}>`} — ${statsLine(p)}`)
-		.join("\n");
+	const staffLines = s.perStaff.map((p) => `${p.staffId === null ? "Sem atendente" : `<@${p.staffId}>`} — ${statsLine(p)}`);
+	const staffFields = chunkLines(staffLines, FIELD_LIMIT).map((value, i) => ({ name: i === 0 ? "Por staff" : "Por staff (cont.)", value }));
 
 	return {
 		title: `Resumo de tickets — ${label}`,
@@ -121,7 +139,7 @@ export function monthlySummaryEmbed(s: MonthSummary, label: string): EmbedOption
 		fields: [
 			{ name: "Por tipo", value: categories || EMPTY },
 			{ name: "Geral", value: statsLine(s.overall) },
-			{ name: "Por staff", value: staff || EMPTY },
+			...(staffFields.length > 0 ? staffFields : [{ name: "Por staff", value: EMPTY }]),
 		],
 	};
 }

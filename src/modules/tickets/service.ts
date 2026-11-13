@@ -11,6 +11,7 @@ import type DGClient from "../../structures/Client";
 import { getCategory, type TicketCategory } from "./categories";
 import type { TicketsConfig } from "./config";
 import { Ticket, nextTicketNumber, type TicketDoc } from "./model";
+import { SURVEY_QUESTIONS, monthlySummaryEmbed, previousMonthRange, summarizeMonth, surveyQuestionMessage } from "./survey";
 import { MAX_TRANSCRIPT_MESSAGES, formatTranscript, type TranscriptEntry } from "./transcript";
 import {
 	closedChannelName,
@@ -30,6 +31,8 @@ export type OpenResult =
 export type ClaimResult =
 	| { ok: true; ticket: TicketDoc }
 	| { ok: false; claimedBy: string | null; closed: boolean };
+
+export type SurveyResult = { ok: true; next: number | null } | { ok: false; reason: "not-owner" | "ignored" };
 
 export type CloseResult = { ok: true } | { ok: false; reason: "not-found" | "already-closed" };
 
@@ -381,7 +384,57 @@ export async function closeTicket(client: DGClient, config: TicketsConfig, ticke
 		console.error("[TICKETS]", error);
 	}
 
+	// 7. Pergunta secreta de avaliação para o jogador.
+	try {
+		await client.rest.channels.createMessage(ticket.channelId, surveyQuestionMessage(String(ticket._id), 0));
+	} catch (error) {
+		console.error("[TICKETS]", error);
+	}
+
 	return { ok: true };
+}
+
+export async function answerSurvey(ticketId: string, userId: string, index: number, value: number): Promise<SurveyResult> {
+	const question = Number.isInteger(index) ? SURVEY_QUESTIONS[index] : undefined;
+	if (!question || !Number.isInteger(value) || !question.options.some((option) => option.value === value) || !isValidObjectId(ticketId)) {
+		return { ok: false, reason: "ignored" };
+	}
+
+	const updated = await Ticket.findOneAndUpdate(
+		{ _id: ticketId, userId, status: "closed", survey: { $size: index } },
+		{ $push: { survey: { questionId: question.id, value, answeredAt: new Date() } } },
+		{ new: true, projection: { _id: 1 } },
+	);
+	if (updated) {
+		return { ok: true, next: index + 1 < SURVEY_QUESTIONS.length ? index + 1 : null };
+	}
+
+	const ticket = await Ticket.findById(ticketId, { userId: 1 });
+	return { ok: false, reason: ticket && ticket.userId !== userId ? "not-owner" : "ignored" };
+}
+
+export async function sendMonthlySummary(client: DGClient, config: TicketsConfig, now: Date = new Date()): Promise<boolean> {
+	if (!config.summaryChannelId) {
+		return false;
+	}
+
+	const { start, end, label } = previousMonthRange(now);
+	const tickets = await Ticket.find(
+		{ guildId: config.guildId, status: "closed", closedAt: { $gte: start, $lt: end } },
+		{ claimedBy: 1, category: 1, survey: 1 },
+	).lean();
+	const summary = summarizeMonth(
+		tickets.map((ticket) => ({
+			claimedBy: ticket.claimedBy ?? null,
+			category: ticket.category,
+			survey: ticket.survey ?? [],
+		})),
+	);
+	await client.rest.channels.createMessage(config.summaryChannelId, {
+		embeds: [monthlySummaryEmbed(summary, label)],
+		allowedMentions: { users: [] },
+	});
+	return true;
 }
 
 export async function purgeExpiredChannels(client: DGClient): Promise<number> {
