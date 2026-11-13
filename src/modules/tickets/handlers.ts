@@ -195,18 +195,17 @@ async function handleRateButton(interaction: ComponentInteraction, arg: string |
 		return;
 	}
 
+	await interaction.deferUpdate();
 	const result = await answerSurvey(parts[0], interaction.user.id, index, value);
 	if ("reason" in result) {
 		if (result.reason === "not-owner") {
-			await replyEphemeral(interaction, "Só quem abriu o ticket pode avaliar.");
-		} else {
-			await interaction.deferUpdate();
+			await interaction.createFollowup({ content: "Só quem abriu o ticket pode avaliar.", flags: MessageFlags.EPHEMERAL });
 		}
 		return;
 	}
 
 	const { content, components } = result.next === null ? surveyDoneMessage() : surveyQuestionMessage(parts[0], result.next);
-	await interaction.editParent({ content, components });
+	await interaction.editOriginal({ content, components });
 }
 
 async function handleModalSubmit(
