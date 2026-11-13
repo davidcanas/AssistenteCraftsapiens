@@ -9,7 +9,9 @@
     "build": "tsc",
     "start": "node dist/main.js",
     "dev": "ts-node --transpileOnly src/main.ts",
-    "run": "node run.js"
+    "run": "node run.js",
+    "seed:test": "ts-node --transpileOnly src/scripts/seed-test.ts",
+    "test:tickets": "node -r ts-node/register/transpile-only --test"
   },
   "dependencies": {
     "@iamtraction/google-translate": "^2.0.1",

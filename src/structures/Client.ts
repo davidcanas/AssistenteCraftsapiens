@@ -227,7 +227,7 @@ export default class DGClient extends Client {
 				autocomplete: command.autocomplete || false,
 			});
 		}
-		this.application.bulkEditGuildCommands("892472046729179136", cmds);
+		this.application.bulkEditGuildCommands(process.env.GUILD_ID || "892472046729179136", cmds);
 		console.log("\x1b[32m[CLIENT] Os slash commands foram atualizados");
 	}
 	connectLavaLink(): void {
