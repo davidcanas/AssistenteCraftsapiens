@@ -10,12 +10,18 @@ import type DGClient from "../../structures/Client";
 import type { TicketCategory } from "./categories";
 import type { TicketsConfig } from "./config";
 import { Ticket, nextTicketNumber, type TicketDoc } from "./model";
-import { ticketChannelName, welcomeMessage, type TicketAnswer } from "./views";
+import { ticketChannelName, welcomeMessage, type PlayerProfile, type TicketAnswer, type WelcomeView } from "./views";
 
 export type OpenResult =
 	| { ok: true; channelId: string }
 	| { ok: false; reason: "already-open"; channelId: string }
 	| { ok: false; reason: "busy" | "failed" };
+
+export type ClaimResult =
+	| { ok: true; ticket: TicketDoc }
+	| { ok: false; claimedBy: string | null; closed: boolean };
+
+type PunishmentEntry = { tipo?: string; motivo?: string; horario?: string };
 
 const FAILED: OpenResult = { ok: false, reason: "failed" };
 const HTTP_NOT_FOUND = 404;
@@ -49,6 +55,18 @@ async function channelExists(client: DGClient, channelId: string): Promise<boole
 		}
 		throw error;
 	}
+}
+
+export function toWelcomeView(ticket: TicketDoc, staffRoleIds: string[]): WelcomeView {
+	return {
+		ticketId: String(ticket._id),
+		number: ticket.number,
+		userId: ticket.userId,
+		categoryId: ticket.category,
+		answers: ticket.answers,
+		staffRoleIds,
+		claimedBy: ticket.claimedBy,
+	};
 }
 
 export async function findOpenTicket(client: DGClient, guildId: string, userId: string): Promise<TicketDoc | null> {
@@ -118,15 +136,7 @@ export async function openTicket(
 		}
 
 		try {
-			await channel.createMessage(welcomeMessage({
-				ticketId: String(ticket._id),
-				number,
-				userId: p.userId,
-				categoryId: p.category.id,
-				answers: p.answers,
-				staffRoleIds: config.staffRoleIds,
-				claimedBy: null,
-			}));
+			await channel.createMessage(welcomeMessage(toWelcomeView(ticket, config.staffRoleIds)));
 		} catch (error) {
 			// Sem a mensagem de boas-vindas o ticket não pode ser assumido nem fechado: desfaz tudo.
 			console.error("[TICKETS]", error);
@@ -150,4 +160,76 @@ export async function openTicket(
 	} finally {
 		opening.delete(key);
 	}
+}
+
+export async function claimTicket(ticketId: string, staffId: string): Promise<ClaimResult> {
+	const updated = await Ticket.findOneAndUpdate(
+		{ _id: ticketId, status: "open", claimedBy: null },
+		{ claimedBy: staffId, claimedAt: new Date() },
+		{ new: true },
+	);
+	if (updated) {
+		return { ok: true, ticket: updated };
+	}
+
+	const ticket = await Ticket.findById(ticketId);
+	return { ok: false, claimedBy: ticket?.claimedBy ?? null, closed: ticket?.status === "closed" };
+}
+
+async function fetchMemberOrUser(client: DGClient, guild: Guild, userId: string): Promise<{ nick: string | null }> {
+	try {
+		const member = guild.members.get(userId) ?? (await guild.getMember(userId));
+		if (member) {
+			return { nick: member.nick ?? member.user.username };
+		}
+	} catch {
+		// Saiu do servidor: tenta o usuário abaixo.
+	}
+	try {
+		const user = client.users.get(userId) ?? (await client.rest.users.get(userId));
+		return { nick: user.username };
+	} catch {
+		return { nick: null };
+	}
+}
+
+async function fetchApiProfile(client: DGClient, nick: string): Promise<PlayerProfile["api"]> {
+	const info = await client.api.getPlayerInfo(nick);
+	const data = info?.data;
+	if (!data) {
+		return "unavailable";
+	}
+	return {
+		group: data.group ?? null,
+		online: data.status?.online ?? null,
+		town: data.towny?.townName ?? null,
+		nation: data.towny?.nationName ?? null,
+	};
+}
+
+async function fetchPunishments(client: DGClient, nick: string): Promise<PlayerProfile["punishments"]> {
+	const doc = await client.db.users.findOne({ nick });
+	const list = (doc?.punicoes ?? []) as PunishmentEntry[];
+	return { total: list.length, last: list.slice(-3).reverse() };
+}
+
+export async function buildPlayerProfile(client: DGClient, guild: Guild, userId: string): Promise<PlayerProfile> {
+	const { nick } = await fetchMemberOrUser(client, guild, userId);
+	if (nick === null) {
+		return { userId, nick, linked: false, api: "unavailable", punishments: "unavailable" };
+	}
+
+	const [linked, api, punishments] = await Promise.allSettled([
+		(async () => !!client.getDiscordByNick(nick))(),
+		fetchApiProfile(client, nick),
+		fetchPunishments(client, nick),
+	]);
+
+	return {
+		userId,
+		nick,
+		linked: linked.status === "fulfilled" ? linked.value : false,
+		api: api.status === "fulfilled" ? api.value : "unavailable",
+		punishments: punishments.status === "fulfilled" ? punishments.value : "unavailable",
+	};
 }

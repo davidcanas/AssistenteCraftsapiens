@@ -6,9 +6,10 @@ import {
 import type DGClient from "../../structures/Client";
 import { getCategory } from "./categories";
 import { parseCustomId } from "./customIds";
-import type { TicketsConfig } from "./config";
-import { findOpenTicket, openTicket, type OpenResult } from "./service";
-import { categoryModal, type TicketAnswer } from "./views";
+import { isStaff, type TicketsConfig } from "./config";
+import { buildPlayerProfile, claimTicket, findOpenTicket, openTicket, toWelcomeView, type OpenResult } from "./service";
+import { Ticket } from "./model";
+import { categoryModal, profileEmbed, welcomeMessage, type TicketAnswer } from "./views";
 
 const GENERIC_ERROR = "Não foi possível concluir agora. Tente novamente em alguns minutos.";
 const OPEN_FAILED = "Não foi possível abrir o ticket agora, tente em alguns minutos.";
@@ -45,6 +46,68 @@ async function handleOpenButton(client: DGClient, interaction: ComponentInteract
 	}
 
 	await interaction.createModal(categoryModal(category));
+}
+
+function memberIsStaff(config: TicketsConfig, interaction: ComponentInteraction): boolean {
+	const member = interaction.member;
+	return !!member && isStaff(member.roles, member.permissions.has("MANAGE_GUILD"), config.staffRoleIds);
+}
+
+async function replyEphemeral(interaction: ComponentInteraction, content: string): Promise<void> {
+	await interaction.createMessage({ content, flags: MessageFlags.EPHEMERAL });
+}
+
+async function handleClaimButton(config: TicketsConfig, interaction: ComponentInteraction, arg: string | null): Promise<void> {
+	if (!memberIsStaff(config, interaction)) {
+		await replyEphemeral(interaction, "Só a staff pode assumir.");
+		return;
+	}
+	if (arg === null) {
+		return;
+	}
+
+	const result = await claimTicket(arg, interaction.user.id);
+	if ("ticket" in result) {
+		const { content, allowedMentions, embeds, components } = welcomeMessage(toWelcomeView(result.ticket, config.staffRoleIds));
+		await interaction.editParent({ content, allowedMentions, embeds, components });
+		return;
+	}
+	if (result.closed) {
+		await replyEphemeral(interaction, "Este ticket está fechado.");
+		return;
+	}
+	await replyEphemeral(
+		interaction,
+		result.claimedBy ? `Este ticket já está sendo atendido por <@${result.claimedBy}>.` : GENERIC_ERROR,
+	);
+}
+
+async function handleProfileButton(
+	client: DGClient,
+	config: TicketsConfig,
+	interaction: ComponentInteraction,
+	guildId: string,
+	arg: string | null,
+): Promise<void> {
+	if (!memberIsStaff(config, interaction)) {
+		await replyEphemeral(interaction, "Só a staff pode ver a ficha.");
+		return;
+	}
+	if (arg === null) {
+		return;
+	}
+
+	await interaction.defer(MessageFlags.EPHEMERAL);
+
+	const ticket = await Ticket.findById(arg);
+	const guild = client.guilds.get(guildId);
+	if (!ticket || !guild) {
+		await interaction.editOriginal({ content: GENERIC_ERROR });
+		return;
+	}
+
+	const profile = await buildPlayerProfile(client, guild, ticket.userId);
+	await interaction.editOriginal({ embeds: [profileEmbed(profile)] });
 }
 
 async function handleModalSubmit(
@@ -96,8 +159,12 @@ export async function routeTicketInteraction(
 		if (interaction instanceof ComponentInteraction) {
 			if (parsed.action === "open") {
 				await handleOpenButton(client, interaction, guildId, parsed.arg);
+			} else if (parsed.action === "claim") {
+				await handleClaimButton(config, interaction, parsed.arg);
+			} else if (parsed.action === "profile") {
+				await handleProfileButton(client, config, interaction, guildId, parsed.arg);
 			}
-			// As demais ações de botão (claim, profile, close, close-confirm) chegam nas próximas etapas.
+			// As demais ações de botão (close, close-confirm) chegam nas próximas etapas.
 			return;
 		}
 
