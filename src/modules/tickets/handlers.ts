@@ -6,7 +6,7 @@ import {
 import type DGClient from "../../structures/Client";
 import { getCategory } from "./categories";
 import { parseCustomId } from "./customIds";
-import { getTicketsConfig } from "./index";
+import type { TicketsConfig } from "./config";
 import { findOpenTicket, openTicket, type OpenResult } from "./service";
 import { categoryModal, type TicketAnswer } from "./views";
 
@@ -47,10 +47,15 @@ async function handleOpenButton(client: DGClient, interaction: ComponentInteract
 	await interaction.createModal(categoryModal(category));
 }
 
-async function handleModalSubmit(client: DGClient, interaction: ModalSubmitInteraction, guildId: string, arg: string | null): Promise<void> {
+async function handleModalSubmit(
+	client: DGClient,
+	config: TicketsConfig,
+	interaction: ModalSubmitInteraction,
+	guildId: string,
+	arg: string | null,
+): Promise<void> {
 	const category = arg === null ? undefined : getCategory(arg);
-	const config = getTicketsConfig();
-	if (!category || !config) {
+	if (!category) {
 		return;
 	}
 
@@ -72,7 +77,11 @@ async function handleModalSubmit(client: DGClient, interaction: ModalSubmitInter
 	await interaction.editOriginal({ content: openResultText(result) });
 }
 
-export async function handleTicketInteraction(client: DGClient, interaction: ComponentInteraction | ModalSubmitInteraction): Promise<void> {
+export async function routeTicketInteraction(
+	client: DGClient,
+	config: TicketsConfig,
+	interaction: ComponentInteraction | ModalSubmitInteraction,
+): Promise<void> {
 	try {
 		const guildId = interaction.guildID;
 		if (!guildId) {
@@ -93,7 +102,7 @@ export async function handleTicketInteraction(client: DGClient, interaction: Com
 		}
 
 		if (parsed.action === "modal") {
-			await handleModalSubmit(client, interaction, guildId, parsed.arg);
+			await handleModalSubmit(client, config, interaction, guildId, parsed.arg);
 		}
 	} catch (error) {
 		console.error("[TICKETS]", error);

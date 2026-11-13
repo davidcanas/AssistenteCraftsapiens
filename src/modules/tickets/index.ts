@@ -2,7 +2,7 @@ import { ComponentInteraction, ModalSubmitInteraction, type Interaction } from "
 import type DGClient from "../../structures/Client";
 import { parseTicketsConfig, type TicketsConfig } from "./config";
 import { TICKET_PREFIX } from "./customIds";
-import { handleTicketInteraction } from "./handlers";
+import { routeTicketInteraction } from "./handlers";
 import { syncCounter } from "./model";
 
 let cachedConfig: TicketsConfig | null | undefined;
@@ -28,7 +28,13 @@ export function isTicketInteraction(i: Interaction): i is ComponentInteraction |
 	return i.data.customID.startsWith(TICKET_PREFIX);
 }
 
-export { handleTicketInteraction };
+export async function handleTicketInteraction(client: DGClient, interaction: ComponentInteraction | ModalSubmitInteraction): Promise<void> {
+	const config = getTicketsConfig();
+	if (!config) {
+		return;
+	}
+	await routeTicketInteraction(client, config, interaction);
+}
 
 export async function startTickets(client: DGClient): Promise<void> {
 	const config = getTicketsConfig();

@@ -117,15 +117,31 @@ export async function openTicket(
 			return FAILED;
 		}
 
-		await channel.createMessage(welcomeMessage({
-			ticketId: String(ticket._id),
-			number,
-			userId: p.userId,
-			categoryId: p.category.id,
-			answers: p.answers,
-			staffRoleIds: config.staffRoleIds,
-			claimedBy: null,
-		}));
+		try {
+			await channel.createMessage(welcomeMessage({
+				ticketId: String(ticket._id),
+				number,
+				userId: p.userId,
+				categoryId: p.category.id,
+				answers: p.answers,
+				staffRoleIds: config.staffRoleIds,
+				claimedBy: null,
+			}));
+		} catch (error) {
+			// Sem a mensagem de boas-vindas o ticket não pode ser assumido nem fechado: desfaz tudo.
+			console.error("[TICKETS]", error);
+			try {
+				await channel.delete();
+			} catch (deleteError) {
+				console.error("[TICKETS]", deleteError);
+			}
+			try {
+				await Ticket.deleteOne({ _id: ticket._id });
+			} catch (deleteError) {
+				console.error("[TICKETS]", deleteError);
+			}
+			return FAILED;
+		}
 
 		return { ok: true, channelId: channel.id };
 	} catch (error) {
