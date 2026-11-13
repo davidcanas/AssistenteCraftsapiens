@@ -203,16 +203,16 @@ export default class DGClient extends Client {
 		const testEvents = ["ready", "interactionCreate", "error", "warn"];
 		if (testMode) {
 			console.log(
-				"[33m[CLIENT] Modo de teste: carregando só ready, interactionCreate, error e warn.",
+				"\x1b[33m[CLIENT] Modo de teste: carregando só ready, interactionCreate, error e warn.",
 			);
 		}
 		for (const file of fs.readdirSync(
 			path.resolve(__dirname, "..", "events"),
 		)) {
 			if (file.endsWith(".ts") || file.endsWith(".js")) {
-				if (testMode && !testEvents.includes(file.split(".")[0])) continue;
-				const event = new (require(`../events/${file}`).default)(this);
 				const eventName = file.split(".")[0] as keyof ClientEvents;
+				if (testMode && !testEvents.includes(eventName)) continue;
+				const event = new (require(`../events/${file}`).default)(this);
 
 				if (eventName === "ready") {
 					super.once("ready", (...args) => event.run(...args));
