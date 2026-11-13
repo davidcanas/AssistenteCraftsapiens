@@ -35,6 +35,7 @@ function openResultText(result: OpenResult): string {
 async function handleOpenButton(client: DGClient, interaction: ComponentInteraction, guildId: string, arg: string | null): Promise<void> {
 	const category = arg === null ? undefined : getCategory(arg);
 	if (!category) {
+		await replyEphemeral(interaction, GENERIC_ERROR);
 		return;
 	}
 
@@ -62,6 +63,7 @@ async function handleClaimButton(config: TicketsConfig, interaction: ComponentIn
 		return;
 	}
 	if (arg === null) {
+		await replyEphemeral(interaction, GENERIC_ERROR);
 		return;
 	}
 
@@ -92,6 +94,7 @@ async function handleProfileButton(
 		return;
 	}
 	if (arg === null) {
+		await replyEphemeral(interaction, GENERIC_ERROR);
 		return;
 	}
 
@@ -117,6 +120,7 @@ async function handleModalSubmit(
 ): Promise<void> {
 	const category = arg === null ? undefined : getCategory(arg);
 	if (!category) {
+		await interaction.createMessage({ content: GENERIC_ERROR, flags: MessageFlags.EPHEMERAL });
 		return;
 	}
 
@@ -171,10 +175,8 @@ export async function routeTicketInteraction(
 		}
 	} catch (error) {
 		console.error("[TICKETS]", error);
-		if (!interaction.acknowledged) {
-			await interaction
-				.createMessage({ content: GENERIC_ERROR, flags: MessageFlags.EPHEMERAL })
-				.catch((replyError) => console.error("[TICKETS]", replyError));
-		}
+		const reply = { content: GENERIC_ERROR, flags: MessageFlags.EPHEMERAL };
+		const send = interaction.acknowledged ? interaction.createFollowup(reply) : interaction.createMessage(reply);
+		await send.catch((replyError) => console.error("[TICKETS]", replyError));
 	}
 }
