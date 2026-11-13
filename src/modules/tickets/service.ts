@@ -8,10 +8,19 @@ import {
 	type OverwriteOptions,
 } from "oceanic.js";
 import type DGClient from "../../structures/Client";
-import type { TicketCategory } from "./categories";
+import { getCategory, type TicketCategory } from "./categories";
 import type { TicketsConfig } from "./config";
 import { Ticket, nextTicketNumber, type TicketDoc } from "./model";
-import { ticketChannelName, welcomeMessage, type PlayerProfile, type TicketAnswer, type WelcomeView } from "./views";
+import { MAX_TRANSCRIPT_MESSAGES, formatTranscript, type TranscriptEntry } from "./transcript";
+import {
+	closedChannelName,
+	logMessage,
+	ticketChannelName,
+	welcomeMessage,
+	type PlayerProfile,
+	type TicketAnswer,
+	type WelcomeView,
+} from "./views";
 
 export type OpenResult =
 	| { ok: true; channelId: string }
@@ -22,10 +31,14 @@ export type ClaimResult =
 	| { ok: true; ticket: TicketDoc }
 	| { ok: false; claimedBy: string | null; closed: boolean };
 
+export type CloseResult = { ok: true } | { ok: false; reason: "not-found" | "already-closed" };
+
 type PunishmentEntry = { tipo?: string; motivo?: string; horario?: string };
 
 const FAILED: OpenResult = { ok: false, reason: "failed" };
 const HTTP_NOT_FOUND = 404;
+const MS_PER_HOUR = 3_600_000;
+const MESSAGES_PAGE_SIZE = 100;
 
 const PLAYER_PERMISSIONS =
 	Permissions.VIEW_CHANNEL |
@@ -40,6 +53,8 @@ const BOT_PERMISSIONS =
 	Permissions.READ_MESSAGE_HISTORY |
 	Permissions.MANAGE_CHANNELS |
 	Permissions.MANAGE_ROLES;
+const CLOSED_PLAYER_ALLOW = Permissions.VIEW_CHANNEL | Permissions.READ_MESSAGE_HISTORY;
+const CLOSED_PLAYER_DENY = Permissions.SEND_MESSAGES;
 
 const opening = new Set<string>();
 
@@ -243,4 +258,152 @@ export async function buildPlayerProfile(client: DGClient, guild: Guild, userId:
 		api: api.status === "fulfilled" ? api.value : "unavailable",
 		punishments: punishments.status === "fulfilled" ? punishments.value : "unavailable",
 	};
+}
+
+async function fetchTranscript(client: DGClient, channelId: string): Promise<{ entries: TranscriptEntry[]; truncated: boolean }> {
+	const entries: TranscriptEntry[] = [];
+	let before: string | undefined;
+	let lastPageFull = false;
+
+	while (entries.length < MAX_TRANSCRIPT_MESSAGES) {
+		const limit = Math.min(MESSAGES_PAGE_SIZE, MAX_TRANSCRIPT_MESSAGES - entries.length);
+		const page = await client.rest.channels.getMessages(channelId, { limit, before });
+		for (const message of page) {
+			entries.push({
+				authorId: message.author.id,
+				authorTag: message.author.tag,
+				content: message.content,
+				attachments: message.attachments.map((attachment) => attachment.url),
+				createdAt: message.timestamp,
+			});
+		}
+		lastPageFull = page.length === limit;
+		if (!lastPageFull) {
+			break;
+		}
+		// O Discord devolve da mais nova para a mais antiga: a última da página é a mais antiga.
+		before = page[page.length - 1].id;
+	}
+
+	return { entries, truncated: entries.length >= MAX_TRANSCRIPT_MESSAGES && lastPageFull };
+}
+
+async function fetchUserTag(client: DGClient, userId: string): Promise<string> {
+	try {
+		const user = client.users.get(userId) ?? (await client.rest.users.get(userId));
+		return user.tag;
+	} catch {
+		return userId;
+	}
+}
+
+export async function closeTicket(client: DGClient, config: TicketsConfig, ticketId: string, closedById: string): Promise<CloseResult> {
+	if (!isValidObjectId(ticketId)) {
+		return { ok: false, reason: "not-found" };
+	}
+
+	// 1. Fecha de forma atômica: só um clique vence, mesmo se os passos seguintes falharem.
+	const closedAt = new Date();
+	const deleteAt = new Date(closedAt.getTime() + config.deleteAfterHours * MS_PER_HOUR);
+	const ticket = await Ticket.findOneAndUpdate(
+		{ _id: ticketId, status: "open" },
+		{ status: "closed", closedBy: closedById, closedAt, deleteAt },
+		{ new: true },
+	);
+	if (!ticket) {
+		const existing = await findTicketById(ticketId);
+		return { ok: false, reason: existing ? "already-closed" : "not-found" };
+	}
+
+	// 2. Transcrição.
+	let entries: TranscriptEntry[] = [];
+	let truncated = false;
+	try {
+		({ entries, truncated } = await fetchTranscript(client, ticket.channelId));
+		await Ticket.updateOne({ _id: ticket._id }, { $set: { transcript: entries } });
+	} catch (error) {
+		console.error("[TICKETS]", error);
+	}
+
+	// 3. Renomeia o canal.
+	try {
+		await client.rest.channels.edit(ticket.channelId, { name: closedChannelName(ticket.number) });
+	} catch (error) {
+		console.error("[TICKETS]", error);
+	}
+
+	// 4. O jogador continua vendo o canal, mas não escreve mais.
+	try {
+		await client.rest.channels.editPermission(ticket.channelId, ticket.userId, {
+			type: OverwriteTypes.MEMBER,
+			allow: CLOSED_PLAYER_ALLOW,
+			deny: CLOSED_PLAYER_DENY,
+		});
+	} catch (error) {
+		console.error("[TICKETS]", error);
+	}
+
+	// 5. Aviso no canal.
+	try {
+		await client.rest.channels.createMessage(ticket.channelId, {
+			content: `Ticket fechado por <@${closedById}>. Este canal será apagado em ${config.deleteAfterHours}h.`,
+			allowedMentions: {},
+		});
+	} catch (error) {
+		console.error("[TICKETS]", error);
+	}
+
+	// 6. Log da staff com a transcrição em .txt.
+	try {
+		const categoryLabel = getCategory(ticket.category)?.label ?? ticket.category;
+		const transcriptText = formatTranscript(
+			{
+				number: ticket.number,
+				categoryLabel,
+				userTag: await fetchUserTag(client, ticket.userId),
+				openedAt: ticket.createdAt,
+				closedAt,
+				truncated,
+			},
+			entries,
+		);
+		const summary = {
+			number: ticket.number,
+			categoryLabel,
+			userId: ticket.userId,
+			claimedBy: ticket.claimedBy,
+			closedBy: closedById,
+			openedAt: ticket.createdAt,
+			closedAt,
+		};
+		await client.rest.channels.createMessage(config.logChannelId, logMessage(summary, transcriptText));
+	} catch (error) {
+		console.error("[TICKETS]", error);
+	}
+
+	return { ok: true };
+}
+
+export async function purgeExpiredChannels(client: DGClient): Promise<number> {
+	const expired = await Ticket.find({ status: "closed", deleteAt: { $lte: new Date() }, channelDeletedAt: null });
+	let deleted = 0;
+
+	for (const ticket of expired) {
+		try {
+			try {
+				await client.rest.channels.delete(ticket.channelId);
+			} catch (error) {
+				// 404: o canal já não existe, conta como apagado.
+				if (!(error instanceof DiscordRESTError && error.status === HTTP_NOT_FOUND)) {
+					throw error;
+				}
+			}
+			await Ticket.updateOne({ _id: ticket._id }, { $set: { channelDeletedAt: new Date() } });
+			deleted++;
+		} catch (error) {
+			console.error("[TICKETS]", error);
+		}
+	}
+
+	return deleted;
 }

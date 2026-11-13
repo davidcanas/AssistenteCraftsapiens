@@ -4,6 +4,7 @@ import { parseTicketsConfig, type TicketsConfig } from "./config";
 import { TICKET_PREFIX } from "./customIds";
 import { routeTicketInteraction } from "./handlers";
 import { syncCounter } from "./model";
+import { startScheduler } from "./scheduler";
 
 let cachedConfig: TicketsConfig | null | undefined;
 
@@ -42,5 +43,6 @@ export async function startTickets(client: DGClient): Promise<void> {
 		return;
 	}
 	await syncCounter(config.startNumber);
+	startScheduler(client);
 	console.log(`[TICKETS] Sistema de tickets ativo para ${client.user.username}.`);
 }

@@ -7,11 +7,24 @@ import type DGClient from "../../structures/Client";
 import { getCategory } from "./categories";
 import { parseCustomId } from "./customIds";
 import { isStaff, type TicketsConfig } from "./config";
-import { buildPlayerProfile, claimTicket, findOpenTicket, findTicketById, openTicket, toWelcomeView, type OpenResult } from "./service";
-import { categoryModal, profileEmbed, welcomeMessage, type TicketAnswer } from "./views";
+import type { TicketDoc } from "./model";
+import {
+	buildPlayerProfile,
+	claimTicket,
+	closeTicket,
+	findOpenTicket,
+	findTicketById,
+	openTicket,
+	toWelcomeView,
+	type CloseResult,
+	type OpenResult,
+} from "./service";
+import { categoryModal, closeConfirmMessage, profileEmbed, welcomeMessage, type TicketAnswer } from "./views";
 
 const GENERIC_ERROR = "Não foi possível concluir agora. Tente novamente em alguns minutos.";
 const OPEN_FAILED = "Não foi possível abrir o ticket agora, tente em alguns minutos.";
+const TICKET_NOT_FOUND = "Ticket não encontrado.";
+const CANNOT_CLOSE = "Você não pode fechar este ticket.";
 
 function alreadyOpenText(channelId: string): string {
 	return `Você já tem um ticket aberto: <#${channelId}>`;
@@ -111,6 +124,66 @@ async function handleProfileButton(
 	await interaction.editOriginal({ embeds: [profileEmbed(profile)] });
 }
 
+function canClose(config: TicketsConfig, interaction: ComponentInteraction, ticket: TicketDoc): boolean {
+	return ticket.userId === interaction.user.id || memberIsStaff(config, interaction);
+}
+
+function closeResultText(result: CloseResult): string {
+	if (!("reason" in result)) {
+		return "Ticket fechado.";
+	}
+	return result.reason === "already-closed" ? "Este ticket já estava fechado." : TICKET_NOT_FOUND;
+}
+
+async function handleCloseButton(config: TicketsConfig, interaction: ComponentInteraction, arg: string | null): Promise<void> {
+	if (arg === null) {
+		await replyEphemeral(interaction, GENERIC_ERROR);
+		return;
+	}
+
+	await interaction.defer(MessageFlags.EPHEMERAL);
+
+	const ticket = await findTicketById(arg);
+	if (!ticket) {
+		await interaction.editOriginal({ content: TICKET_NOT_FOUND });
+		return;
+	}
+	if (!canClose(config, interaction, ticket)) {
+		await interaction.editOriginal({ content: CANNOT_CLOSE });
+		return;
+	}
+
+	const { content, components } = closeConfirmMessage(String(ticket._id));
+	await interaction.editOriginal({ content, components });
+}
+
+async function handleCloseConfirmButton(
+	client: DGClient,
+	config: TicketsConfig,
+	interaction: ComponentInteraction,
+	arg: string | null,
+): Promise<void> {
+	if (arg === null) {
+		await replyEphemeral(interaction, GENERIC_ERROR);
+		return;
+	}
+
+	await interaction.deferUpdate();
+
+	const ticket = await findTicketById(arg);
+	if (!ticket) {
+		await interaction.editOriginal({ content: TICKET_NOT_FOUND, components: [] });
+		return;
+	}
+	if (!canClose(config, interaction, ticket)) {
+		await interaction.editOriginal({ content: CANNOT_CLOSE, components: [] });
+		return;
+	}
+
+	const result = await closeTicket(client, config, arg, interaction.user.id);
+	await interaction.editOriginal({ content: closeResultText(result), components: [] });
+}
+
 async function handleModalSubmit(
 	client: DGClient,
 	config: TicketsConfig,
@@ -165,8 +238,11 @@ export async function routeTicketInteraction(
 				await handleClaimButton(config, interaction, parsed.arg);
 			} else if (parsed.action === "profile") {
 				await handleProfileButton(client, config, interaction, guildId, parsed.arg);
+			} else if (parsed.action === "close") {
+				await handleCloseButton(config, interaction, parsed.arg);
+			} else if (parsed.action === "close-confirm") {
+				await handleCloseConfirmButton(client, config, interaction, parsed.arg);
 			}
-			// As demais ações de botão (close, close-confirm) chegam nas próximas etapas.
 			return;
 		}
 
