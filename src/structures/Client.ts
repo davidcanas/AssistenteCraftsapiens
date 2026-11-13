@@ -199,10 +199,18 @@ export default class DGClient extends Client {
 		console.log("\x1b[32m[CLIENT] Os comandos foram carregados.");
 	}
 	loadEvents(): void {
+		const testMode = process.env.DEVELOPMENT === "true";
+		const testEvents = ["ready", "interactionCreate", "error", "warn"];
+		if (testMode) {
+			console.log(
+				"[33m[CLIENT] Modo de teste: carregando só ready, interactionCreate, error e warn.",
+			);
+		}
 		for (const file of fs.readdirSync(
 			path.resolve(__dirname, "..", "events"),
 		)) {
 			if (file.endsWith(".ts") || file.endsWith(".js")) {
+				if (testMode && !testEvents.includes(file.split(".")[0])) continue;
 				const event = new (require(`../events/${file}`).default)(this);
 				const eventName = file.split(".")[0] as keyof ClientEvents;
 
