@@ -1,8 +1,8 @@
-export type TicketAction = "open" | "modal" | "claim" | "profile" | "close" | "close-confirm";
-
 export const TICKET_PREFIX = "ticket:";
 
-const TICKET_ACTIONS: readonly TicketAction[] = ["open", "modal", "claim", "profile", "close", "close-confirm"];
+const TICKET_ACTIONS = ["open", "modal", "claim", "profile", "close", "close-confirm", "rate"] as const;
+
+export type TicketAction = typeof TICKET_ACTIONS[number];
 
 export function buildCustomId(action: TicketAction, arg?: string): string {
 	return arg === undefined ? `${TICKET_PREFIX}${action}` : `${TICKET_PREFIX}${action}:${arg}`;

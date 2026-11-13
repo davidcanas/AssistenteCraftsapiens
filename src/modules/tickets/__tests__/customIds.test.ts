@@ -28,3 +28,7 @@ test("parseCustomId rejects foreign or unknown ids", () => {
 test("close-confirm custom id fits Discord's 100 char limit", () => {
 	assert.ok(buildCustomId("close-confirm", "a".repeat(24)).length <= 100);
 });
+
+test("parseCustomId reads rate", () => {
+	assert.deepEqual(parseCustomId("ticket:rate:t1:0:2"), { action: "rate", arg: "t1:0:2" });
+});

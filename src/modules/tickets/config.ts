@@ -4,6 +4,7 @@ export interface TicketsConfig {
 	logChannelId: string;
 	startNumber: number;
 	deleteAfterHours: number;
+	summaryChannelId: string | null;
 }
 
 export interface ConfigResult {
@@ -57,10 +58,12 @@ export function parseTicketsConfig(env: Record<string, string | undefined>): Con
 		deleteAfterHours = parsed;
 	}
 
+	const summaryChannelId = (env.TICKETS_SUMMARY_CHANNEL_ID ?? "").trim() || null;
+
 	const guildId = (env.GUILD_ID ?? "").trim() || DEFAULT_GUILD_ID;
 
 	return {
-		config: { guildId, staffRoleIds, logChannelId, startNumber, deleteAfterHours },
+		config: { guildId, staffRoleIds, logChannelId, startNumber, deleteAfterHours, summaryChannelId },
 		error: null,
 	};
 }
