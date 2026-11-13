@@ -50,10 +50,10 @@ O novo sistema mantém a aparência que jogadores e staff já conhecem (um canal
 ## 5. Como funciona (fluxo)
 
 ### 5.1 Painel
-- Um staff com permissão `Gerenciar Servidor` usa `/ticket painel` num canal. O bot publica um embed "Precisa de ajuda?" com um **menu de seleção** dos tipos de ticket.
+- Um staff com permissão `Gerenciar Servidor` usa `/ticket painel` num canal. O bot publica um embed "Precisa de ajuda?" com **5 botões**, um por tipo de ticket.
 
 ### 5.2 Abertura
-1. O jogador escolhe um tipo no menu.
+1. O jogador clica no botão do tipo.
 2. Se ele já tem um ticket aberto, recebe uma resposta efêmera com o link do ticket existente, e nada é criado.
 3. Senão, abre um **modal** com os campos do tipo:
 
@@ -108,7 +108,7 @@ src/modules/tickets/
   scheduler.ts     apaga canais fechados vencidos
   index.ts         API pública: isTicketInteraction, handleTicketInteraction, startTickets
 ```
-- Os IDs de componentes seguem o formato `ticket:<ação>[:<id>]`, por exemplo `ticket:open`, `ticket:modal:<tipo>`, `ticket:claim:<ticketId>`, `ticket:close:<ticketId>`, `ticket:close-confirm:<ticketId>`, `ticket:profile:<ticketId>`.
+- Os IDs de componentes seguem o formato `ticket:<ação>[:<id>]`, por exemplo `ticket:open:<tipo>`, `ticket:modal:<tipo>`, `ticket:claim:<ticketId>`, `ticket:close:<ticketId>`, `ticket:close-confirm:<ticketId>`, `ticket:profile:<ticketId>`.
 - Todo handler roda dentro de `try/catch`. Um erro é logado com o prefixo `[TICKETS]` e o usuário recebe uma resposta efêmera "Não foi possível…". Nada sobe para o processo.
 
 ### 6.2 Dados (`model.ts`)
@@ -174,7 +174,7 @@ Se o módulo estiver ligado e faltar uma variável obrigatória, o `config.ts` l
 
 ## 8. Decisões tomadas pelo Claude (o dono pode corrigir)
 1. Ficha por botão efêmero só para a staff, em vez de embed fixo no topo do canal, porque o canal é compartilhado com o jogador e as punições não devem ficar expostas.
-2. Painel com menu de seleção (5 tipos) em vez de um botão por tipo.
+2. Painel com 5 botões, um por tipo. O menu de seleção foi descartado porque, quando o jogador fecha o formulário sem enviar, o menu fica preso na opção escolhida e não dá para escolher a mesma de novo.
 3. Fechamento: o canal vira `closed-NNNN` e é apagado 24h depois (configurável). A transcrição vai para o canal de log e para o banco.
 4. Um ticket aberto por jogador, contando todos os tipos.
 5. Numeração: contador próprio no banco que só sobe, começando uns 100 acima do último número do bot antigo, para não colidir durante a etapa 2.
