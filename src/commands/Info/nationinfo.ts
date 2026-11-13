@@ -71,7 +71,7 @@ export default class nationinfo extends Command {
                 .setFooter("Assistente | Craftsapiens")
                 .setColor(parseInt(nation.data.mapColor, 16))
                 .setThumbnail(`https://mineskin.eu/armor/bust/${nation.data.leader}/100.png`)
-                .setURL("http://jogar.craftsapiens.com.br:50024/mapa/iframe?nationName=" + nation.data.name);
+                .setURL("https://assistente.craftsapiens.com.br/mapa/iframe?nationName=" + nation.data.name);
 
             ctx.sendMessage({ embeds: [embed] });
         } catch (err) {

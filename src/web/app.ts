@@ -33,7 +33,7 @@ passport.serializeUser(function(user, done) {
   passport.use(new Strategy({
     clientID: "734297444744953907",
     clientSecret: process.env.SECRET,
-    callbackURL: "http://" + process.env.LOCAL_IP + ":" + port + "/callback",
+    callbackURL: "https://" + process.env.LOCAL_IP + "/callback",
 
     scope: scopes
   }, function(accessToken, refreshToken, profile, done) {
