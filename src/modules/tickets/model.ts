@@ -1,0 +1,100 @@
+import { Schema, model, type Document, type Model } from "mongoose";
+import { TICKET_CATEGORIES, type TicketCategoryId } from "./categories";
+import type { TranscriptEntry } from "./transcript";
+import type { TicketAnswer } from "./views";
+
+export interface TicketDoc extends Document {
+	number: number;
+	guildId: string;
+	channelId: string;
+	userId: string;
+	category: TicketCategoryId;
+	answers: TicketAnswer[];
+	status: "open" | "closed";
+	claimedBy: string | null;
+	closedBy: string | null;
+	createdAt: Date;
+	claimedAt: Date | null;
+	closedAt: Date | null;
+	deleteAt: Date | null;
+	channelDeletedAt: Date | null;
+	transcript: TranscriptEntry[];
+}
+
+const answerSchema = new Schema<TicketAnswer>(
+	{
+		label: { type: String, required: true },
+		value: { type: String, default: "" },
+	},
+	{ _id: false },
+);
+
+const transcriptEntrySchema = new Schema<TranscriptEntry>(
+	{
+		authorId: { type: String, required: true },
+		authorTag: { type: String, required: true },
+		content: { type: String, default: "" },
+		attachments: { type: [String], default: [] },
+		createdAt: { type: Date, required: true },
+	},
+	{ _id: false },
+);
+
+const ticketSchema = new Schema<TicketDoc>(
+	{
+		number: { type: Number, required: true },
+		guildId: { type: String, required: true },
+		channelId: { type: String, required: true },
+		userId: { type: String, required: true },
+		category: { type: String, required: true, enum: TICKET_CATEGORIES.map((category) => category.id) },
+		answers: { type: [answerSchema], default: [] },
+		status: { type: String, required: true, enum: ["open", "closed"], default: "open" },
+		claimedBy: { type: String, default: null },
+		closedBy: { type: String, default: null },
+		createdAt: { type: Date, default: () => new Date() },
+		claimedAt: { type: Date, default: null },
+		closedAt: { type: Date, default: null },
+		deleteAt: { type: Date, default: null },
+		channelDeletedAt: { type: Date, default: null },
+		transcript: { type: [transcriptEntrySchema], default: [] },
+	},
+	{ versionKey: false },
+);
+
+ticketSchema.index({ guildId: 1, userId: 1, status: 1 });
+
+export const Ticket: Model<TicketDoc> = model<TicketDoc>("Ticket", ticketSchema);
+
+interface TicketCounterDoc {
+	_id: string;
+	seq: number;
+}
+
+const COUNTER_ID = "ticket";
+
+const counterSchema = new Schema<TicketCounterDoc>(
+	{
+		_id: { type: String, required: true },
+		seq: { type: Number },
+	},
+	{ versionKey: false },
+);
+
+const TicketCounter = model<TicketCounterDoc>("TicketCounter", counterSchema, "TicketCounter");
+
+export async function syncCounter(startNumber: number): Promise<void> {
+	await TicketCounter.updateOne(
+		{ _id: COUNTER_ID },
+		{ $max: { seq: startNumber - 1 } },
+		{ upsert: true },
+	);
+}
+
+export async function nextTicketNumber(): Promise<number> {
+	const counter = await TicketCounter.findOneAndUpdate(
+		{ _id: COUNTER_ID },
+		{ $inc: { seq: 1 } },
+		{ upsert: true, new: true },
+	);
+	return counter.seq;
+}

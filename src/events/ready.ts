@@ -1,4 +1,5 @@
 import Client from "../structures/Client";
+import { startTickets } from "../modules/tickets";
 
 export default class ready {
 	client: Client;
@@ -35,6 +36,8 @@ export default class ready {
 		if (process.env.DEVELOPMENT !== "true") {
 			this.client.connectLavaLink();
 		}
+
+		startTickets(this.client).catch((e) => console.error("[TICKETS]", e));
 
 	}
 }
