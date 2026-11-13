@@ -1,3 +1,4 @@
+import { isValidObjectId } from "mongoose";
 import {
 	ChannelTypes,
 	DiscordRESTError,
@@ -162,7 +163,17 @@ export async function openTicket(
 	}
 }
 
+export async function findTicketById(ticketId: string): Promise<TicketDoc | null> {
+	if (!isValidObjectId(ticketId)) {
+		return null;
+	}
+	return Ticket.findById(ticketId);
+}
+
 export async function claimTicket(ticketId: string, staffId: string): Promise<ClaimResult> {
+	if (!isValidObjectId(ticketId)) {
+		return { ok: false, claimedBy: null, closed: false };
+	}
 	const updated = await Ticket.findOneAndUpdate(
 		{ _id: ticketId, status: "open", claimedBy: null },
 		{ claimedBy: staffId, claimedAt: new Date() },
@@ -172,7 +183,7 @@ export async function claimTicket(ticketId: string, staffId: string): Promise<Cl
 		return { ok: true, ticket: updated };
 	}
 
-	const ticket = await Ticket.findById(ticketId);
+	const ticket = await findTicketById(ticketId);
 	return { ok: false, claimedBy: ticket?.claimedBy ?? null, closed: ticket?.status === "closed" };
 }
 

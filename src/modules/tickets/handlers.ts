@@ -7,8 +7,7 @@ import type DGClient from "../../structures/Client";
 import { getCategory } from "./categories";
 import { parseCustomId } from "./customIds";
 import { isStaff, type TicketsConfig } from "./config";
-import { buildPlayerProfile, claimTicket, findOpenTicket, openTicket, toWelcomeView, type OpenResult } from "./service";
-import { Ticket } from "./model";
+import { buildPlayerProfile, claimTicket, findOpenTicket, findTicketById, openTicket, toWelcomeView, type OpenResult } from "./service";
 import { categoryModal, profileEmbed, welcomeMessage, type TicketAnswer } from "./views";
 
 const GENERIC_ERROR = "Não foi possível concluir agora. Tente novamente em alguns minutos.";
@@ -66,20 +65,19 @@ async function handleClaimButton(config: TicketsConfig, interaction: ComponentIn
 		return;
 	}
 
+	await interaction.deferUpdate();
 	const result = await claimTicket(arg, interaction.user.id);
 	if ("ticket" in result) {
 		const { content, allowedMentions, embeds, components } = welcomeMessage(toWelcomeView(result.ticket, config.staffRoleIds));
-		await interaction.editParent({ content, allowedMentions, embeds, components });
+		await interaction.editOriginal({ content, allowedMentions, embeds, components });
 		return;
 	}
-	if (result.closed) {
-		await replyEphemeral(interaction, "Este ticket está fechado.");
-		return;
-	}
-	await replyEphemeral(
-		interaction,
-		result.claimedBy ? `Este ticket já está sendo atendido por <@${result.claimedBy}>.` : GENERIC_ERROR,
-	);
+	const text = result.closed
+		? "Este ticket está fechado."
+		: result.claimedBy
+			? `Este ticket já está sendo atendido por <@${result.claimedBy}>.`
+			: GENERIC_ERROR;
+	await interaction.createFollowup({ content: text, flags: MessageFlags.EPHEMERAL });
 }
 
 async function handleProfileButton(
@@ -99,7 +97,7 @@ async function handleProfileButton(
 
 	await interaction.defer(MessageFlags.EPHEMERAL);
 
-	const ticket = await Ticket.findById(arg);
+	const ticket = await findTicketById(arg);
 	const guild = client.guilds.get(guildId);
 	if (!ticket || !guild) {
 		await interaction.editOriginal({ content: GENERIC_ERROR });
