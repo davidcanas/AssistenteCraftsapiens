@@ -7,7 +7,7 @@ import type DGClient from "../../structures/Client";
 import { deleteReplyLater } from "./autoDelete";
 import { getCategory, type TicketAnswer } from "./categories";
 import { parseCustomId } from "./customIds";
-import { memberIsStaff, type TicketsConfig } from "./config";
+import { memberCanTakeEscalation, memberIsStaff, type TicketsConfig } from "./config";
 import type { TicketDoc } from "./model";
 import {
 	answerSurvey,
@@ -18,6 +18,8 @@ import {
 	findTicketById,
 	MAX_OPEN_TICKETS,
 	openTicket,
+	requestEscalation,
+	takeEscalation,
 	toWelcomeView,
 	type CloseResult,
 	type OpenResult,
@@ -26,6 +28,7 @@ import { surveyMessageAt } from "./survey";
 import {
 	categoryModal,
 	closeConfirmMessage,
+	escalationClaimedMessage,
 	openConfirmMessage,
 	openLimitText,
 	panelMessage,
@@ -155,6 +158,64 @@ async function handleProfileButton(
 
 	const profile = await buildPlayerProfile(client, guild, ticket.userId);
 	await interaction.editOriginal({ embeds: [profileEmbed(profile)] });
+}
+
+async function handleEscalateButton(
+	client: DGClient,
+	config: TicketsConfig,
+	interaction: ComponentInteraction,
+	arg: string | null,
+): Promise<void> {
+	if (!memberIsStaff(interaction.member, config)) {
+		await replyEphemeral(interaction, "Só a staff pode chamar um superior.");
+		return;
+	}
+	if (!config.escalationChannelId) {
+		await replyEphemeral(interaction, "Chamar superior não está configurado (TICKETS_ESCALATION_CHANNEL_ID).");
+		return;
+	}
+	if (arg === null) {
+		await replyEphemeral(interaction, GENERIC_ERROR);
+		return;
+	}
+
+	await interaction.defer(MessageFlags.EPHEMERAL);
+	const result = await requestEscalation(client, config, arg, interaction.user.id);
+	const text = "ticket" in result
+		? "Pedido enviado aos superiores. O jogador não vê esse pedido."
+		: result.reason === "closed" ? "Este ticket está fechado." : TICKET_NOT_FOUND;
+	await interaction.editOriginal({ content: text });
+}
+
+async function handleEscalateClaimButton(
+	client: DGClient,
+	config: TicketsConfig,
+	interaction: ComponentInteraction,
+	arg: string | null,
+): Promise<void> {
+	if (!memberCanTakeEscalation(interaction.member, config)) {
+		await replyEphemeral(interaction, "Só superiores podem assumir este pedido.");
+		return;
+	}
+	const [ticketId, requestedBy] = arg === null ? [] : arg.split(":");
+	if (!ticketId || !requestedBy) {
+		await replyEphemeral(interaction, GENERIC_ERROR);
+		return;
+	}
+
+	await interaction.deferUpdate();
+	const result = await takeEscalation(client, config, ticketId, interaction.user.id);
+	if (!("ticket" in result)) {
+		const text = result.reason === "closed" ? "Este ticket já foi fechado." : TICKET_NOT_FOUND;
+		await interaction.createFollowup({ content: text, flags: MessageFlags.EPHEMERAL });
+		return;
+	}
+
+	const { ticket } = result;
+	const view = { ticketId, number: ticket.number, channelId: ticket.channelId, requestedBy, roleIds: config.escalationRoleIds };
+	const { embeds, components } = escalationClaimedMessage(view, interaction.user.id);
+	await interaction.editOriginal({ embeds, components });
+	await interaction.createFollowup({ content: `Você assumiu: <#${ticket.channelId}>`, flags: MessageFlags.EPHEMERAL });
 }
 
 function canClose(config: TicketsConfig, interaction: ComponentInteraction, ticket: TicketDoc): boolean {
@@ -316,6 +377,12 @@ export async function routeTicketInteraction(
 					return;
 				case "rate":
 					await handleRateButton(interaction, parsed.arg);
+					return;
+				case "escalate":
+					await handleEscalateButton(client, config, interaction, parsed.arg);
+					return;
+				case "escalate-claim":
+					await handleEscalateClaimButton(client, config, interaction, parsed.arg);
 					return;
 			}
 		} else if (parsed.action === "modal") {

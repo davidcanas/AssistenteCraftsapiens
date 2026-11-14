@@ -12,6 +12,8 @@ export interface TicketDoc extends Document {
 	answers: TicketAnswer[];
 	status: "open" | "closed";
 	claimedBy: string | null;
+	// Superiores que assumiram um "Chamar superior" (o atendente original continua em claimedBy).
+	helpers: string[];
 	closedBy: string | null;
 	createdAt: Date;
 	claimedAt: Date | null;
@@ -61,6 +63,7 @@ const ticketSchema = new Schema<TicketDoc>(
 		answers: { type: [answerSchema], default: [] },
 		status: { type: String, required: true, enum: ["open", "closed"], default: "open" },
 		claimedBy: { type: String, default: null },
+		helpers: { type: [String], default: [] },
 		closedBy: { type: String, default: null },
 		createdAt: { type: Date, default: () => new Date() },
 		claimedAt: { type: Date, default: null },

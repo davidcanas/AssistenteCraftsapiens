@@ -61,13 +61,18 @@ export function surveyQuestionMessage(ticketId: string, index: number): CreateMe
 	};
 }
 
+/** Primeira pergunta, enviada no fechamento: marca o jogador para ele ver a avaliação. */
+export function surveyOpeningMessage(ticketId: string, userId: string): CreateMessageOptions {
+	return { ...surveyQuestionMessage(ticketId, 0), content: `<@${userId}>`, allowedMentions: { users: [userId] } };
+}
+
 export function surveyDoneMessage(): CreateMessageOptions {
 	return {
 		content: "",
 		embeds: [{
 			title: "✅ Avaliação registrada",
 			color: COLOR_PRIMARY,
-			description: "Obrigado! Sua opinião ajuda a melhorar o suporte.",
+			description: "Obrigado! Sua opinião ajuda a melhorar o suporte.\nEste canal será apagado em instantes.",
 		}],
 		components: [],
 	};

@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { SURVEY_QUESTIONS, surveyDoneMessage, surveyMessageAt, surveyQuestionMessage, previousMonthRange, summarizeMonth, monthlySummaryEmbed } from "../survey";
+import { SURVEY_QUESTIONS, surveyDoneMessage, surveyOpeningMessage, surveyMessageAt, surveyQuestionMessage, previousMonthRange, summarizeMonth, monthlySummaryEmbed } from "../survey";
 import { COLOR_PRIMARY, EMPTY } from "../style";
 
 function customIds(message: ReturnType<typeof surveyQuestionMessage>): string[] {
@@ -47,6 +47,14 @@ test("done message has no components", () => {
 	assert.deepEqual(m.components, []);
 	assert.equal(m.content, "");
 	assert.equal(m.embeds?.[0].title, "✅ Avaliação registrada");
+	assert.ok(m.embeds?.[0].description?.includes("apagado"));
+});
+
+test("opening message pings the player on the first question", () => {
+	const m = surveyOpeningMessage("t1", "u1");
+	assert.equal(m.content, "<@u1>");
+	assert.deepEqual(m.allowedMentions, { users: ["u1"] });
+	assert.deepEqual(m.components, surveyQuestionMessage("t1", 0).components);
 });
 
 test("previousMonthRange", () => {

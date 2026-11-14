@@ -12,11 +12,13 @@ import type DGClient from "../../structures/Client";
 import { getCategory, type TicketAnswer, type TicketCategory } from "./categories";
 import type { TicketsConfig } from "./config";
 import { Ticket, nextTicketNumber, type TicketDoc } from "./model";
-import { SURVEY_QUESTIONS, monthlySummaryEmbed, previousMonthRange, summarizeMonth, surveyQuestionMessage } from "./survey";
+import { SURVEY_QUESTIONS, monthlySummaryEmbed, previousMonthRange, summarizeMonth, surveyOpeningMessage } from "./survey";
+import { withTimeout } from "./timeout";
 import { MAX_TRANSCRIPT_MESSAGES, formatTranscript, type TranscriptEntry } from "./transcript";
 import {
 	closedChannelName,
 	closedNoticeMessage,
+	escalationMessage,
 	logMessage,
 	ticketChannelName,
 	welcomeMessage,
@@ -44,12 +46,16 @@ export type SurveyResult =
 
 export type CloseResult = { ok: true } | { ok: false; reason: "not-found" | "already-closed" };
 
+export type EscalationResult = { ok: true; ticket: TicketDoc } | { ok: false; reason: "not-found" | "closed" };
+
 type PunishmentEntry = Exclude<PlayerProfile["punishments"], "unavailable">["last"][number];
 
 const FAILED: OpenResult = { ok: false, reason: "failed" };
 const HTTP_NOT_FOUND = 404;
 const MS_PER_HOUR = 3_600_000;
 const MESSAGES_PAGE_SIZE = 100;
+// A API do jogo pode não responder nunca: sem limite a Ficha ficava carregando para sempre.
+const PROFILE_TIMEOUT_MS = 5_000;
 
 const PLAYER_PERMISSIONS =
 	Permissions.VIEW_CHANNEL |
@@ -97,6 +103,7 @@ export function toWelcomeView(ticket: TicketDoc, staffRoleIds: string[]): Welcom
 		answers: ticket.answers,
 		staffRoleIds,
 		claimedBy: ticket.claimedBy,
+		helpers: ticket.helpers ?? [],
 		closed: ticket.status === "closed",
 	};
 }
@@ -267,15 +274,15 @@ async function fetchPunishments(client: DGClient, nick: string): Promise<PlayerP
 }
 
 export async function buildPlayerProfile(client: DGClient, guild: Guild, userId: string): Promise<PlayerProfile> {
-	const nick = await fetchNick(client, guild, userId);
+	const nick = await withTimeout(fetchNick(client, guild, userId), PROFILE_TIMEOUT_MS).catch(() => null);
 	if (nick === null) {
 		return { userId, nick, linked: false, api: "unavailable", punishments: "unavailable" };
 	}
 
 	const [linked, api, punishments] = await Promise.allSettled([
 		(async () => !!client.getDiscordByNick(nick))(),
-		fetchApiProfile(client, nick),
-		fetchPunishments(client, nick),
+		withTimeout(fetchApiProfile(client, nick), PROFILE_TIMEOUT_MS),
+		withTimeout(fetchPunishments(client, nick), PROFILE_TIMEOUT_MS),
 	]);
 
 	return {
@@ -399,6 +406,7 @@ export async function closeTicket(client: DGClient, config: TicketsConfig, ticke
 			categoryLabel,
 			userId: ticket.userId,
 			claimedBy: ticket.claimedBy,
+			helpers: ticket.helpers ?? [],
 			closedBy: closedById,
 			openedAt: ticket.createdAt,
 			closedAt,
@@ -408,14 +416,65 @@ export async function closeTicket(client: DGClient, config: TicketsConfig, ticke
 		console.error("[TICKETS]", error);
 	}
 
-	// 7. Pergunta secreta de avaliação para o jogador.
+	// 7. Pergunta secreta de avaliação para o jogador (marcando-o).
 	try {
-		await client.rest.channels.createMessage(ticket.channelId, surveyQuestionMessage(String(ticket._id), 0));
+		await client.rest.channels.createMessage(ticket.channelId, surveyOpeningMessage(String(ticket._id), ticket.userId));
 	} catch (error) {
 		console.error("[TICKETS]", error);
 	}
 
 	return { ok: true };
+}
+
+/** Manda o pedido de superior no canal da staff (o jogador não vê). */
+export async function requestEscalation(client: DGClient, config: TicketsConfig, ticketId: string, requestedBy: string): Promise<EscalationResult> {
+	const ticket = await findTicketById(ticketId);
+	if (!ticket) {
+		return { ok: false, reason: "not-found" };
+	}
+	if (ticket.status !== "open") {
+		return { ok: false, reason: "closed" };
+	}
+	await client.rest.channels.createMessage(config.escalationChannelId, escalationMessage({
+		ticketId: String(ticket._id),
+		number: ticket.number,
+		channelId: ticket.channelId,
+		requestedBy,
+		roleIds: config.escalationRoleIds,
+	}));
+	return { ok: true, ticket };
+}
+
+/** Superior assume: entra no canal (se o cargo dele não tiver acesso) e no "Atendido por" do card. */
+export async function takeEscalation(client: DGClient, config: TicketsConfig, ticketId: string, staffId: string): Promise<EscalationResult> {
+	if (!isValidObjectId(ticketId)) {
+		return { ok: false, reason: "not-found" };
+	}
+	const ticket = await Ticket.findOneAndUpdate(
+		{ _id: ticketId, status: "open" },
+		{ $addToSet: { helpers: staffId } },
+		{ new: true },
+	);
+	if (!ticket) {
+		return { ok: false, reason: (await findTicketById(ticketId)) ? "closed" : "not-found" };
+	}
+
+	try {
+		await client.rest.channels.editPermission(ticket.channelId, staffId, { type: OverwriteTypes.MEMBER, allow: STAFF_PERMISSIONS });
+	} catch (error) {
+		console.error("[TICKETS]", error);
+	}
+
+	if (ticket.welcomeMessageId) {
+		try {
+			const { embeds, components } = welcomeMessage(toWelcomeView(ticket, config.staffRoleIds));
+			await client.rest.channels.editMessage(ticket.channelId, ticket.welcomeMessageId, { embeds, components });
+		} catch (error) {
+			console.error("[TICKETS]", error);
+		}
+	}
+
+	return { ok: true, ticket };
 }
 
 export async function answerSurvey(ticketId: string, userId: string, index: number, value: number): Promise<SurveyResult> {
@@ -424,9 +483,15 @@ export async function answerSurvey(ticketId: string, userId: string, index: numb
 		return { ok: false, reason: "ignored", answered: null };
 	}
 
+	const now = new Date();
+	// Última resposta: o canal já foi transcrito no fechamento, então a limpeza (a cada minuto) o apaga.
+	const isLast = index === SURVEY_QUESTIONS.length - 1;
 	const updated = await Ticket.findOneAndUpdate(
 		{ _id: ticketId, userId, status: "closed", survey: { $size: index } },
-		{ $push: { survey: { questionId: question.id, value, answeredAt: new Date() } } },
+		{
+			$push: { survey: { questionId: question.id, value, answeredAt: now } },
+			...(isLast ? { $set: { deleteAt: now } } : {}),
+		},
 		{ new: true, projection: { _id: 1 } },
 	);
 	if (updated) {

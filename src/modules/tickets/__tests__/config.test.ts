@@ -12,6 +12,7 @@ test("disabled when TICKETS_ENABLED is absent or not 'true'", () => {
 test("applies defaults", () => {
 	assert.deepEqual(parseTicketsConfig(base), { error: null, config: {
 		guildId: "892472046729179136", staffRoleIds: ["1", "2"], logChannelId: "9", startNumber: 8917, deleteAfterHours: 24, summaryChannelId: null,
+		escalationChannelId: null, escalationRoleIds: [],
 	} });
 });
 
@@ -24,6 +25,12 @@ test("reads overrides", () => {
 
 test("reads summary channel", () => {
 	assert.equal(parseTicketsConfig({ ...base, TICKETS_SUMMARY_CHANNEL_ID: "77" }).config?.summaryChannelId, "77");
+});
+
+test("reads escalation channel and roles", () => {
+	const { config } = parseTicketsConfig({ ...base, TICKETS_ESCALATION_CHANNEL_ID: " 55 ", TICKETS_ESCALATION_ROLE_IDS: "7, 8," });
+	assert.equal(config?.escalationChannelId, "55");
+	assert.deepEqual(config?.escalationRoleIds, ["7", "8"]);
 });
 
 test("missing required vars disable with an error naming the var", () => {

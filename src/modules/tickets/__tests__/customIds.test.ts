@@ -37,3 +37,8 @@ test("parseCustomId reads open-confirm and open-cancel", () => {
 test("parseCustomId reads rate", () => {
 	assert.deepEqual(parseCustomId("ticket:rate:t1:0:2"), { action: "rate", arg: "t1:0:2" });
 });
+
+test("parseCustomId reads escalate and escalate-claim", () => {
+	assert.deepEqual(parseCustomId("ticket:escalate:t1"), { action: "escalate", arg: "t1" });
+	assert.deepEqual(parseCustomId("ticket:escalate-claim:t1"), { action: "escalate-claim", arg: "t1" });
+});
