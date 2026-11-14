@@ -1,8 +1,7 @@
 import { Schema, model, type Document, type Model } from "mongoose";
-import { TICKET_CATEGORIES, type TicketCategoryId } from "./categories";
+import { TICKET_CATEGORIES, type TicketAnswer, type TicketCategoryId } from "./categories";
 import type { SurveyAnswer } from "./survey";
 import type { TranscriptEntry } from "./transcript";
-import type { TicketAnswer } from "./views";
 
 export interface TicketDoc extends Document {
 	number: number;
@@ -102,10 +101,12 @@ export async function syncCounter(startNumber: number): Promise<void> {
 	);
 }
 
-export async function nextTicketNumber(): Promise<number> {
+export async function nextTicketNumber(startNumber: number): Promise<number> {
+	// Pipeline atômico: aplica o piso (startNumber - 1) e incrementa na mesma operação,
+	// então a numeração nunca recomeça do 1, mesmo se o syncCounter do boot falhar.
 	const counter = await TicketCounter.findOneAndUpdate(
 		{ _id: COUNTER_ID },
-		{ $inc: { seq: 1 } },
+		[{ $set: { seq: { $add: [{ $max: [{ $ifNull: ["$seq", 0] }, startNumber - 1] }, 1] } } }],
 		{ upsert: true, new: true },
 	);
 	return counter.seq;

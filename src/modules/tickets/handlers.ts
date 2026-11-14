@@ -4,9 +4,9 @@ import {
 	type ModalSubmitInteraction,
 } from "oceanic.js";
 import type DGClient from "../../structures/Client";
-import { getCategory } from "./categories";
+import { getCategory, type TicketAnswer } from "./categories";
 import { parseCustomId } from "./customIds";
-import { isStaff, type TicketsConfig } from "./config";
+import { memberIsStaff, type TicketsConfig } from "./config";
 import type { TicketDoc } from "./model";
 import {
 	answerSurvey,
@@ -20,8 +20,8 @@ import {
 	type CloseResult,
 	type OpenResult,
 } from "./service";
-import { surveyDoneMessage, surveyQuestionMessage } from "./survey";
-import { categoryModal, closeConfirmMessage, profileEmbed, welcomeMessage, type TicketAnswer } from "./views";
+import { surveyMessageAt } from "./survey";
+import { categoryModal, closeConfirmMessage, profileEmbed, welcomeMessage } from "./views";
 
 const GENERIC_ERROR = "Não foi possível concluir agora. Tente novamente em alguns minutos.";
 const OPEN_FAILED = "Não foi possível abrir o ticket agora, tente em alguns minutos.";
@@ -56,24 +56,19 @@ async function handleOpenButton(client: DGClient, interaction: ComponentInteract
 
 	const existing = await findOpenTicket(client, guildId, interaction.user.id);
 	if (existing) {
-		await interaction.createMessage({ content: alreadyOpenText(existing.channelId), flags: MessageFlags.EPHEMERAL });
+		await replyEphemeral(interaction, alreadyOpenText(existing.channelId));
 		return;
 	}
 
 	await interaction.createModal(categoryModal(category));
 }
 
-function memberIsStaff(config: TicketsConfig, interaction: ComponentInteraction): boolean {
-	const member = interaction.member;
-	return !!member && isStaff(member.roles, member.permissions.has("MANAGE_GUILD"), config.staffRoleIds);
-}
-
-async function replyEphemeral(interaction: ComponentInteraction, content: string): Promise<void> {
+async function replyEphemeral(interaction: ComponentInteraction | ModalSubmitInteraction, content: string): Promise<void> {
 	await interaction.createMessage({ content, flags: MessageFlags.EPHEMERAL });
 }
 
 async function handleClaimButton(config: TicketsConfig, interaction: ComponentInteraction, arg: string | null): Promise<void> {
-	if (!memberIsStaff(config, interaction)) {
+	if (!memberIsStaff(interaction.member, config)) {
 		await replyEphemeral(interaction, "Só a staff pode assumir.");
 		return;
 	}
@@ -104,7 +99,7 @@ async function handleProfileButton(
 	guildId: string,
 	arg: string | null,
 ): Promise<void> {
-	if (!memberIsStaff(config, interaction)) {
+	if (!memberIsStaff(interaction.member, config)) {
 		await replyEphemeral(interaction, "Só a staff pode ver a ficha.");
 		return;
 	}
@@ -127,7 +122,7 @@ async function handleProfileButton(
 }
 
 function canClose(config: TicketsConfig, interaction: ComponentInteraction, ticket: TicketDoc): boolean {
-	return ticket.userId === interaction.user.id || memberIsStaff(config, interaction);
+	return ticket.userId === interaction.user.id || memberIsStaff(interaction.member, config);
 }
 
 function closeResultText(result: CloseResult): string {
@@ -197,14 +192,16 @@ async function handleRateButton(interaction: ComponentInteraction, arg: string |
 
 	await interaction.deferUpdate();
 	const result = await answerSurvey(parts[0], interaction.user.id, index, value);
-	if ("reason" in result) {
-		if (result.reason === "not-owner") {
-			await interaction.createFollowup({ content: "Só quem abriu o ticket pode avaliar.", flags: MessageFlags.EPHEMERAL });
-		}
+	if (!("answered" in result)) {
+		await interaction.createFollowup({ content: "Só quem abriu o ticket pode avaliar.", flags: MessageFlags.EPHEMERAL });
+		return;
+	}
+	if (result.answered === null) {
 		return;
 	}
 
-	const { content, components } = result.next === null ? surveyDoneMessage() : surveyQuestionMessage(parts[0], result.next);
+	// Mostra a próxima pergunta pendente (ou a conclusão); nunca repete as respostas.
+	const { content, components } = surveyMessageAt(parts[0], result.answered);
 	await interaction.editOriginal({ content, components });
 }
 
@@ -217,7 +214,7 @@ async function handleModalSubmit(
 ): Promise<void> {
 	const category = arg === null ? undefined : getCategory(arg);
 	if (!category) {
-		await interaction.createMessage({ content: GENERIC_ERROR, flags: MessageFlags.EPHEMERAL });
+		await replyEphemeral(interaction, GENERIC_ERROR);
 		return;
 	}
 
@@ -245,36 +242,46 @@ export async function routeTicketInteraction(
 	interaction: ComponentInteraction | ModalSubmitInteraction,
 ): Promise<void> {
 	try {
+		// Só atende o servidor configurado (e nunca DMs).
 		const guildId = interaction.guildID;
-		if (!guildId) {
+		if (guildId !== config.guildId) {
 			return;
 		}
 
 		const parsed = parseCustomId(interaction.data.customID);
 		if (!parsed) {
+			await replyEphemeral(interaction, GENERIC_ERROR);
 			return;
 		}
 
 		if (interaction instanceof ComponentInteraction) {
-			if (parsed.action === "open") {
-				await handleOpenButton(client, interaction, guildId, parsed.arg);
-			} else if (parsed.action === "claim") {
-				await handleClaimButton(config, interaction, parsed.arg);
-			} else if (parsed.action === "profile") {
-				await handleProfileButton(client, config, interaction, guildId, parsed.arg);
-			} else if (parsed.action === "close") {
-				await handleCloseButton(config, interaction, parsed.arg);
-			} else if (parsed.action === "close-confirm") {
-				await handleCloseConfirmButton(client, config, interaction, parsed.arg);
-			} else if (parsed.action === "rate") {
-				await handleRateButton(interaction, parsed.arg);
+			switch (parsed.action) {
+				case "open":
+					await handleOpenButton(client, interaction, guildId, parsed.arg);
+					return;
+				case "claim":
+					await handleClaimButton(config, interaction, parsed.arg);
+					return;
+				case "profile":
+					await handleProfileButton(client, config, interaction, guildId, parsed.arg);
+					return;
+				case "close":
+					await handleCloseButton(config, interaction, parsed.arg);
+					return;
+				case "close-confirm":
+					await handleCloseConfirmButton(client, config, interaction, parsed.arg);
+					return;
+				case "rate":
+					await handleRateButton(interaction, parsed.arg);
+					return;
 			}
+		} else if (parsed.action === "modal") {
+			await handleModalSubmit(client, config, interaction, guildId, parsed.arg);
 			return;
 		}
 
-		if (parsed.action === "modal") {
-			await handleModalSubmit(client, config, interaction, guildId, parsed.arg);
-		}
+		// customID de ticket válido, mas sem handler para este tipo de interação.
+		await replyEphemeral(interaction, GENERIC_ERROR);
 	} catch (error) {
 		console.error("[TICKETS]", error);
 		const reply = { content: GENERIC_ERROR, flags: MessageFlags.EPHEMERAL };

@@ -1,5 +1,10 @@
 export type TicketCategoryId = "denuncia" | "duvida" | "bug" | "recurso" | "vip";
 
+export interface TicketAnswer {
+	label: string;
+	value: string;
+}
+
 export interface TicketField {
 	id: string;
 	label: string;

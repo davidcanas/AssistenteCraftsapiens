@@ -6,9 +6,10 @@ import {
 	Permissions,
 	type Guild,
 	type OverwriteOptions,
+	type User,
 } from "oceanic.js";
 import type DGClient from "../../structures/Client";
-import { getCategory, type TicketCategory } from "./categories";
+import { getCategory, type TicketAnswer, type TicketCategory } from "./categories";
 import type { TicketsConfig } from "./config";
 import { Ticket, nextTicketNumber, type TicketDoc } from "./model";
 import { SURVEY_QUESTIONS, monthlySummaryEmbed, previousMonthRange, summarizeMonth, surveyQuestionMessage } from "./survey";
@@ -19,7 +20,6 @@ import {
 	ticketChannelName,
 	welcomeMessage,
 	type PlayerProfile,
-	type TicketAnswer,
 	type WelcomeView,
 } from "./views";
 
@@ -32,11 +32,15 @@ export type ClaimResult =
 	| { ok: true; ticket: TicketDoc }
 	| { ok: false; claimedBy: string | null; closed: boolean };
 
-export type SurveyResult = { ok: true; next: number | null } | { ok: false; reason: "not-owner" | "ignored" };
+/** `answered`: quantas perguntas o dono já respondeu (null quando não há o que mostrar). */
+export type SurveyResult =
+	| { ok: true; answered: number }
+	| { ok: false; reason: "not-owner" }
+	| { ok: false; reason: "ignored"; answered: number | null };
 
 export type CloseResult = { ok: true } | { ok: false; reason: "not-found" | "already-closed" };
 
-type PunishmentEntry = { tipo?: string; motivo?: string; horario?: string };
+type PunishmentEntry = Exclude<PlayerProfile["punishments"], "unavailable">["last"][number];
 
 const FAILED: OpenResult = { ok: false, reason: "failed" };
 const HTTP_NOT_FOUND = 404;
@@ -61,6 +65,10 @@ const CLOSED_PLAYER_DENY = Permissions.SEND_MESSAGES;
 
 const opening = new Set<string>();
 
+function isNotFound(error: unknown): boolean {
+	return error instanceof DiscordRESTError && error.status === HTTP_NOT_FOUND;
+}
+
 async function channelExists(client: DGClient, channelId: string): Promise<boolean> {
 	if (client.getChannel(channelId)) {
 		return true;
@@ -69,7 +77,7 @@ async function channelExists(client: DGClient, channelId: string): Promise<boole
 		await client.rest.channels.get(channelId);
 		return true;
 	} catch (error) {
-		if (error instanceof DiscordRESTError && error.status === HTTP_NOT_FOUND) {
+		if (isNotFound(error)) {
 			return false;
 		}
 		throw error;
@@ -131,7 +139,7 @@ export async function openTicket(
 			return { ok: false, reason: "already-open", channelId: existing.channelId };
 		}
 
-		const number = await nextTicketNumber();
+		const number = await nextTicketNumber(config.startNumber);
 		const channel = await p.guild.createChannel(ChannelTypes.GUILD_TEXT, {
 			name: ticketChannelName(number),
 			permissionOverwrites: buildOverwrites(client, p.guild, p.userId, config.staffRoleIds),
@@ -205,21 +213,28 @@ export async function claimTicket(ticketId: string, staffId: string): Promise<Cl
 	return { ok: false, claimedBy: ticket?.claimedBy ?? null, closed: ticket?.status === "closed" };
 }
 
-async function fetchMemberOrUser(client: DGClient, guild: Guild, userId: string): Promise<{ nick: string | null }> {
+async function fetchUser(client: DGClient, userId: string): Promise<User | null> {
+	try {
+		return client.users.get(userId) ?? (await client.rest.users.get(userId));
+	} catch {
+		return null;
+	}
+}
+
+async function fetchUserTag(client: DGClient, userId: string): Promise<string> {
+	return (await fetchUser(client, userId))?.tag ?? userId;
+}
+
+async function fetchNick(client: DGClient, guild: Guild, userId: string): Promise<string | null> {
 	try {
 		const member = guild.members.get(userId) ?? (await guild.getMember(userId));
 		if (member) {
-			return { nick: member.nick ?? member.user.username };
+			return member.nick ?? member.user.username;
 		}
 	} catch {
 		// Saiu do servidor: tenta o usuário abaixo.
 	}
-	try {
-		const user = client.users.get(userId) ?? (await client.rest.users.get(userId));
-		return { nick: user.username };
-	} catch {
-		return { nick: null };
-	}
+	return (await fetchUser(client, userId))?.username ?? null;
 }
 
 async function fetchApiProfile(client: DGClient, nick: string): Promise<PlayerProfile["api"]> {
@@ -243,7 +258,7 @@ async function fetchPunishments(client: DGClient, nick: string): Promise<PlayerP
 }
 
 export async function buildPlayerProfile(client: DGClient, guild: Guild, userId: string): Promise<PlayerProfile> {
-	const { nick } = await fetchMemberOrUser(client, guild, userId);
+	const nick = await fetchNick(client, guild, userId);
 	if (nick === null) {
 		return { userId, nick, linked: false, api: "unavailable", punishments: "unavailable" };
 	}
@@ -288,16 +303,9 @@ async function fetchTranscript(client: DGClient, channelId: string): Promise<{ e
 		before = page[page.length - 1].id;
 	}
 
+	// Grava em ordem cronológica (mais antiga primeiro).
+	entries.reverse();
 	return { entries, truncated: entries.length >= MAX_TRANSCRIPT_MESSAGES && lastPageFull };
-}
-
-async function fetchUserTag(client: DGClient, userId: string): Promise<string> {
-	try {
-		const user = client.users.get(userId) ?? (await client.rest.users.get(userId));
-		return user.tag;
-	} catch {
-		return userId;
-	}
 }
 
 export async function closeTicket(client: DGClient, config: TicketsConfig, ticketId: string, closedById: string): Promise<CloseResult> {
@@ -318,7 +326,18 @@ export async function closeTicket(client: DGClient, config: TicketsConfig, ticke
 		return { ok: false, reason: existing ? "already-closed" : "not-found" };
 	}
 
-	// 2. Transcrição.
+	// 2. O jogador continua vendo o canal, mas não escreve mais (antes da transcrição, para nada se perder).
+	try {
+		await client.rest.channels.editPermission(ticket.channelId, ticket.userId, {
+			type: OverwriteTypes.MEMBER,
+			allow: CLOSED_PLAYER_ALLOW,
+			deny: CLOSED_PLAYER_DENY,
+		});
+	} catch (error) {
+		console.error("[TICKETS]", error);
+	}
+
+	// 3. Transcrição.
 	let entries: TranscriptEntry[] = [];
 	let truncated = false;
 	try {
@@ -328,20 +347,9 @@ export async function closeTicket(client: DGClient, config: TicketsConfig, ticke
 		console.error("[TICKETS]", error);
 	}
 
-	// 3. Renomeia o canal.
+	// 4. Renomeia o canal.
 	try {
 		await client.rest.channels.edit(ticket.channelId, { name: closedChannelName(ticket.number) });
-	} catch (error) {
-		console.error("[TICKETS]", error);
-	}
-
-	// 4. O jogador continua vendo o canal, mas não escreve mais.
-	try {
-		await client.rest.channels.editPermission(ticket.channelId, ticket.userId, {
-			type: OverwriteTypes.MEMBER,
-			allow: CLOSED_PLAYER_ALLOW,
-			deny: CLOSED_PLAYER_DENY,
-		});
 	} catch (error) {
 		console.error("[TICKETS]", error);
 	}
@@ -397,7 +405,7 @@ export async function closeTicket(client: DGClient, config: TicketsConfig, ticke
 export async function answerSurvey(ticketId: string, userId: string, index: number, value: number): Promise<SurveyResult> {
 	const question = Number.isInteger(index) ? SURVEY_QUESTIONS[index] : undefined;
 	if (!question || !Number.isInteger(value) || !question.options.some((option) => option.value === value) || !isValidObjectId(ticketId)) {
-		return { ok: false, reason: "ignored" };
+		return { ok: false, reason: "ignored", answered: null };
 	}
 
 	const updated = await Ticket.findOneAndUpdate(
@@ -406,11 +414,16 @@ export async function answerSurvey(ticketId: string, userId: string, index: numb
 		{ new: true, projection: { _id: 1 } },
 	);
 	if (updated) {
-		return { ok: true, next: index + 1 < SURVEY_QUESTIONS.length ? index + 1 : null };
+		return { ok: true, answered: index + 1 };
 	}
 
-	const ticket = await Ticket.findById(ticketId, { userId: 1 });
-	return { ok: false, reason: ticket && ticket.userId !== userId ? "not-owner" : "ignored" };
+	// Clique repetido ou fora de ordem: devolve só a contagem, para mostrar a pergunta pendente.
+	const ticket = await Ticket.findById(ticketId, { userId: 1, status: 1, survey: 1 });
+	if (ticket && ticket.userId !== userId) {
+		return { ok: false, reason: "not-owner" };
+	}
+	const answered = ticket && ticket.status === "closed" ? ticket.survey.length : null;
+	return { ok: false, reason: "ignored", answered };
 }
 
 export async function sendMonthlySummary(client: DGClient, config: TicketsConfig, now: Date = new Date()): Promise<boolean> {
@@ -437,8 +450,11 @@ export async function sendMonthlySummary(client: DGClient, config: TicketsConfig
 	return true;
 }
 
-export async function purgeExpiredChannels(client: DGClient): Promise<number> {
-	const expired = await Ticket.find({ status: "closed", deleteAt: { $lte: new Date() }, channelDeletedAt: null });
+export async function purgeExpiredChannels(client: DGClient, config: TicketsConfig): Promise<number> {
+	const expired = await Ticket.find(
+		{ guildId: config.guildId, status: "closed", deleteAt: { $lte: new Date() }, channelDeletedAt: null },
+		{ channelId: 1 },
+	);
 	let deleted = 0;
 
 	for (const ticket of expired) {
@@ -447,7 +463,7 @@ export async function purgeExpiredChannels(client: DGClient): Promise<number> {
 				await client.rest.channels.delete(ticket.channelId);
 			} catch (error) {
 				// 404: o canal já não existe, conta como apagado.
-				if (!(error instanceof DiscordRESTError && error.status === HTTP_NOT_FOUND)) {
+				if (!isNotFound(error)) {
 					throw error;
 				}
 			}

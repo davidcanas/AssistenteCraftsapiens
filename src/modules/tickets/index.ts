@@ -5,6 +5,10 @@ import { TICKET_PREFIX } from "./customIds";
 import { routeTicketInteraction } from "./handlers";
 import { syncCounter } from "./model";
 import { startMonthlySummary, startScheduler } from "./scheduler";
+import { panelMessage } from "./views";
+
+export { memberIsStaff, type TicketsConfig } from "./config";
+export { sendMonthlySummary } from "./service";
 
 let cachedConfig: TicketsConfig | null | undefined;
 
@@ -37,13 +41,22 @@ export async function handleTicketInteraction(client: DGClient, interaction: Com
 	await routeTicketInteraction(client, config, interaction);
 }
 
+export async function publishPanel(client: DGClient, channelId: string): Promise<void> {
+	await client.rest.channels.createMessage(channelId, panelMessage());
+}
+
 export async function startTickets(client: DGClient): Promise<void> {
 	const config = getTicketsConfig();
 	if (!config) {
 		return;
 	}
-	await syncCounter(config.startNumber);
-	startScheduler(client);
+	startScheduler(client, config);
 	startMonthlySummary(client, config);
+	try {
+		await syncCounter(config.startNumber);
+	} catch (error) {
+		// Não é fatal: nextTicketNumber aplica o mesmo piso a cada ticket.
+		console.error("[TICKETS]", error);
+	}
 	console.log(`[TICKETS] Sistema de tickets ativo para ${client.user.username}.`);
 }

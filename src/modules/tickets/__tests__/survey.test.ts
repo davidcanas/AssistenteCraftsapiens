@@ -1,6 +1,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { SURVEY_QUESTIONS, surveyDoneMessage, surveyQuestionMessage, previousMonthRange, summarizeMonth, monthlySummaryEmbed } from "../survey";
+import { SURVEY_QUESTIONS, surveyDoneMessage, surveyMessageAt, surveyQuestionMessage, previousMonthRange, summarizeMonth, monthlySummaryEmbed } from "../survey";
+import { COLOR_PRIMARY, EMPTY } from "../style";
 
 function customIds(message: ReturnType<typeof surveyQuestionMessage>): string[] {
 	const rows = (message.components ?? []) as Array<{ components: Array<{ customID?: string }> }>;
@@ -85,4 +86,17 @@ test("summary embed splits staff lines into fields of at most 1024 chars", () =>
 	for (const ticket of many) {
 		assert.ok(text.includes(`<@${ticket.claimedBy}>`));
 	}
+});
+
+test("surveyMessageAt shows the pending question or the done message", () => {
+	assert.deepEqual(surveyMessageAt("t1", 0), surveyQuestionMessage("t1", 0));
+	assert.deepEqual(surveyMessageAt("t1", 2), surveyQuestionMessage("t1", 2));
+	assert.deepEqual(surveyMessageAt("t1", SURVEY_QUESTIONS.length), surveyDoneMessage());
+	assert.deepEqual(surveyMessageAt("t1", SURVEY_QUESTIONS.length + 1), surveyDoneMessage());
+});
+
+test("summary embed uses the shared colour and empty marker", () => {
+	const embed = monthlySummaryEmbed(summarizeMonth([]), "outubro de 2026");
+	assert.equal(embed.color, COLOR_PRIMARY);
+	assert.equal(embed.fields?.[0].value, EMPTY);
 });

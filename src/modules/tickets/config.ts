@@ -1,3 +1,5 @@
+import type { Member } from "oceanic.js";
+
 export interface TicketsConfig {
 	guildId: string;
 	staffRoleIds: string[];
@@ -73,4 +75,8 @@ export function isStaff(memberRoleIds: readonly string[], hasManageGuild: boolea
 		return true;
 	}
 	return memberRoleIds.some((roleId) => staffRoleIds.includes(roleId));
+}
+
+export function memberIsStaff(member: Member | null | undefined, config: TicketsConfig): boolean {
+	return !!member && isStaff(member.roles, member.permissions.has("MANAGE_GUILD"), config.staffRoleIds);
 }

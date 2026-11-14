@@ -1,6 +1,7 @@
 import { ButtonStyles, ComponentTypes, type CreateMessageOptions, type EmbedOptions } from "oceanic.js";
 import { getCategory } from "./categories";
 import { buildCustomId } from "./customIds";
+import { COLOR_PRIMARY, EMPTY } from "./style";
 
 export interface SurveyOption { label: string; value: number; }
 export interface SurveyQuestion { id: "resolved" | "service" | "speed"; text: string; options: SurveyOption[]; }
@@ -23,8 +24,6 @@ export const SURVEY_QUESTIONS: readonly SurveyQuestion[] = [
 ];
 
 const FIELD_LIMIT = 1024;
-const COLOR_SUMMARY = 0x5865f2;
-const EMPTY = "—";
 const SP_OFFSET_HOURS = 3;
 const MONTHS = ["janeiro", "fevereiro", "março", "abril", "maio", "junho", "julho", "agosto", "setembro", "outubro", "novembro", "dezembro"];
 const RESOLVED_SCORE: Record<number, number> = { 2: 100, 1: 50, 0: 0 };
@@ -47,6 +46,11 @@ export function surveyQuestionMessage(ticketId: string, index: number): CreateMe
 
 export function surveyDoneMessage(): CreateMessageOptions {
 	return { content: "Avaliação registrada. Obrigado!", components: [] };
+}
+
+/** Mensagem da pergunta pendente depois de `answered` respostas (ou de conclusão). */
+export function surveyMessageAt(ticketId: string, answered: number): CreateMessageOptions {
+	return answered >= SURVEY_QUESTIONS.length ? surveyDoneMessage() : surveyQuestionMessage(ticketId, answered);
 }
 
 export function previousMonthRange(now: Date): { start: Date; end: Date; label: string } {
@@ -134,7 +138,7 @@ export function monthlySummaryEmbed(s: MonthSummary, label: string): EmbedOption
 
 	return {
 		title: `Resumo de tickets — ${label}`,
-		color: COLOR_SUMMARY,
+		color: COLOR_PRIMARY,
 		description: `Total de tickets: ${s.total}`,
 		fields: [
 			{ name: "Por tipo", value: categories || EMPTY },

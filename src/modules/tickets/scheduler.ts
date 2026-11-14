@@ -8,8 +8,8 @@ const PURGE_INTERVAL_MS = 600_000;
 let purgeInterval: NodeJS.Timeout | null = null;
 let summaryTask: ScheduledTask | null = null;
 
-function runPurge(client: DGClient): void {
-	purgeExpiredChannels(client)
+function runPurge(client: DGClient, config: TicketsConfig): void {
+	purgeExpiredChannels(client, config)
 		.then((deleted) => {
 			if (deleted > 0) {
 				console.log(`[TICKETS] ${deleted} canal(is) de ticket fechado(s) apagado(s).`);
@@ -18,12 +18,12 @@ function runPurge(client: DGClient): void {
 		.catch((error) => console.error("[TICKETS]", error));
 }
 
-export function startScheduler(client: DGClient): void {
+export function startScheduler(client: DGClient, config: TicketsConfig): void {
 	if (purgeInterval) {
 		return;
 	}
-	purgeInterval = setInterval(() => runPurge(client), PURGE_INTERVAL_MS);
-	runPurge(client);
+	purgeInterval = setInterval(() => runPurge(client, config), PURGE_INTERVAL_MS);
+	runPurge(client, config);
 }
 
 export function startMonthlySummary(client: DGClient, config: TicketsConfig): void {

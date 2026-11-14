@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { parseTicketsConfig, isStaff } from "../config";
+import { parseTicketsConfig, isStaff, memberIsStaff, type TicketsConfig } from "../config";
 
 const base = { TICKETS_ENABLED: "true", TICKETS_STAFF_ROLE_IDS: " 1, 2 ", TICKETS_LOG_CHANNEL_ID: "9" };
 
@@ -44,4 +44,15 @@ test("isStaff", () => {
 	assert.equal(isStaff([], true, ["1"]), true);
 	assert.equal(isStaff(["5"], false, ["1"]), false);
 	assert.equal(isStaff([], false, []), false);
+});
+
+test("memberIsStaff reads roles and Manage Server from the member", () => {
+	const config = { staffRoleIds: ["1"] } as TicketsConfig;
+	const member = (roles: string[], manageGuild: boolean) =>
+		({ roles, permissions: { has: (perm: string) => perm === "MANAGE_GUILD" && manageGuild } }) as unknown as Parameters<typeof memberIsStaff>[0];
+	assert.equal(memberIsStaff(member(["1"], false), config), true);
+	assert.equal(memberIsStaff(member([], true), config), true);
+	assert.equal(memberIsStaff(member(["5"], false), config), false);
+	assert.equal(memberIsStaff(null, config), false);
+	assert.equal(memberIsStaff(undefined, config), false);
 });

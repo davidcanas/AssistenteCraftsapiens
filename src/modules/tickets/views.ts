@@ -8,10 +8,9 @@ import {
 	type InteractionContent,
 	type ModalData,
 } from "oceanic.js";
-import { TICKET_CATEGORIES, getCategory, type TicketCategory } from "./categories";
+import { TICKET_CATEGORIES, getCategory, type TicketAnswer, type TicketCategory } from "./categories";
 import { buildCustomId } from "./customIds";
-
-export interface TicketAnswer { label: string; value: string; }
+import { COLOR_PRIMARY, EMPTY } from "./style";
 
 export interface WelcomeView {
 	ticketId: string;
@@ -41,11 +40,9 @@ export interface LogSummary {
 	closedAt: Date;
 }
 
-const COLOR_PRIMARY = 0x5865f2;
 const COLOR_INFO = 0x2b8a3e;
 const COLOR_LOG = 0x868e96;
 const UNAVAILABLE = "Indisponível";
-const EMPTY = "—";
 const MODAL_TITLE_MAX = 45;
 const EMBED_FIELD_MAX = 1024;
 const LAST_PUNISHMENTS = 3;

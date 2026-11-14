@@ -13,6 +13,7 @@ import {
 	type PlayerProfile,
 	type WelcomeView,
 } from "../views";
+import { COLOR_PRIMARY, EMPTY } from "../style";
 
 interface AnyRow { components: Array<{ customID?: string; disabled?: boolean; required?: boolean }>; }
 
@@ -69,7 +70,7 @@ test("welcomeMessage claimed", () => {
 
 test("welcomeMessage empty answer shows dash", () => {
 	const msg = welcomeMessage({ ...baseWelcome, answers: [{ label: "X", value: "" }] });
-	assert.equal(msg.embeds?.[0].fields?.[0].value, "—");
+	assert.equal(msg.embeds?.[0].fields?.[0].value, EMPTY);
 });
 
 test("profileEmbed shows fallbacks", () => {
@@ -94,4 +95,9 @@ test("logMessage attaches transcript", () => {
 	assert.equal(msg.files?.[0].name, "ticket-9100.txt");
 	assert.equal(msg.files?.[0].contents.toString("utf8"), "abc");
 	assert.ok(JSON.stringify(msg.embeds).includes("2h 15min"));
+});
+
+test("panel and welcome use the shared primary colour", () => {
+	assert.equal(panelMessage().embeds?.[0].color, COLOR_PRIMARY);
+	assert.equal(welcomeMessage(baseWelcome).embeds?.[0].color, COLOR_PRIMARY);
 });
