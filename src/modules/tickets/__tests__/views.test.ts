@@ -37,9 +37,17 @@ test("channel names", () => {
 	assert.equal(closedChannelName(9100), "closed-9100");
 });
 
-test("panelMessage has one button per category", () => {
-	const ids = buttonsOf(panelMessage().components).map((b) => b.customID);
-	assert.deepEqual(ids, TICKET_CATEGORIES.map((c) => "ticket:open:" + c.id));
+test("panelMessage has one select menu with one option per category", () => {
+	const menus = buttonsOf(panelMessage().components) as Array<{
+		customID: string;
+		options: Array<{ value: string; description: string }>;
+	}>;
+	assert.equal(menus.length, 1);
+	assert.equal(menus[0].customID, "ticket:open");
+	assert.deepEqual(menus[0].options.map((o) => o.value), TICKET_CATEGORIES.map((c) => c.id));
+	for (const option of menus[0].options) {
+		assert.ok(option.description.length > 0 && option.description.length <= 100);
+	}
 });
 
 test("categoryModal for denuncia", () => {

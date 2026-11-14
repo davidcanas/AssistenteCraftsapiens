@@ -16,6 +16,8 @@ export interface TicketField {
 export interface TicketCategory {
 	id: TicketCategoryId;
 	label: string;
+	// Aparece abaixo da opção no menu do painel (máx. 100 caracteres).
+	description: string;
 	emoji: string;
 	fields: TicketField[];
 }
@@ -35,6 +37,7 @@ export const TICKET_CATEGORIES: readonly TicketCategory[] = [
 	{
 		id: "denuncia",
 		label: "Denúncia",
+		description: "Jogador quebrando as regras: hack, ofensa, griefing, roubo",
 		emoji: "🚨",
 		fields: [
 			short("reported_nick", "Nick do denunciado", true),
@@ -45,12 +48,14 @@ export const TICKET_CATEGORIES: readonly TicketCategory[] = [
 	{
 		id: "duvida",
 		label: "Dúvida",
+		description: "Perguntas sobre o servidor, comandos ou mecânicas",
 		emoji: "❓",
 		fields: [paragraph("question", "Sua dúvida", true)],
 	},
 	{
 		id: "bug",
 		label: "Bug",
+		description: "Algo no servidor não funciona como deveria",
 		emoji: "🐛",
 		fields: [
 			paragraph("what_happened", "O que aconteceu", true),
@@ -60,6 +65,7 @@ export const TICKET_CATEGORIES: readonly TicketCategory[] = [
 	{
 		id: "recurso",
 		label: "Recorrer de punição",
+		description: "Acha que sua punição foi injusta? Peça uma revisão",
 		emoji: "⚖️",
 		fields: [
 			short("punished_nick", "Nick punido", true),
@@ -69,6 +75,7 @@ export const TICKET_CATEGORIES: readonly TicketCategory[] = [
 	{
 		id: "vip",
 		label: "VIP / Compras",
+		description: "Problemas com VIP, compras ou pagamentos",
 		emoji: "💎",
 		fields: [
 			short("nick", "Nick", true),

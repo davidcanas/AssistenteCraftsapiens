@@ -21,7 +21,7 @@ import {
 	type OpenResult,
 } from "./service";
 import { surveyMessageAt } from "./survey";
-import { categoryModal, closeConfirmMessage, profileEmbed, welcomeMessage } from "./views";
+import { categoryModal, closeConfirmMessage, panelMessage, profileEmbed, welcomeMessage } from "./views";
 
 const GENERIC_ERROR = "Não foi possível concluir agora. Tente novamente em alguns minutos.";
 const OPEN_FAILED = "Não foi possível abrir o ticket agora, tente em alguns minutos.";
@@ -47,8 +47,12 @@ function openResultText(result: OpenResult): string {
 	}
 }
 
-async function handleOpenButton(client: DGClient, interaction: ComponentInteraction, guildId: string, arg: string | null): Promise<void> {
-	const category = arg === null ? undefined : getCategory(arg);
+async function handleOpen(client: DGClient, interaction: ComponentInteraction, guildId: string, arg: string | null): Promise<void> {
+	// Painel novo: menu de seleção (categoria no valor escolhido).
+	// Painéis antigos: um botão por categoria (categoria no customID).
+	const fromSelect = arg === null && "values" in interaction.data;
+	const categoryId = fromSelect && "values" in interaction.data ? interaction.data.values.raw[0] : arg;
+	const category = categoryId ? getCategory(categoryId) : undefined;
 	if (!category) {
 		await replyEphemeral(interaction, GENERIC_ERROR);
 		return;
@@ -57,10 +61,16 @@ async function handleOpenButton(client: DGClient, interaction: ComponentInteract
 	const existing = await findOpenTicket(client, guildId, interaction.user.id);
 	if (existing) {
 		await replyEphemeral(interaction, alreadyOpenText(existing.channelId));
-		return;
+	} else {
+		await interaction.createModal(categoryModal(category));
 	}
 
-	await interaction.createModal(categoryModal(category));
+	if (fromSelect) {
+		// O Discord deixa a opção marcada no menu; reeditar o painel limpa a seleção
+		// para que o jogador possa escolher a mesma categoria de novo.
+		await interaction.message.edit({ components: panelMessage().components })
+			.catch((error) => console.error("[TICKETS]", error));
+	}
 }
 
 async function replyEphemeral(interaction: ComponentInteraction | ModalSubmitInteraction, content: string): Promise<void> {
@@ -257,7 +267,7 @@ export async function routeTicketInteraction(
 		if (interaction instanceof ComponentInteraction) {
 			switch (parsed.action) {
 				case "open":
-					await handleOpenButton(client, interaction, guildId, parsed.arg);
+					await handleOpen(client, interaction, guildId, parsed.arg);
 					return;
 				case "claim":
 					await handleClaimButton(config, interaction, parsed.arg);

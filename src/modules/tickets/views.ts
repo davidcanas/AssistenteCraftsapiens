@@ -70,7 +70,7 @@ export function panelMessage(): CreateMessageOptions {
 				description: [
 					"Escolha abaixo o tipo de atendimento. Um canal privado será aberto para você e a equipe.",
 					"",
-					...TICKET_CATEGORIES.map((category) => `${category.emoji} **${category.label}**`),
+					...TICKET_CATEGORIES.map((category) => `${category.emoji} **${category.label}** — ${category.description}`),
 				].join("\n"),
 				color: COLOR_PRIMARY,
 			},
@@ -78,13 +78,21 @@ export function panelMessage(): CreateMessageOptions {
 		components: [
 			{
 				type: ComponentTypes.ACTION_ROW,
-				components: TICKET_CATEGORIES.map((category) => ({
-					type: ComponentTypes.BUTTON as const,
-					style: ButtonStyles.PRIMARY as const,
-					customID: buildCustomId("open", category.id),
-					label: category.label,
-					emoji: { name: category.emoji },
-				})),
+				components: [
+					{
+						type: ComponentTypes.STRING_SELECT,
+						customID: buildCustomId("open"),
+						placeholder: "Selecione o tipo de atendimento…",
+						minValues: 1,
+						maxValues: 1,
+						options: TICKET_CATEGORIES.map((category) => ({
+							label: category.label,
+							value: category.id,
+							description: category.description,
+							emoji: { name: category.emoji },
+						})),
+					},
+				],
 			},
 		],
 	};
