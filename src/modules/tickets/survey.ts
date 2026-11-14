@@ -12,7 +12,7 @@ export interface SurveyOption {
 export interface SurveyQuestion { id: "resolved" | "service" | "speed"; text: string; options: SurveyOption[]; }
 export interface SurveyAnswer { questionId: string; value: number; answeredAt: Date; }
 
-export interface MonthTicket { claimedBy: string | null; category: string; survey: Array<{ questionId: string; value: number }>; }
+export interface MonthTicket { claimedBy: string | null; helpers?: string[]; category: string; survey: Array<{ questionId: string; value: number }>; }
 export interface StaffStats { staffId: string | null; handled: number; rated: number; resolvedPct: number | null; serviceAvg: number | null; speedAvg: number | null; }
 export interface MonthSummary { total: number; byCategory: Record<string, number>; overall: StaffStats; perStaff: StaffStats[]; }
 
@@ -115,7 +115,11 @@ export function summarizeMonth(tickets: MonthTicket[]): MonthSummary {
 	const groups = new Map<string | null, MonthTicket[]>();
 	for (const ticket of tickets) {
 		byCategory[ticket.category] = (byCategory[ticket.category] ?? 0) + 1;
-		groups.set(ticket.claimedBy, [...(groups.get(ticket.claimedBy) ?? []), ticket]);
+		// O ticket conta para quem assumiu e para cada superior chamado (uma vez por pessoa).
+		const ids = [...new Set([ticket.claimedBy, ...(ticket.helpers ?? [])].filter((id): id is string => !!id))];
+		for (const staffId of ids.length > 0 ? ids : [null]) {
+			groups.set(staffId, [...(groups.get(staffId) ?? []), ticket]);
+		}
 	}
 
 	const perStaff = [...groups.entries()]

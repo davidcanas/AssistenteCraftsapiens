@@ -515,11 +515,12 @@ export async function sendMonthlySummary(client: DGClient, config: TicketsConfig
 	const { start, end, label } = previousMonthRange(now);
 	const tickets = await Ticket.find(
 		{ guildId: config.guildId, status: "closed", closedAt: { $gte: start, $lt: end } },
-		{ claimedBy: 1, category: 1, survey: 1 },
+		{ claimedBy: 1, helpers: 1, category: 1, survey: 1 },
 	).lean();
 	const summary = summarizeMonth(
 		tickets.map((ticket) => ({
 			claimedBy: ticket.claimedBy ?? null,
+			helpers: ticket.helpers ?? [],
 			category: ticket.category,
 			survey: ticket.survey ?? [],
 		})),

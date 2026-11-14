@@ -86,6 +86,19 @@ test("summarizeMonth", () => {
 	assert.equal(s.perStaff[0].staffId, "s1");
 });
 
+test("summarizeMonth credits superiors who took part, without double counting", () => {
+	const s = summarizeMonth([
+		{ claimedBy: "s1", helpers: ["s1", "m1"], category: "duvida", survey: [{ questionId: "service", value: 5 }] },
+		{ claimedBy: null, helpers: ["m1"], category: "bug", survey: [] },
+		{ claimedBy: "s1", category: "bug", survey: [] },
+	]);
+	assert.equal(s.total, 3);
+	assert.equal(s.overall.handled, 3);
+	assert.deepEqual(s.perStaff.find((x) => x.staffId === "s1"), { staffId: "s1", handled: 2, rated: 1, resolvedPct: null, serviceAvg: 5, speedAvg: null });
+	assert.deepEqual(s.perStaff.find((x) => x.staffId === "m1"), { staffId: "m1", handled: 2, rated: 1, resolvedPct: null, serviceAvg: 5, speedAvg: null });
+	assert.equal(s.perStaff.some((x) => x.staffId === null), false);
+});
+
 test("summary embed fallbacks", () => {
 	const json = JSON.stringify(monthlySummaryEmbed(summarizeMonth(tickets), "outubro de 2026"));
 	assert.ok(json.includes("<@s1>"));
