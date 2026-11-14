@@ -16,6 +16,7 @@ import { SURVEY_QUESTIONS, monthlySummaryEmbed, previousMonthRange, summarizeMon
 import { MAX_TRANSCRIPT_MESSAGES, formatTranscript, type TranscriptEntry } from "./transcript";
 import {
 	closedChannelName,
+	closedNoticeMessage,
 	logMessage,
 	ticketChannelName,
 	welcomeMessage,
@@ -356,10 +357,7 @@ export async function closeTicket(client: DGClient, config: TicketsConfig, ticke
 
 	// 5. Aviso no canal.
 	try {
-		await client.rest.channels.createMessage(ticket.channelId, {
-			content: `Ticket fechado por <@${closedById}>. Este canal será apagado em ${config.deleteAfterHours}h.`,
-			allowedMentions: {},
-		});
+		await client.rest.channels.createMessage(ticket.channelId, closedNoticeMessage(closedById, deleteAt));
 	} catch (error) {
 		console.error("[TICKETS]", error);
 	}

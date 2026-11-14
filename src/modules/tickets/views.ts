@@ -219,6 +219,20 @@ export function profileEmbed(p: PlayerProfile): EmbedOptions {
 	return { title: "Ficha do jogador", color: COLOR_INFO, fields };
 }
 
+export function closedNoticeMessage(closedBy: string, deleteAt: Date): CreateMessageOptions {
+	const unix = Math.floor(deleteAt.getTime() / 1000);
+	return {
+		embeds: [
+			{
+				title: "🔒 Ticket fechado",
+				color: COLOR_PRIMARY,
+				description: `Fechado por <@${closedBy}>\nEste canal será apagado <t:${unix}:R>`,
+			},
+		],
+		allowedMentions: {},
+	};
+}
+
 export function logMessage(s: LogSummary, transcriptText: string): CreateMessageOptions {
 	return {
 		embeds: [

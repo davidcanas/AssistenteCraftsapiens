@@ -4,6 +4,7 @@ import { TICKET_CATEGORIES, getCategory } from "../categories";
 import {
 	categoryModal,
 	closeConfirmMessage,
+	closedNoticeMessage,
 	closedChannelName,
 	logMessage,
 	panelMessage,
@@ -100,4 +101,13 @@ test("logMessage attaches transcript", () => {
 test("panel and welcome use the shared primary colour", () => {
 	assert.equal(panelMessage().embeds?.[0].color, COLOR_PRIMARY);
 	assert.equal(welcomeMessage(baseWelcome).embeds?.[0].color, COLOR_PRIMARY);
+});
+
+test("closedNoticeMessage embeds who closed and a relative timestamp without pings", () => {
+	const msg = closedNoticeMessage("u1", new Date(1700000000 * 1000));
+	const embed = msg.embeds?.[0];
+	assert.equal(embed?.title, "🔒 Ticket fechado");
+	assert.ok(embed?.description?.includes("<@u1>"));
+	assert.ok(embed?.description?.includes("<t:1700000000:R>"));
+	assert.deepEqual(msg.allowedMentions, {});
 });

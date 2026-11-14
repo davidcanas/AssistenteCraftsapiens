@@ -3,7 +3,12 @@ import { getCategory } from "./categories";
 import { buildCustomId } from "./customIds";
 import { COLOR_PRIMARY, EMPTY } from "./style";
 
-export interface SurveyOption { label: string; value: number; }
+export interface SurveyOption {
+	label: string;
+	value: number;
+	style?: ButtonStyles.PRIMARY | ButtonStyles.SECONDARY | ButtonStyles.SUCCESS | ButtonStyles.DANGER;
+	emoji?: string;
+}
 export interface SurveyQuestion { id: "resolved" | "service" | "speed"; text: string; options: SurveyOption[]; }
 export interface SurveyAnswer { questionId: string; value: number; answeredAt: Date; }
 
@@ -17,7 +22,11 @@ export const SURVEY_QUESTIONS: readonly SurveyQuestion[] = [
 	{
 		id: "resolved",
 		text: "Seu problema foi resolvido?",
-		options: [{ label: "Sim", value: 2 }, { label: "Em parte", value: 1 }, { label: "Não", value: 0 }],
+		options: [
+			{ label: "Sim", value: 2, style: ButtonStyles.SUCCESS, emoji: "✅" },
+			{ label: "Em parte", value: 1, style: ButtonStyles.SECONDARY, emoji: "〰️" },
+			{ label: "Não", value: 0, style: ButtonStyles.DANGER, emoji: "❌" },
+		],
 	},
 	{ id: "service", text: "Como você avalia o atendimento?", options: scale() },
 	{ id: "speed", text: "E o tempo até ser atendido?", options: scale() },
@@ -30,14 +39,22 @@ const RESOLVED_SCORE: Record<number, number> = { 2: 100, 1: 50, 0: 0 };
 
 export function surveyQuestionMessage(ticketId: string, index: number): CreateMessageOptions {
 	const question = SURVEY_QUESTIONS[index];
+	const scaleHint = question.options.length === 5 ? "\n1 = muito ruim · 5 = excelente" : "";
 	return {
-		content: `${question.text}\nSuas respostas são anônimas para a staff (${index + 1}/${SURVEY_QUESTIONS.length})`,
+		content: "",
+		embeds: [{
+			title: "⭐ Avalie o atendimento",
+			color: COLOR_PRIMARY,
+			description: `**${question.text}**${scaleHint}`,
+			footer: { text: `Pergunta ${index + 1}/${SURVEY_QUESTIONS.length} • Suas respostas são anônimas para a staff` },
+		}],
 		components: [{
 			type: ComponentTypes.ACTION_ROW,
 			components: question.options.map((option) => ({
 				type: ComponentTypes.BUTTON as const,
-				style: (question.id === "resolved" ? ButtonStyles.PRIMARY : ButtonStyles.SECONDARY) as ButtonStyles.PRIMARY | ButtonStyles.SECONDARY,
+				style: option.style ?? ButtonStyles.PRIMARY,
 				label: option.label,
+				...(option.emoji ? { emoji: { name: option.emoji } } : {}),
 				customID: buildCustomId("rate", `${ticketId}:${index}:${option.value}`),
 			})),
 		}],
@@ -45,7 +62,15 @@ export function surveyQuestionMessage(ticketId: string, index: number): CreateMe
 }
 
 export function surveyDoneMessage(): CreateMessageOptions {
-	return { content: "Avaliação registrada. Obrigado!", components: [] };
+	return {
+		content: "",
+		embeds: [{
+			title: "✅ Avaliação registrada",
+			color: COLOR_PRIMARY,
+			description: "Obrigado! Sua opinião ajuda a melhorar o suporte.",
+		}],
+		components: [],
+	};
 }
 
 /** Mensagem da pergunta pendente depois de `answered` respostas (ou de conclusão). */

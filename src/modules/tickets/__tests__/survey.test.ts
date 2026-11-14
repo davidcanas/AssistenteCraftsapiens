@@ -17,8 +17,12 @@ test("questions", () => {
 
 test("first question message", () => {
 	const m = surveyQuestionMessage("t1", 0);
-	assert.match(m.content ?? "", /\(1\/3\)/);
-	assert.match(m.content ?? "", /anônimas/);
+	assert.equal(m.content, "");
+	const embed = m.embeds?.[0];
+	assert.equal(embed?.title, "⭐ Avalie o atendimento");
+	assert.equal(embed?.description, "**Seu problema foi resolvido?**");
+	assert.match(embed?.footer?.text ?? "", /Pergunta 1\/3/);
+	assert.match(embed?.footer?.text ?? "", /anônimas/);
 	assert.deepEqual(customIds(m), ["ticket:rate:t1:0:2", "ticket:rate:t1:0:1", "ticket:rate:t1:0:0"]);
 });
 
@@ -26,8 +30,23 @@ test("second question has 1..5", () => {
 	assert.deepEqual(customIds(surveyQuestionMessage("t1", 1)), [1, 2, 3, 4, 5].map((n) => `ticket:rate:t1:1:${n}`));
 });
 
+test("scale question shows the legend and plain primary buttons", () => {
+	const m = surveyQuestionMessage("t1", 1);
+	assert.match(m.embeds?.[0].description ?? "", /1 = muito ruim · 5 = excelente/);
+	const buttons = (m.components as Array<{ components: Array<{ style: number; emoji?: unknown }> }>)[0].components;
+	assert.ok(buttons.every((b) => b.style === 1 && b.emoji === undefined));
+});
+
+test("resolved question buttons have style and emoji", () => {
+	const buttons = (surveyQuestionMessage("t1", 0).components as Array<{ components: Array<{ style: number; emoji?: { name: string } }> }>)[0].components;
+	assert.deepEqual(buttons.map((b) => [b.style, b.emoji?.name]), [[3, "✅"], [2, "〰️"], [4, "❌"]]);
+});
+
 test("done message has no components", () => {
-	assert.deepEqual(surveyDoneMessage().components, []);
+	const m = surveyDoneMessage();
+	assert.deepEqual(m.components, []);
+	assert.equal(m.content, "");
+	assert.equal(m.embeds?.[0].title, "✅ Avaliação registrada");
 });
 
 test("previousMonthRange", () => {
