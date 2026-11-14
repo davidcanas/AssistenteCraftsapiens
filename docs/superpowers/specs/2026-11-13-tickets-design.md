@@ -94,7 +94,7 @@ O novo sistema mantém a aparência que jogadores e staff já conhecem (um canal
    - gera a transcrição (autor, data e hora, texto, URLs de anexos) e salva no documento do ticket;
    - publica no canal de log da staff um resumo (número, tipo, jogador, quem assumiu, quem fechou, duração) com a transcrição em anexo `.txt`;
    - marca o ticket como fechado, com o horário em que o canal deve ser apagado.
-3. Depois de `TICKETS_DELETE_AFTER_HOURS`, o canal é apagado. A verificação roda a cada 10 minutos e também ao iniciar o bot, então sobrevive a reinicializações.
+3. Depois de `TICKETS_DELETE_AFTER_HOURS`, o canal é apagado. A verificação roda a cada 1 minuto e também ao iniciar o bot, então sobrevive a reinicializações.
 
 ### 5.6 Avaliação do atendimento (secreta, um clique por pergunta)
 Perguntas, nesta ordem (lista fixa no código, então dá para mudar ou acrescentar uma 4ª editando só os dados):

@@ -73,6 +73,8 @@ const ticketSchema = new Schema<TicketDoc>(
 );
 
 ticketSchema.index({ guildId: 1, userId: 1, status: 1 });
+// Limpeza de canais fechados (roda a cada minuto).
+ticketSchema.index({ guildId: 1, status: 1, channelDeletedAt: 1, deleteAt: 1 });
 
 export const Ticket: Model<TicketDoc> = model<TicketDoc>("Ticket", ticketSchema);
 
