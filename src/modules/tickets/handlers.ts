@@ -4,6 +4,7 @@ import {
 	type ModalSubmitInteraction,
 } from "oceanic.js";
 import type DGClient from "../../structures/Client";
+import { deleteReplyLater } from "./autoDelete";
 import { getCategory, type TicketAnswer } from "./categories";
 import { parseCustomId } from "./customIds";
 import { memberIsStaff, type TicketsConfig } from "./config";
@@ -60,14 +61,18 @@ async function handleOpen(client: DGClient, interaction: ComponentInteraction, g
 	const category = categoryId ? getCategory(categoryId) : undefined;
 	if (!category) {
 		await replyEphemeral(interaction, GENERIC_ERROR);
+		deleteReplyLater(interaction);
 		return;
 	}
 
 	const openChannelIds = (await findOpenTickets(client, guildId, interaction.user.id)).map((ticket) => ticket.channelId);
 	if (openChannelIds.length >= MAX_OPEN_TICKETS) {
 		await replyEphemeral(interaction, openLimitText(openChannelIds));
+		deleteReplyLater(interaction);
 	} else if (openChannelIds.length > 0) {
+		// Some também depois de "Abrir outro" ou "Cancelar" (que só editam esta mensagem).
 		await interaction.createMessage(openConfirmMessage(category, openChannelIds));
+		deleteReplyLater(interaction);
 	} else {
 		await interaction.createModal(categoryModal(category));
 	}
@@ -250,6 +255,7 @@ async function handleModalSubmit(
 	}
 
 	await interaction.defer(MessageFlags.EPHEMERAL);
+	deleteReplyLater(interaction); // "Ticket criado", limite ou erro: tudo some depois de 5 min.
 
 	const answers: TicketAnswer[] = category.fields.map((field) => ({
 		label: field.label,
