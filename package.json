@@ -9,9 +9,7 @@
     "build": "tsc",
     "start": "node dist/main.js",
     "dev": "ts-node --transpileOnly src/main.ts",
-    "run": "node run.js",
-    "seed:test": "ts-node --transpileOnly src/scripts/seed-test.ts",
-    "test:tickets": "node -r ts-node/register/transpile-only --test src/modules/tickets/__tests__/autoDelete.test.ts src/modules/tickets/__tests__/config.test.ts src/modules/tickets/__tests__/categories.test.ts src/modules/tickets/__tests__/customIds.test.ts src/modules/tickets/__tests__/views.test.ts src/modules/tickets/__tests__/transcript.test.ts src/modules/tickets/__tests__/survey.test.ts src/modules/tickets/__tests__/timeout.test.ts"
+    "run": "node run.js"
   },
   "dependencies": {
     "@iamtraction/google-translate": "^2.0.1",
