@@ -201,8 +201,8 @@ async function handleRateButton(interaction: ComponentInteraction, arg: string |
 	}
 
 	// Mostra a próxima pergunta pendente (ou a conclusão); nunca repete as respostas.
-	const { content, components } = surveyMessageAt(parts[0], result.answered);
-	await interaction.editOriginal({ content, components });
+	const { content, embeds, components } = surveyMessageAt(parts[0], result.answered);
+	await interaction.editOriginal({ content, embeds, components });
 }
 
 async function handleModalSubmit(
