@@ -61,6 +61,12 @@ test("categoryModal for denuncia", () => {
 	assert.ok(modal.title.length <= 45);
 });
 
+test("welcomeMessage closed disables every button", () => {
+	const buttons = buttonsOf(welcomeMessage({ ...baseWelcome, closed: true }).components);
+	assert.equal(buttons.length, 3);
+	assert.ok(buttons.every((b) => b.disabled === true));
+});
+
 test("welcomeMessage unclaimed", () => {
 	const msg = welcomeMessage(baseWelcome);
 	assert.ok(msg.content?.includes("<@u1>"));

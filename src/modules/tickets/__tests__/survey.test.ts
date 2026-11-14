@@ -86,6 +86,22 @@ test("summary embed fallbacks", () => {
 	assert.ok(json.includes("Resumo de tickets — outubro de 2026"));
 });
 
+test("summary embed hides a staff's averages with fewer than 3 ratings", () => {
+	const rated = (claimedBy: string) => ({
+		claimedBy,
+		category: "duvida",
+		survey: [{ questionId: "resolved", value: 2 }, { questionId: "service", value: 5 }, { questionId: "speed", value: 4 }],
+	});
+	const embed = monthlySummaryEmbed(summarizeMonth([rated("few"), rated("few"), rated("many"), rated("many"), rated("many")]), "outubro de 2026");
+	const lines = (embed.fields ?? []).filter((f) => f.name.startsWith("Por staff")).map((f) => f.value).join("\n").split("\n");
+	const few = lines.find((l) => l.includes("<@few>")) ?? "";
+	const many = lines.find((l) => l.includes("<@many>")) ?? "";
+	assert.ok(few.includes("2 avaliados"));
+	assert.ok(!few.includes("5.0") && !few.includes("100%"));
+	assert.ok(few.includes("3+ avaliações"));
+	assert.ok(many.includes("atendimento 5.0") && many.includes("resolvido 100%"));
+});
+
 test("summary embed splits staff lines into fields of at most 1024 chars", () => {
 	const many = Array.from({ length: 30 }, (_, i) => ({
 		claimedBy: `1000000000000000${String(i).padStart(2, "0")}`,

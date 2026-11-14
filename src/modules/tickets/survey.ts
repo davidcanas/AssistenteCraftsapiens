@@ -136,6 +136,20 @@ function statsLine(s: StaffStats): string {
 	return `${s.handled} atendidos · ${s.rated} avaliados · resolvido ${fmtPct(s.resolvedPct)} · atendimento ${fmtAvg(s.serviceAvg)} · tempo ${fmtAvg(s.speedAvg)}`;
 }
 
+// A avaliação é secreta: com poucas respostas, a média de um staff revelaria quem avaliou.
+const MIN_RATED_FOR_AVERAGE = 3;
+
+function staffLine(p: StaffStats): string {
+	if (p.staffId === null) {
+		return `Sem atendente — ${statsLine(p)}`;
+	}
+	if (p.rated > 0 && p.rated < MIN_RATED_FOR_AVERAGE) {
+		const hidden = { ...p, resolvedPct: null, serviceAvg: null, speedAvg: null };
+		return `<@${p.staffId}> — ${statsLine(hidden)} (médias só com ${MIN_RATED_FOR_AVERAGE}+ avaliações)`;
+	}
+	return `<@${p.staffId}> — ${statsLine(p)}`;
+}
+
 function chunkLines(lines: string[], limit: number): string[] {
 	const chunks: string[] = [];
 	let current = "";
@@ -158,7 +172,7 @@ export function monthlySummaryEmbed(s: MonthSummary, label: string): EmbedOption
 	const categories = Object.entries(s.byCategory)
 		.map(([id, count]) => `${getCategory(id)?.label ?? id}: ${count}`)
 		.join("\n");
-	const staffLines = s.perStaff.map((p) => `${p.staffId === null ? "Sem atendente" : `<@${p.staffId}>`} — ${statsLine(p)}`);
+	const staffLines = s.perStaff.map(staffLine);
 	const staffFields = chunkLines(staffLines, FIELD_LIMIT).map((value, i) => ({ name: i === 0 ? "Por staff" : "Por staff (cont.)", value }));
 
 	return {

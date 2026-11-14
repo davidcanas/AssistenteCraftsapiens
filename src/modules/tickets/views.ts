@@ -20,6 +20,8 @@ export interface WelcomeView {
 	answers: TicketAnswer[];
 	staffRoleIds: string[];
 	claimedBy: string | null;
+	// Ticket fechado: todos os botões do card ficam desativados.
+	closed?: boolean;
 }
 
 export interface PlayerProfile {
@@ -150,7 +152,7 @@ export function welcomeMessage(v: WelcomeView): CreateMessageOptions {
 						customID: buildCustomId("claim", v.ticketId),
 						label: "Assumir",
 						emoji: { name: "🙋" },
-						...(v.claimedBy ? { disabled: true } : {}),
+						...(v.claimedBy || v.closed ? { disabled: true } : {}),
 					},
 					{
 						type: ComponentTypes.BUTTON,
@@ -158,6 +160,7 @@ export function welcomeMessage(v: WelcomeView): CreateMessageOptions {
 						customID: buildCustomId("profile", v.ticketId),
 						label: "Ficha",
 						emoji: { name: "📋" },
+						...(v.closed ? { disabled: true } : {}),
 					},
 					{
 						type: ComponentTypes.BUTTON,
@@ -165,6 +168,7 @@ export function welcomeMessage(v: WelcomeView): CreateMessageOptions {
 						customID: buildCustomId("close", v.ticketId),
 						label: "Fechar",
 						emoji: { name: "🔒" },
+						...(v.closed ? { disabled: true } : {}),
 					},
 				],
 			},

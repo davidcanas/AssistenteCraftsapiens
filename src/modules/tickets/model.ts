@@ -18,6 +18,7 @@ export interface TicketDoc extends Document {
 	closedAt: Date | null;
 	deleteAt: Date | null;
 	channelDeletedAt: Date | null;
+	welcomeMessageId: string | null;
 	transcript: TranscriptEntry[];
 	survey: SurveyAnswer[];
 }
@@ -66,6 +67,7 @@ const ticketSchema = new Schema<TicketDoc>(
 		closedAt: { type: Date, default: null },
 		deleteAt: { type: Date, default: null },
 		channelDeletedAt: { type: Date, default: null },
+		welcomeMessageId: { type: String, default: null },
 		transcript: { type: [transcriptEntrySchema], default: [] },
 		survey: { type: [surveyAnswerSchema], default: [] },
 	},

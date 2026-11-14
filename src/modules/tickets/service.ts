@@ -94,6 +94,7 @@ export function toWelcomeView(ticket: TicketDoc, staffRoleIds: string[]): Welcom
 		answers: ticket.answers,
 		staffRoleIds,
 		claimedBy: ticket.claimedBy,
+		closed: ticket.status === "closed",
 	};
 }
 
@@ -163,8 +164,9 @@ export async function openTicket(
 			return FAILED;
 		}
 
+		let welcomeMessageId: string;
 		try {
-			await channel.createMessage(welcomeMessage(toWelcomeView(ticket, config.staffRoleIds)));
+			welcomeMessageId = (await channel.createMessage(welcomeMessage(toWelcomeView(ticket, config.staffRoleIds)))).id;
 		} catch (error) {
 			// Sem a mensagem de boas-vindas o ticket não pode ser assumido nem fechado: desfaz tudo.
 			console.error("[TICKETS]", error);
@@ -180,6 +182,10 @@ export async function openTicket(
 			}
 			return FAILED;
 		}
+
+		// Guardado para desativar os botões do card quando o ticket fechar (falhar aqui não impede o ticket).
+		await Ticket.updateOne({ _id: ticket._id }, { $set: { welcomeMessageId } })
+			.catch((error) => console.error("[TICKETS]", error));
 
 		return { ok: true, channelId: channel.id };
 	} catch (error) {
@@ -336,6 +342,16 @@ export async function closeTicket(client: DGClient, config: TicketsConfig, ticke
 		});
 	} catch (error) {
 		console.error("[TICKETS]", error);
+	}
+
+	// 2b. Desativa os botões do card de boas-vindas (Assumir, Ficha, Fechar).
+	if (ticket.welcomeMessageId) {
+		try {
+			const { components } = welcomeMessage(toWelcomeView(ticket, config.staffRoleIds));
+			await client.rest.channels.editMessage(ticket.channelId, ticket.welcomeMessageId, { components });
+		} catch (error) {
+			console.error("[TICKETS]", error);
+		}
 	}
 
 	// 3. Transcrição.
