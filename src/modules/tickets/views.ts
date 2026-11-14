@@ -20,6 +20,8 @@ export interface WelcomeView {
 	answers: TicketAnswer[];
 	staffRoleIds: string[];
 	claimedBy: string | null;
+	// Superiores chamados pelo "Chamar superior" (aparecem junto de quem assumiu).
+	helpers?: string[];
 	// Ticket fechado: todos os botões do card ficam desativados.
 	closed?: boolean;
 }
@@ -37,12 +39,22 @@ export interface LogSummary {
 	categoryLabel: string;
 	userId: string;
 	claimedBy: string | null;
+	helpers?: string[];
 	closedBy: string;
 	openedAt: Date;
 	closedAt: Date;
 }
 
+export interface EscalationView {
+	ticketId: string;
+	number: number;
+	channelId: string;
+	requestedBy: string;
+	roleIds: string[];
+}
+
 const COLOR_INFO = 0x2b8a3e;
+const COLOR_ESCALATION = 0xf08c00;
 const COLOR_LOG = 0x868e96;
 const UNAVAILABLE = "Indisponível";
 const MODAL_TITLE_MAX = 45;
@@ -55,6 +67,12 @@ export function ticketChannelName(n: number): string {
 
 export function closedChannelName(n: number): string {
 	return `closed-${n}`;
+}
+
+/** Todos que atenderam: quem assumiu primeiro e depois os superiores, sem repetir. */
+function attendantsText(claimedBy: string | null, helpers: string[] = []): string | null {
+	const ids = [...new Set([claimedBy, ...helpers].filter((id): id is string => !!id))];
+	return ids.length > 0 ? ids.map((id) => `<@${id}>`).join("\n") : null;
 }
 
 function formatDuration(ms: number): string {
@@ -127,8 +145,9 @@ export function welcomeMessage(v: WelcomeView): CreateMessageOptions {
 		name: answer.label,
 		value: (answer.value.trim() === "" ? EMPTY : answer.value).slice(0, EMBED_FIELD_MAX),
 	}));
-	if (v.claimedBy) {
-		fields.push({ name: "Atendido por", value: `<@${v.claimedBy}>` });
+	const attendants = attendantsText(v.claimedBy, v.helpers);
+	if (attendants) {
+		fields.push({ name: "Atendido por", value: attendants });
 	}
 
 	return {
@@ -160,6 +179,14 @@ export function welcomeMessage(v: WelcomeView): CreateMessageOptions {
 						customID: buildCustomId("profile", v.ticketId),
 						label: "Ficha",
 						emoji: { name: "📋" },
+						...(v.closed ? { disabled: true } : {}),
+					},
+					{
+						type: ComponentTypes.BUTTON,
+						style: ButtonStyles.SECONDARY,
+						customID: buildCustomId("escalate", v.ticketId),
+						label: "Chamar superior",
+						emoji: { name: "🆘" },
 						...(v.closed ? { disabled: true } : {}),
 					},
 					{
@@ -295,7 +322,7 @@ export function logMessage(s: LogSummary, transcriptText: string): CreateMessage
 					{ name: "Número", value: `#${s.number}`, inline: true },
 					{ name: "Tipo", value: s.categoryLabel, inline: true },
 					{ name: "Jogador", value: `<@${s.userId}>`, inline: true },
-					{ name: "Assumido por", value: s.claimedBy ? `<@${s.claimedBy}>` : EMPTY, inline: true },
+					{ name: "Atendido por", value: attendantsText(s.claimedBy, s.helpers) ?? EMPTY, inline: true },
 					{ name: "Fechado por", value: `<@${s.closedBy}>`, inline: true },
 					{ name: "Duração", value: formatDuration(s.closedAt.getTime() - s.openedAt.getTime()), inline: true },
 				],
@@ -303,5 +330,53 @@ export function logMessage(s: LogSummary, transcriptText: string): CreateMessage
 		],
 		allowedMentions: {},
 		files: [{ name: `ticket-${s.number}.txt`, contents: Buffer.from(transcriptText, "utf8") }],
+	};
+}
+
+function escalationEmbed(v: EscalationView, takenBy: string | null): EmbedOptions {
+	return {
+		title: `🆘 Ticket #${v.number} precisa de um superior`,
+		color: COLOR_ESCALATION,
+		description: [
+			`Canal: <#${v.channelId}>`,
+			`Pedido por: <@${v.requestedBy}>`,
+			takenBy ? `Assumido por: <@${takenBy}>` : "O jogador não vê este pedido.",
+		].join("\n"),
+	};
+}
+
+function escalationButton(v: EscalationView, disabled: boolean): CreateMessageOptions["components"] {
+	return [
+		{
+			type: ComponentTypes.ACTION_ROW,
+			components: [
+				{
+					type: ComponentTypes.BUTTON,
+					style: ButtonStyles.SUCCESS,
+					// Quem pediu vai junto para reescrever o pedido ao assumir (24 + 20 chars cabem nos 100).
+					customID: buildCustomId("escalate-claim", `${v.ticketId}:${v.requestedBy}`),
+					label: "Assumir",
+					emoji: { name: "🙋" },
+					...(disabled ? { disabled: true } : {}),
+				},
+			],
+		},
+	];
+}
+
+/** Pedido no canal da staff: marca os cargos de superiores, nunca aparece no canal do ticket. */
+export function escalationMessage(v: EscalationView): CreateMessageOptions {
+	return {
+		content: v.roleIds.map((id) => `<@&${id}>`).join(" "),
+		allowedMentions: { users: [], roles: [...v.roleIds] },
+		embeds: [escalationEmbed(v, null)],
+		components: escalationButton(v, false),
+	};
+}
+
+export function escalationClaimedMessage(v: EscalationView, takenBy: string): CreateMessageOptions {
+	return {
+		embeds: [escalationEmbed(v, takenBy)],
+		components: escalationButton(v, true),
 	};
 }

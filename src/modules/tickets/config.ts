@@ -7,6 +7,9 @@ export interface TicketsConfig {
 	startNumber: number;
 	deleteAfterHours: number;
 	summaryChannelId: string | null;
+	// "Chamar superior": canal só da staff e cargos marcados (opcionais; sem canal o botão avisa).
+	escalationChannelId: string | null;
+	escalationRoleIds: string[];
 }
 
 export interface ConfigResult {
@@ -18,6 +21,13 @@ const DEFAULT_GUILD_ID = "892472046729179136";
 const DEFAULT_START_NUMBER = 8917;
 const DEFAULT_DELETE_AFTER_HOURS = 24;
 
+function parseIdList(raw: string | undefined): string[] {
+	return (raw ?? "")
+		.split(",")
+		.map((id) => id.trim())
+		.filter((id) => id.length > 0);
+}
+
 function fail(error: string): ConfigResult {
 	return { config: null, error };
 }
@@ -27,10 +37,7 @@ export function parseTicketsConfig(env: Record<string, string | undefined>): Con
 		return { config: null, error: null };
 	}
 
-	const staffRoleIds = (env.TICKETS_STAFF_ROLE_IDS ?? "")
-		.split(",")
-		.map((id) => id.trim())
-		.filter((id) => id.length > 0);
+	const staffRoleIds = parseIdList(env.TICKETS_STAFF_ROLE_IDS);
 	if (staffRoleIds.length === 0) {
 		return fail("TICKETS_STAFF_ROLE_IDS é obrigatória quando TICKETS_ENABLED=true.");
 	}
@@ -61,11 +68,13 @@ export function parseTicketsConfig(env: Record<string, string | undefined>): Con
 	}
 
 	const summaryChannelId = (env.TICKETS_SUMMARY_CHANNEL_ID ?? "").trim() || null;
+	const escalationChannelId = (env.TICKETS_ESCALATION_CHANNEL_ID ?? "").trim() || null;
+	const escalationRoleIds = parseIdList(env.TICKETS_ESCALATION_ROLE_IDS);
 
 	const guildId = (env.GUILD_ID ?? "").trim() || DEFAULT_GUILD_ID;
 
 	return {
-		config: { guildId, staffRoleIds, logChannelId, startNumber, deleteAfterHours, summaryChannelId },
+		config: { guildId, staffRoleIds, logChannelId, startNumber, deleteAfterHours, summaryChannelId, escalationChannelId, escalationRoleIds },
 		error: null,
 	};
 }
@@ -75,6 +84,11 @@ export function isStaff(memberRoleIds: readonly string[], hasManageGuild: boolea
 		return true;
 	}
 	return memberRoleIds.some((roleId) => staffRoleIds.includes(roleId));
+}
+
+/** Quem pode atender um "Chamar superior": cargos de escalonamento ou Gerenciar Servidor. */
+export function memberCanTakeEscalation(member: Member | null | undefined, config: TicketsConfig): boolean {
+	return !!member && isStaff(member.roles, member.permissions.has("MANAGE_GUILD"), config.escalationRoleIds);
 }
 
 export function memberIsStaff(member: Member | null | undefined, config: TicketsConfig): boolean {
