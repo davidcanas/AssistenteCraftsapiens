@@ -13,24 +13,29 @@ import {
 	buildPlayerProfile,
 	claimTicket,
 	closeTicket,
-	findOpenTicket,
+	findOpenTickets,
 	findTicketById,
+	MAX_OPEN_TICKETS,
 	openTicket,
 	toWelcomeView,
 	type CloseResult,
 	type OpenResult,
 } from "./service";
 import { surveyMessageAt } from "./survey";
-import { categoryModal, closeConfirmMessage, panelMessage, profileEmbed, welcomeMessage } from "./views";
+import {
+	categoryModal,
+	closeConfirmMessage,
+	openConfirmMessage,
+	openLimitText,
+	panelMessage,
+	profileEmbed,
+	welcomeMessage,
+} from "./views";
 
 const GENERIC_ERROR = "Não foi possível concluir agora. Tente novamente em alguns minutos.";
 const OPEN_FAILED = "Não foi possível abrir o ticket agora, tente em alguns minutos.";
 const TICKET_NOT_FOUND = "Ticket não encontrado.";
 const CANNOT_CLOSE = "Você não pode fechar este ticket.";
-
-function alreadyOpenText(channelId: string): string {
-	return `Você já tem um ticket aberto: <#${channelId}>`;
-}
 
 function openResultText(result: OpenResult): string {
 	// Sem strictNullChecks, `result.ok` não discrimina a união; `in` funciona.
@@ -38,8 +43,8 @@ function openResultText(result: OpenResult): string {
 		return `Ticket criado: <#${result.channelId}>`;
 	}
 	switch (result.reason) {
-		case "already-open":
-			return alreadyOpenText(result.channelId);
+		case "limit":
+			return openLimitText(result.channelIds);
 		case "busy":
 			return "Seu ticket já está sendo criado.";
 		default:
@@ -58,9 +63,11 @@ async function handleOpen(client: DGClient, interaction: ComponentInteraction, g
 		return;
 	}
 
-	const existing = await findOpenTicket(client, guildId, interaction.user.id);
-	if (existing) {
-		await replyEphemeral(interaction, alreadyOpenText(existing.channelId));
+	const openChannelIds = (await findOpenTickets(client, guildId, interaction.user.id)).map((ticket) => ticket.channelId);
+	if (openChannelIds.length >= MAX_OPEN_TICKETS) {
+		await replyEphemeral(interaction, openLimitText(openChannelIds));
+	} else if (openChannelIds.length > 0) {
+		await interaction.createMessage(openConfirmMessage(category, openChannelIds));
 	} else {
 		await interaction.createModal(categoryModal(category));
 	}
@@ -71,6 +78,20 @@ async function handleOpen(client: DGClient, interaction: ComponentInteraction, g
 		await interaction.message.edit({ components: panelMessage().components })
 			.catch((error) => console.error("[TICKETS]", error));
 	}
+}
+
+// "Abrir outro": o limite volta a ser conferido no envio do formulário (openTicket).
+async function handleOpenConfirm(interaction: ComponentInteraction, arg: string | null): Promise<void> {
+	const category = arg === null ? undefined : getCategory(arg);
+	if (!category) {
+		await replyEphemeral(interaction, GENERIC_ERROR);
+		return;
+	}
+	await interaction.createModal(categoryModal(category));
+}
+
+async function handleOpenCancel(interaction: ComponentInteraction): Promise<void> {
+	await interaction.editParent({ content: "Cancelado.", components: [] });
 }
 
 async function replyEphemeral(interaction: ComponentInteraction | ModalSubmitInteraction, content: string): Promise<void> {
@@ -268,6 +289,12 @@ export async function routeTicketInteraction(
 			switch (parsed.action) {
 				case "open":
 					await handleOpen(client, interaction, guildId, parsed.arg);
+					return;
+				case "open-confirm":
+					await handleOpenConfirm(interaction, parsed.arg);
+					return;
+				case "open-cancel":
+					await handleOpenCancel(interaction);
 					return;
 				case "claim":
 					await handleClaimButton(config, interaction, parsed.arg);

@@ -1,6 +1,6 @@
 export const TICKET_PREFIX = "ticket:";
 
-const TICKET_ACTIONS = ["open", "modal", "claim", "profile", "close", "close-confirm", "rate"] as const;
+const TICKET_ACTIONS = ["open", "open-confirm", "open-cancel", "modal", "claim", "profile", "close", "close-confirm", "rate"] as const;
 
 export type TicketAction = typeof TICKET_ACTIONS[number];
 

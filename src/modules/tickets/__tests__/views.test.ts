@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
+import { MessageFlags } from "oceanic.js";
 import { TICKET_CATEGORIES, getCategory } from "../categories";
 import {
 	categoryModal,
@@ -7,6 +8,8 @@ import {
 	closedNoticeMessage,
 	closedChannelName,
 	logMessage,
+	openConfirmMessage,
+	openLimitText,
 	panelMessage,
 	profileEmbed,
 	ticketChannelName,
@@ -48,6 +51,23 @@ test("panelMessage has one select menu with one option per category", () => {
 	for (const option of menus[0].options) {
 		assert.ok(option.description.length > 0 && option.description.length <= 100);
 	}
+});
+
+test("openConfirmMessage lists open tickets and offers open-another or cancel", () => {
+	const category = getCategory("denuncia");
+	assert.ok(category);
+	const one = openConfirmMessage(category, ["c1"]);
+	assert.ok(one.content?.includes("1 ticket aberto: <#c1>"));
+	assert.ok(one.content?.includes("Denúncia"));
+	assert.ok(((one.flags ?? 0) & MessageFlags.EPHEMERAL) !== 0);
+	assert.deepEqual(buttonsOf(one.components).map((b) => b.customID), ["ticket:open-confirm:denuncia", "ticket:open-cancel"]);
+	assert.ok(openConfirmMessage(category, ["c1", "c2"]).content?.includes("2 tickets abertos: <#c1>, <#c2>"));
+});
+
+test("openLimitText asks to close one first", () => {
+	const text = openLimitText(["c1", "c2", "c3"]);
+	assert.ok(text.includes("3 tickets abertos: <#c1>, <#c2>, <#c3>"));
+	assert.ok(text.includes("Feche um deles"));
 });
 
 test("categoryModal for denuncia", () => {

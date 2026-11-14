@@ -176,6 +176,46 @@ export function welcomeMessage(v: WelcomeView): CreateMessageOptions {
 	};
 }
 
+function channelList(channelIds: string[]): string {
+	return channelIds.map((id) => `<#${id}>`).join(", ");
+}
+
+function openCountText(channelIds: string[]): string {
+	const count = channelIds.length;
+	return `Você já tem ${count} ${count === 1 ? "ticket aberto" : "tickets abertos"}: ${channelList(channelIds)}`;
+}
+
+export function openLimitText(channelIds: string[]): string {
+	return `${openCountText(channelIds)}\nFeche um deles antes de abrir outro.`;
+}
+
+/** Jogador que já tem ticket aberto confirma antes de abrir mais um. */
+export function openConfirmMessage(category: TicketCategory, channelIds: string[]): InteractionContent {
+	return {
+		content: `${openCountText(channelIds)}\nQuer abrir outro de ${category.emoji} **${category.label}** mesmo assim?`,
+		flags: MessageFlags.EPHEMERAL,
+		components: [
+			{
+				type: ComponentTypes.ACTION_ROW,
+				components: [
+					{
+						type: ComponentTypes.BUTTON,
+						style: ButtonStyles.PRIMARY,
+						customID: buildCustomId("open-confirm", category.id),
+						label: "Abrir outro",
+					},
+					{
+						type: ComponentTypes.BUTTON,
+						style: ButtonStyles.SECONDARY,
+						customID: buildCustomId("open-cancel"),
+						label: "Cancelar",
+					},
+				],
+			},
+		],
+	};
+}
+
 export function closeConfirmMessage(ticketId: string): InteractionContent {
 	return {
 		content: "Tem certeza que deseja fechar este ticket?",

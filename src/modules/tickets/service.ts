@@ -26,8 +26,11 @@ import {
 
 export type OpenResult =
 	| { ok: true; channelId: string }
-	| { ok: false; reason: "already-open"; channelId: string }
+	| { ok: false; reason: "limit"; channelIds: string[] }
 	| { ok: false; reason: "busy" | "failed" };
+
+/** Quantos tickets um jogador pode ter abertos ao mesmo tempo. */
+export const MAX_OPEN_TICKETS = 3;
 
 export type ClaimResult =
 	| { ok: true; ticket: TicketDoc }
@@ -98,21 +101,20 @@ export function toWelcomeView(ticket: TicketDoc, staffRoleIds: string[]): Welcom
 	};
 }
 
-export async function findOpenTicket(client: DGClient, guildId: string, userId: string): Promise<TicketDoc | null> {
-	const ticket = await Ticket.findOne({ guildId, userId, status: "open" });
-	if (!ticket) {
-		return null;
-	}
-	if (await channelExists(client, ticket.channelId)) {
-		return ticket;
-	}
+/** Tickets abertos do jogador cujo canal ainda existe (canal apagado à mão fecha o ticket). */
+export async function findOpenTickets(client: DGClient, guildId: string, userId: string): Promise<TicketDoc[]> {
+	const tickets = await Ticket.find({ guildId, userId, status: "open" }).sort({ createdAt: 1 });
+	const alive = await Promise.all(tickets.map((ticket) => channelExists(client, ticket.channelId)));
 
 	const now = new Date();
-	await Ticket.updateOne(
-		{ _id: ticket._id, status: "open" },
-		{ $set: { status: "closed", closedAt: now, channelDeletedAt: now } },
-	);
-	return null;
+	const gone = tickets.filter((_, i) => !alive[i]).map((ticket) => ticket._id);
+	if (gone.length > 0) {
+		await Ticket.updateMany(
+			{ _id: { $in: gone }, status: "open" },
+			{ $set: { status: "closed", closedAt: now, channelDeletedAt: now } },
+		);
+	}
+	return tickets.filter((_, i) => alive[i]);
 }
 
 function buildOverwrites(client: DGClient, guild: Guild, userId: string, staffRoleIds: string[]): OverwriteOptions[] {
@@ -136,9 +138,9 @@ export async function openTicket(
 	opening.add(key);
 
 	try {
-		const existing = await findOpenTicket(client, p.guild.id, p.userId);
-		if (existing) {
-			return { ok: false, reason: "already-open", channelId: existing.channelId };
+		const open = await findOpenTickets(client, p.guild.id, p.userId);
+		if (open.length >= MAX_OPEN_TICKETS) {
+			return { ok: false, reason: "limit", channelIds: open.map((ticket) => ticket.channelId) };
 		}
 
 		const number = await nextTicketNumber(config.startNumber);

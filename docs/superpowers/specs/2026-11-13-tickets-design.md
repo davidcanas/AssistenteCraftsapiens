@@ -53,11 +53,13 @@ O novo sistema mantém a aparência que jogadores e staff já conhecem (um canal
 ## 5. Como funciona (fluxo)
 
 ### 5.1 Painel
-- Um staff com permissão `Gerenciar Servidor` usa `/ticket painel` num canal. O bot publica um embed "Precisa de ajuda?" com **5 botões**, um por tipo de ticket.
+- Um staff com permissão `Gerenciar Servidor` usa `/ticket painel` num canal. O bot publica um embed "Precisa de ajuda?" com um **menu de seleção**: uma opção por tipo de ticket, cada uma com descrição curta.
 
 ### 5.2 Abertura
-1. O jogador clica no botão do tipo.
-2. Se ele já tem um ticket aberto, recebe uma resposta efêmera com o link do ticket existente, e nada é criado.
+1. O jogador escolhe o tipo no menu.
+2. Um jogador pode ter até **3 tickets abertos** ao mesmo tempo (ex.: duas denúncias e uma dúvida).
+   - Se já tem 1 ou 2 abertos, recebe uma mensagem efêmera com os links e a pergunta "Quer abrir outro de <tipo> mesmo assim?", com os botões **Abrir outro** e **Cancelar**.
+   - Se já tem 3, recebe os links e o pedido para fechar um antes; nada é criado. O limite é conferido de novo no envio do formulário.
 3. Senão, abre um **modal** com os campos do tipo:
 
 | Tipo | Campos do modal |
@@ -143,7 +145,7 @@ src/modules/tickets/
 
 ### 6.2 Dados (`model.ts`)
 - **Ticket:** `number`, `guildId`, `channelId`, `userId`, `category`, `answers` (pares campo/resposta), `status` (`open` | `closed`), `claimedBy`, `closedBy`, `createdAt`, `claimedAt`, `closedAt`, `deleteAt`, `survey` (lista ordenada de `{ questionId, value, answeredAt }`), `transcript` (lista de `{ authorId, authorTag, content, attachments[], createdAt }`).
-  - Índice em `{ guildId, userId, status }` para a regra de um ticket aberto por jogador.
+  - Índice em `{ guildId, userId, status }` para contar os tickets abertos de cada jogador (limite de 3).
 - **Contador:** documento `{ _id: "ticket", seq }`, incrementado com `findOneAndUpdate({ $inc })`. Ao iniciar, o módulo faz `seq = max(seq, TICKETS_START_NUMBER - 1)`. O valor **só sobe, nunca desce**, então mudar a variável para um número maior pula a numeração, e um número menor é ignorado.
 
 ### 6.2.1 Por que fora de categorias
