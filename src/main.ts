@@ -152,14 +152,16 @@ async function resetTopHorasCall() {
 }
 
 
-cron.schedule("0 4 1 * *", async () => {
+if (process.env.DEVELOPMENT !== "true") {
+	cron.schedule("0 4 1 * *", async () => {
 
-	await sendMonthlyTopCallTime(client);
+		await sendMonthlyTopCallTime(client);
 
-	setTimeout(async () => {
-		await resetTopHorasCall();
-	}, 10000);
-});
+		setTimeout(async () => {
+			await resetTopHorasCall();
+		}, 10000);
+	});
+}
 
 
 export default client;

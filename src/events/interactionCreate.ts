@@ -9,6 +9,7 @@ import {
     TextChannel
 } from "oceanic.js";
 import CommandContext from "../structures/CommandContext";
+import { handleTicketInteraction, isTicketInteraction } from "../modules/tickets";
 
 export default class InteractionCreate {
     client: Client;
@@ -18,6 +19,11 @@ export default class InteractionCreate {
     }
 
     async run(interaction: Interaction) {
+        if (isTicketInteraction(interaction)) {
+            await handleTicketInteraction(this.client, interaction);
+            return;
+        }
+
         if (interaction instanceof AutocompleteInteraction) {
             await this.handleAutocompleteInteraction(interaction);
         } else if (interaction instanceof CommandInteraction) {

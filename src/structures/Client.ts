@@ -53,12 +53,14 @@ export default class DGClient extends Client {
 	statusInterval?: NodeJS.Timeout;
 
 	constructor(token: string) {
+		// Modo teste só carrega ready/interactionCreate: não precisa de intents privilegiadas.
+		const testMode = process.env.DEVELOPMENT === "true";
 		const clientOptions: ClientOptions = {
 			auth: token,
 			defaultImageFormat: "png",
 			gateway: {
-				getAllUsers: true,
-				intents: [
+				getAllUsers: !testMode,
+				intents: testMode ? ["GUILDS"] : [
 					"ALL"
 				],
 			},
@@ -199,12 +201,20 @@ export default class DGClient extends Client {
 		console.log("\x1b[32m[CLIENT] Os comandos foram carregados.");
 	}
 	loadEvents(): void {
+		const testMode = process.env.DEVELOPMENT === "true";
+		const testEvents = ["ready", "interactionCreate", "error", "warn"];
+		if (testMode) {
+			console.log(
+				"\x1b[33m[CLIENT] Modo de teste: carregando só ready, interactionCreate, error e warn.",
+			);
+		}
 		for (const file of fs.readdirSync(
 			path.resolve(__dirname, "..", "events"),
 		)) {
 			if (file.endsWith(".ts") || file.endsWith(".js")) {
-				const event = new (require(`../events/${file}`).default)(this);
 				const eventName = file.split(".")[0] as keyof ClientEvents;
+				if (testMode && !testEvents.includes(eventName)) continue;
+				const event = new (require(`../events/${file}`).default)(this);
 
 				if (eventName === "ready") {
 					super.once("ready", (...args) => event.run(...args));
@@ -227,7 +237,7 @@ export default class DGClient extends Client {
 				autocomplete: command.autocomplete || false,
 			});
 		}
-		this.application.bulkEditGuildCommands("892472046729179136", cmds);
+		this.application.bulkEditGuildCommands(process.env.GUILD_ID || "892472046729179136", cmds);
 		console.log("\x1b[32m[CLIENT] Os slash commands foram atualizados");
 	}
 	connectLavaLink(): void {

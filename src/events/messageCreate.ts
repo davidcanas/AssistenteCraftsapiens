@@ -5,6 +5,7 @@
 import Client from "../structures/Client";
 import { Message } from "oceanic.js";
 import CommandContext from "../structures/CommandContext";
+import { isTicketChannel } from "../modules/tickets";
 
 export default class MessageCreate {
     client: Client;
@@ -124,7 +125,8 @@ export default class MessageCreate {
 
 		}
 
-	if (message.channel.name.includes("ticket-") || message.channel.name.includes("closed-")) {
+	// Orientação de denúncia para os canais do Ticket Tool; os tickets novos já pedem isso no formulário.
+	if ((message.channel.name.includes("ticket-") || message.channel.name.includes("closed-")) && !(await isTicketChannel(message.channel.id))) {
 
 
 			const hora = new Date()
