@@ -163,7 +163,7 @@ export default class PlayerInfo extends Command {
                             type: 2,
                             style: 5,
                             label: "Ver perfil online",
-                            url: "http://jogar.craftsapiens.com.br:50024/player/" + username,
+                            url: "https://assistente.craftsapiens.com.br/player/" + username,
                             emoji: { name: "🔗" },
                         }],
                     }

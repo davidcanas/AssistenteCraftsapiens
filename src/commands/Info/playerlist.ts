@@ -245,7 +245,7 @@ export default class PlayerList extends Command {
                     type: 2,
                     style: 5,
                     label: "Ver online",
-                    url: "http://jogar.craftsapiens.com.br:50024/stats/survival",
+                    url: "https://assistente.craftsapiens.com.br/stats/survival",
                     emoji: { name: "👀" },
                 },
                 ]

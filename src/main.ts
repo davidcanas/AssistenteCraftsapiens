@@ -102,7 +102,7 @@ async function sendMonthlyTopCallTime(client: DGClient) {
 							type: 2,
 							style: 5,
 							label: `Ver ranking completo (${thisMonth.charAt(0).toUpperCase()}${thisMonth.slice(1)})`,
-							url: "http://jogar.craftsapiens.com.br:50024/stats/topcall",
+							url: "https://assistente.craftsapiens.com.br/stats/topcall",
 							emoji: { name: "🏆" },
 						},
 					],

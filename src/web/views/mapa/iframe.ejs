@@ -16,10 +16,10 @@
 <body>
 
     <% if (cityName && cityInfo) {%>
-        <iframe src="http://jogar.craftsapiens.com.br:30009/?worldname=Earth&zoom=4&x=<%=cityInfo.data.location.x%>&z=<%=cityInfo.data.location.z%>" id="cityIframe"></iframe>
+        <iframe src="https://mapa.craftsapiens.com.br/?worldname=Earth&zoom=4&x=<%=cityInfo.data.location.x%>&z=<%=cityInfo.data.location.z%>" id="cityIframe"></iframe>
         <div class="success-message" id="successMessage"><%= cityName %> (<%= cityInfo.data.mayor %>)</div>
     <% } else { %>
-        <iframe src="http://jogar.craftsapiens.com.br:30009/?worldname=Earth&zoom=0.3&x=3680&z=-16254" id="cityIframe"></iframe>
+        <iframe src="https://mapa.craftsapiens.com.br/?worldname=Earth&zoom=0.3&x=3680&z=-16254" id="cityIframe"></iframe>
         <div class="error-message" id="errorMessage"><%= cityName %> não encontrada</div>
     <% } %>
 
@@ -36,7 +36,7 @@
                 var iframe = document.getElementById('cityIframe');
                 
                 // Força a porta 2053 e as coordenadas exatas: X -1920, Z 928
-                iframe.src = "http://jogar.craftsapiens.com.br:2053/?worldname=Earth&zoom=0.3&x=-1920&z=928";
+                iframe.src = "https://mapa.craftsapiens.com.br/?worldname=Earth&zoom=0.3&x=-1920&z=928";
                 
                 // Esconde mensagens de erro/sucesso do Geo2, pois não se aplicam aqui
                 var err = document.getElementById('errorMessage');

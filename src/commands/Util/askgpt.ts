@@ -74,7 +74,7 @@ export default class askGPT extends Command {
         const linksUteis = [
             { name: "Site oficial da craftsapiens", value: "https://craftsapiens.com.br" },
             { name: "Loja da craftsapiens (apenas dá para comprar premium,vip, ou sapiens)", value: "https://craftsapiens.lojasquare.net" },
-            { name: "Mapa", value: "http://jogar.craftsapiens.com.br:50024/mapa" },
+            { name: "Mapa", value: "https://assistente.craftsapiens.com.br/mapa" },
             { name: "Código do Assistente (github)", value: "https://github.com/davidcanas/AssistenteCraftsapiens" },
             { name: "Textura do Slimefun (opcional, Java)", value: "https://bit.ly/craftsapiens-textura" }
         ];
