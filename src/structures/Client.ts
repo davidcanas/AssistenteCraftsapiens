@@ -53,12 +53,14 @@ export default class DGClient extends Client {
 	statusInterval?: NodeJS.Timeout;
 
 	constructor(token: string) {
+		// Modo teste só carrega ready/interactionCreate: não precisa de intents privilegiadas.
+		const testMode = process.env.DEVELOPMENT === "true";
 		const clientOptions: ClientOptions = {
 			auth: token,
 			defaultImageFormat: "png",
 			gateway: {
-				getAllUsers: true,
-				intents: [
+				getAllUsers: !testMode,
+				intents: testMode ? ["GUILDS"] : [
 					"ALL"
 				],
 			},
