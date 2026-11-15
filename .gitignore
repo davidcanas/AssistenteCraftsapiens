@@ -6,3 +6,4 @@ src/data/*.yml
 package-lock.json
 package.json
 dist/
+/data/

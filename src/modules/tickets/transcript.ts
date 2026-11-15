@@ -1,11 +1,17 @@
 export const MAX_TRANSCRIPT_MESSAGES = 2000;
 
+export interface StoredFile {
+	name: string;
+	stored: string | null;
+}
+
 export interface TranscriptEntry {
 	authorId: string;
 	authorTag: string;
 	content: string;
 	attachments: string[];
 	createdAt: Date;
+	files?: StoredFile[];
 }
 
 export interface TranscriptHeader {

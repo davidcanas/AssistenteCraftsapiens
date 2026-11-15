@@ -1,7 +1,7 @@
 import { Schema, model, type Document, type Model } from "mongoose";
 import { TICKET_CATEGORIES, type TicketAnswer, type TicketCategoryId } from "./categories";
 import type { SurveyAnswer } from "./survey";
-import type { TranscriptEntry } from "./transcript";
+import type { StoredFile, TranscriptEntry } from "./transcript";
 
 export interface TicketDoc extends Document {
 	number: number;
@@ -39,6 +39,10 @@ const transcriptEntrySchema = new Schema<TranscriptEntry>(
 		authorTag: { type: String, required: true },
 		content: { type: String, default: "" },
 		attachments: { type: [String], default: [] },
+		files: {
+			type: [new Schema<StoredFile>({ name: { type: String, required: true }, stored: { type: String, default: null } }, { _id: false })],
+			default: undefined,
+		},
 		createdAt: { type: Date, required: true },
 	},
 	{ _id: false },
