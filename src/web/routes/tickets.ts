@@ -87,7 +87,7 @@ router.get("/anexos/:ticketId/:arquivo", async (req, res) => {
 		const { ticketId, arquivo } = req.params;
 		if (!isValidObjectId(ticketId)) return res.status(404).render("errors/404");
 
-		const ticket = await Ticket.findById(ticketId, { transcript: 1 }).lean();
+		const ticket = await Ticket.findById(ticketId, { "transcript.files": 1 }).lean();
 		if (!ticket) return res.status(404).render("errors/404");
 
 		const files: StoredFile[] = [];
@@ -236,11 +236,17 @@ router.get("/stream", (req, res) => {
 		}
 	};
 
-	const listener = (event: TicketEvent) => safeWrite(sseFrame(event));
+	// Enriquece o evento com nomes (o evento em si continua só com ids).
+	const listener = (event: TicketEvent) => {
+		const nomes: { staffNome?: string; fechadoPorNome?: string } = {};
+		if ("staffId" in event) nomes.staffNome = displayName(event.staffId);
+		if (event.tipo === "fechado") nomes.fechadoPorNome = displayName(event.fechadoPor);
+		safeWrite(sseFrame({ ...event, ...nomes } as TicketEvent));
+	};
 	ticketEvents.on("ticket", listener);
 	const ping = setInterval(() => safeWrite(": ping\n\n"), 25_000);
 
-	req.on("close", () => {
+	res.on("close", () => {
 		ticketEvents.off("ticket", listener);
 		clearInterval(ping);
 	});

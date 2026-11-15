@@ -54,30 +54,53 @@
 		return tr.querySelector('[data-col="' + col + '"]');
 	}
 
+	function nomeDe(nome, id) {
+		return nome || id;
+	}
+
+	// Acrescenta o superior ao fim do campo (sem apagar o que veio renderizado), sem repetir ids.
+	function acrescentarSuperior(el, e) {
+		var ids = (el.getAttribute("data-live-ids") || "").split(",").filter(Boolean);
+		var links = el.querySelectorAll("a");
+		for (var i = 0; i < links.length; i++) {
+			var m = /\/(\d+)$/.exec(links[i].getAttribute("href") || "");
+			if (m && ids.indexOf(m[1]) === -1) ids.push(m[1]);
+		}
+		if (ids.indexOf(e.staffId) !== -1) return;
+		ids.push(e.staffId);
+		el.setAttribute("data-live-ids", ids.join(","));
+		var vazio = ids.length === 1 && links.length === 0;
+		if (vazio) el.textContent = "";
+		var nome = nomeDe(e.staffNome, e.staffId);
+		el.appendChild(document.createTextNode((el.textContent.trim() ? ", " : "") + nome));
+	}
+
+	function doDetalhe(e) {
+		return noDetalhe && conversa.getAttribute("data-ticket-id") === e.ticketId;
+	}
+
 	function aoAssumir(e) {
-		var tr = linhaDoTicket(e.ticketId);
-		if (!tr) return;
-		var td = celula(tr, "assumido");
-		if (td) td.textContent = e.staffId;
+		if (naLista) {
+			var tr = linhaDoTicket(e.ticketId);
+			var td = tr && celula(tr, "assumido");
+			if (td) td.textContent = nomeDe(e.staffNome, e.staffId);
+		}
+		if (doDetalhe(e)) {
+			var campo = document.querySelector("[data-ticket-assumido]");
+			if (campo) campo.textContent = nomeDe(e.staffNome, e.staffId);
+		}
 	}
 
 	function aoSuperiorAssumir(e) {
-		var tr = linhaDoTicket(e.ticketId);
-		if (!tr) return;
-		var td = celula(tr, "superiores");
-		if (!td) return;
-		var ids = td.getAttribute("data-live-ids");
-		var lista = ids ? ids.split(",") : [];
-		if (lista.indexOf(e.staffId) === -1) lista.push(e.staffId);
-		td.setAttribute("data-live-ids", lista.join(","));
-		// Mostra os já renderizados + os novos (o nome aparece ao recarregar).
-		var atuais = [];
-		var links = td.querySelectorAll("a");
-		for (var i = 0; i < links.length; i++) atuais.push(links[i].textContent);
-		var extras = lista.filter(function (id) {
-			return !td.querySelector('a[href$="/' + id + '"]');
-		});
-		td.textContent = atuais.concat(extras).join(", ");
+		if (naLista) {
+			var tr = linhaDoTicket(e.ticketId);
+			var td = tr && celula(tr, "superiores");
+			if (td) acrescentarSuperior(td, e);
+		}
+		if (doDetalhe(e)) {
+			var campo = document.querySelector("[data-ticket-superiores]");
+			if (campo) acrescentarSuperior(campo, e);
+		}
 	}
 
 	function aoFechar(e) {
@@ -90,10 +113,15 @@
 				badge.className = "badge bg-secondary";
 			}
 		}
-		if (noDetalhe && conversa.getAttribute("data-ticket-id") === e.ticketId) {
+		if (doDetalhe(e)) {
+			var status = document.querySelector("[data-ticket-status]");
+			if (status) {
+				status.textContent = "Fechado";
+				status.className = "badge bg-secondary ms-2";
+			}
 			var aviso = document.createElement("div");
 			aviso.className = "alert alert-secondary mt-2";
-			aviso.textContent = "Ticket fechado · recarregue para ver a transcrição final";
+			aviso.textContent = "Ticket fechado · recarregue em alguns segundos para ver a transcrição final";
 			conversa.appendChild(aviso);
 		}
 	}
@@ -137,7 +165,14 @@
 
 	var fonte = new EventSource("/tickets/stream");
 	fonte.onopen = function () { setIndicador(true); };
-	fonte.onerror = function () { setIndicador(false); };
+	fonte.onerror = function () {
+		if (fonte.readyState === EventSource.CLOSED) {
+			indicador.textContent = "● desconectado · recarregue a página";
+			indicador.style.color = "#ff5555";
+			return;
+		}
+		setIndicador(false);
+	};
 	fonte.onmessage = function (ev) {
 		var e;
 		try { e = JSON.parse(ev.data); } catch (_) { return; }
@@ -148,10 +183,10 @@
 				if (naLista) mostrarFaixa();
 				break;
 			case "assumido":
-				if (naLista) aoAssumir(e);
+				aoAssumir(e);
 				break;
 			case "superior-assumiu":
-				if (naLista) aoSuperiorAssumir(e);
+				aoSuperiorAssumir(e);
 				break;
 			case "fechado":
 				aoFechar(e);

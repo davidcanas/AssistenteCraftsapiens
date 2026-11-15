@@ -46,19 +46,18 @@
     <div class="card-box">
       <h1 class="h4 mb-3">
         Ticket #<%= ticket.number %>
-        <span class="badge <%= ticket.status === "open" ? "bg-success" : "bg-secondary" %> ms-2"><%= ticket.status === "open" ? "Aberto" : "Fechado" %></span>
+        <span data-ticket-status class="badge <%= ticket.status === "open" ? "bg-success" : "bg-secondary" %> ms-2"><%= ticket.status === "open" ? "Aberto" : "Fechado" %></span>
       </h1>
       <div class="row g-2">
         <div class="col-md-4"><span class="ficha-label">Categoria</span><br><%= ticket.categoria %></div>
         <div class="col-md-4"><span class="ficha-label">Jogador</span><br><a href="/tickets/jogador/<%= ticket.jogador.id %>"><%= ticket.jogador.nome %></a></div>
         <div class="col-md-4">
           <span class="ficha-label">Atendente</span><br>
-          <% if (ticket.assumidoPor) { %><a href="/tickets/staff/<%= ticket.assumidoPor.id %>"><%= ticket.assumidoPor.nome %></a><% } else { %>-<% } %>
+          <span data-ticket-assumido><% if (ticket.assumidoPor) { %><a href="/tickets/staff/<%= ticket.assumidoPor.id %>"><%= ticket.assumidoPor.nome %></a><% } else { %>-<% } %></span>
         </div>
         <div class="col-md-4">
           <span class="ficha-label">Superiores</span><br>
-          <% if (ticket.superiores.length === 0) { %>-<% } %>
-          <% ticket.superiores.forEach((s, i) => { %><a href="/tickets/staff/<%= s.id %>"><%= s.nome %></a><%= i < ticket.superiores.length - 1 ? ", " : "" %><% }) %>
+          <span data-ticket-superiores><% if (ticket.superiores.length === 0) { %>-<% } %><% ticket.superiores.forEach((s, i) => { %><a href="/tickets/staff/<%= s.id %>"><%= s.nome %></a><%= i < ticket.superiores.length - 1 ? ", " : "" %><% }) %></span>
         </div>
         <div class="col-md-4">
           <span class="ficha-label">Fechado por</span><br>

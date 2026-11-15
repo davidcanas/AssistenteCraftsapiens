@@ -38,7 +38,10 @@
     const sufixo = (n) => (n > 0 ? " (" + n + " avaliações)" : "");
   %>
   <div class="container py-4">
-    <h1 class="h3 mb-4"><i class="fa-solid fa-ranking-star me-2"></i> Staff - tickets</h1>
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <h1 class="h3 mb-0"><i class="fa-solid fa-ranking-star me-2"></i> Staff - tickets</h1>
+      <a href="/tickets" class="btn btn-outline-secondary"><i class="fa-solid fa-ticket me-1"></i> Tickets</a>
+    </div>
 
     <form method="get" action="/tickets/staff" class="card-box row g-3 align-items-end">
       <div class="col-md-3">

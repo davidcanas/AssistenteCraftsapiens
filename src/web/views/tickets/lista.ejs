@@ -42,7 +42,10 @@
     const linkPagina = (n) => { const p = new URLSearchParams(qs); p.set("pagina", String(n)); return "/tickets?" + p.toString(); };
   %>
   <div class="container py-4">
-    <h1 class="h3 mb-4"><i class="fa-solid fa-ticket me-2"></i> Tickets</h1>
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <h1 class="h3 mb-0"><i class="fa-solid fa-ticket me-2"></i> Tickets</h1>
+      <a href="/tickets/staff" class="btn btn-outline-secondary"><i class="fa-solid fa-ranking-star me-1"></i> Ranking da staff</a>
+    </div>
 
     <% if (aviso) { %>
       <div class="alert alert-warning"><%= aviso %></div>
