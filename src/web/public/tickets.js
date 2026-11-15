@@ -108,7 +108,7 @@
 		msg.className = "msg";
 
 		var autor = document.createElement("strong");
-		autor.className = "autor-staff";
+		autor.className = e.autorId === conversa.getAttribute("data-jogador-id") ? "autor-jogador" : "autor-staff";
 		autor.textContent = e.autorTag;
 		msg.appendChild(autor);
 

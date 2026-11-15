@@ -109,7 +109,7 @@
       <% if (erroConversa) { %>
         <div class="alert alert-warning"><%= erroConversa %></div>
       <% } %>
-      <div id="conversa" data-ticket-id="<%= ticket.id %>">
+      <div id="conversa" data-ticket-id="<%= ticket.id %>" data-jogador-id="<%= ticket.jogador.id %>">
         <% if (conversa.length === 0 && !ticket.canalApagadoSemTranscricao && !erroConversa) { %>
           <p class="text-secondary mb-0">Nenhuma mensagem.</p>
         <% } %>
