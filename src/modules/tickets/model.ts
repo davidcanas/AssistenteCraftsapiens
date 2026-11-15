@@ -84,6 +84,16 @@ const ticketSchema = new Schema<TicketDoc>(
 ticketSchema.index({ guildId: 1, userId: 1, status: 1 });
 // Limpeza de canais fechados (roda a cada minuto).
 ticketSchema.index({ guildId: 1, status: 1, channelDeletedAt: 1, deleteAt: 1 });
+// Lista do site: tickets do servidor ordenados por data de criação.
+ticketSchema.index({ guildId: 1, createdAt: -1 });
+// Lista do site filtrada por atendente que assumiu o ticket.
+ticketSchema.index({ guildId: 1, claimedBy: 1, createdAt: -1 });
+// Lista do site filtrada por atendente que ajudou no ticket.
+ticketSchema.index({ guildId: 1, helpers: 1, createdAt: -1 });
+// Métricas: tickets fechados por período de fechamento.
+ticketSchema.index({ guildId: 1, status: 1, closedAt: -1 });
+// Busca do ticket pelo canal do Discord.
+ticketSchema.index({ channelId: 1 });
 
 export const Ticket: Model<TicketDoc> = model<TicketDoc>("Ticket", ticketSchema);
 

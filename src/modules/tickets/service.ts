@@ -11,6 +11,7 @@ import {
 import type DGClient from "../../structures/Client";
 import { getCategory, type TicketAnswer, type TicketCategory } from "./categories";
 import type { TicketsConfig } from "./config";
+import { emitTicketEvent } from "./events";
 import { Ticket, nextTicketNumber, type TicketDoc } from "./model";
 import { SURVEY_QUESTIONS, monthlySummaryEmbed, previousMonthRange, summarizeMonth, surveyOpeningMessage } from "./survey";
 import { downloadsEmAndamento, storeAttachments } from "./attachments";
@@ -197,6 +198,7 @@ export async function openTicket(
 		await Ticket.updateOne({ _id: ticket._id }, { $set: { welcomeMessageId } })
 			.catch((error) => console.error("[TICKETS]", error));
 
+		emitTicketEvent({ tipo: "aberto", ticketId: String(ticket._id), number: ticket.number, userId: p.userId, categoria: p.category.id, em: new Date().toISOString() });
 		return { ok: true, channelId: channel.id };
 	} catch (error) {
 		console.error("[TICKETS]", error);
@@ -223,6 +225,7 @@ export async function claimTicket(ticketId: string, staffId: string): Promise<Cl
 		{ new: true },
 	);
 	if (updated) {
+		emitTicketEvent({ tipo: "assumido", ticketId: String(updated._id), number: updated.number, staffId, em: new Date().toISOString() });
 		return { ok: true, ticket: updated };
 	}
 
@@ -295,7 +298,7 @@ export async function buildPlayerProfile(client: DGClient, guild: Guild, userId:
 	};
 }
 
-async function fetchTranscript(client: DGClient, channelId: string): Promise<{ entries: TranscriptEntry[]; truncated: boolean }> {
+export async function fetchTranscript(client: DGClient, channelId: string): Promise<{ entries: TranscriptEntry[]; truncated: boolean }> {
 	const entries: TranscriptEntry[] = [];
 	let before: string | undefined;
 	let lastPageFull = false;
@@ -342,6 +345,7 @@ export async function closeTicket(client: DGClient, config: TicketsConfig, ticke
 		const existing = await findTicketById(ticketId);
 		return { ok: false, reason: existing ? "already-closed" : "not-found" };
 	}
+	emitTicketEvent({ tipo: "fechado", ticketId: String(ticket._id), number: ticket.number, fechadoPor: closedById, em: new Date().toISOString() });
 
 	// 2. O jogador continua vendo o canal, mas não escreve mais (antes da transcrição, para nada se perder).
 	try {
@@ -450,6 +454,7 @@ export async function requestEscalation(client: DGClient, config: TicketsConfig,
 		requestedBy,
 		roleIds: config.escalationRoleIds,
 	}));
+	emitTicketEvent({ tipo: "superior-chamado", ticketId: String(ticket._id), number: ticket.number, pedidoPor: requestedBy, em: new Date().toISOString() });
 	return { ok: true, ticket };
 }
 
@@ -466,6 +471,7 @@ export async function takeEscalation(client: DGClient, config: TicketsConfig, ti
 	if (!ticket) {
 		return { ok: false, reason: (await findTicketById(ticketId)) ? "closed" : "not-found" };
 	}
+	emitTicketEvent({ tipo: "superior-assumiu", ticketId: String(ticket._id), number: ticket.number, staffId, em: new Date().toISOString() });
 
 	try {
 		await client.rest.channels.editPermission(ticket.channelId, staffId, { type: OverwriteTypes.MEMBER, allow: STAFF_PERMISSIONS });
