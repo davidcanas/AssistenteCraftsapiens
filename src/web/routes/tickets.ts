@@ -1,11 +1,16 @@
 import { Router } from "express";
+import { isValidObjectId } from "mongoose";
 import client from "../../main";
 import isLogged from "../helpers/isLogged";
 import isAdmin from "../helpers/isAdmin";
 import { Ticket } from "../../modules/tickets/model";
 import { getTicketsConfig } from "../../modules/tickets";
 import { buildTicketFilter, PAGE_SIZE } from "../../modules/tickets/metrics";
-import { toListItem, type Pessoa, type TicketLike } from "../../modules/tickets/siteViews";
+import { toListItem, toDetail, toConversation, isNotFoundError, resolveAttachment, isInlineFile, type ConversaItem, type Pessoa, type TicketLike } from "../../modules/tickets/siteViews";
+import { ATTACHMENTS_ROOT } from "../../modules/tickets/attachments";
+import { fetchTranscript } from "../../modules/tickets/service";
+import { withTimeout } from "../../modules/tickets/timeout";
+import type { StoredFile } from "../../modules/tickets/transcript";
 import { TICKET_CATEGORIES } from "../../modules/tickets/categories";
 
 const router = Router();
@@ -71,6 +76,78 @@ router.get("/", async (req, res) => {
 	} catch (error) {
 		console.error("[TICKETS]", error);
 		res.status(500).send("Erro ao carregar os tickets.");
+	}
+});
+
+// Arquivo anexado ao ticket: só serve o que está listado no transcript (sem caminho vindo do usuário).
+router.get("/anexos/:ticketId/:arquivo", async (req, res) => {
+	try {
+		const { ticketId, arquivo } = req.params;
+		if (!isValidObjectId(ticketId)) return res.status(404).render("errors/404");
+
+		const ticket = await Ticket.findById(ticketId, { transcript: 1 }).lean();
+		if (!ticket) return res.status(404).render("errors/404");
+
+		const files: StoredFile[] = [];
+		for (const entry of ticket.transcript ?? []) files.push(...((entry as { files?: StoredFile[] }).files ?? []));
+
+		const caminho = resolveAttachment(ATTACHMENTS_ROOT, ticketId, files, arquivo);
+		if (!caminho) return res.status(404).render("errors/404");
+
+		res.setHeader("X-Content-Type-Options", "nosniff");
+		if (!isInlineFile(arquivo)) res.setHeader("Content-Disposition", "attachment");
+
+		res.sendFile(caminho, (erro) => {
+			if (!erro || res.headersSent) return;
+			res.removeHeader("Content-Disposition");
+			res.status(404).render("errors/404");
+		});
+	} catch (error) {
+		console.error("[TICKETS]", error);
+		res.status(500).send("Erro ao carregar o anexo.");
+	}
+});
+
+// Rotas fixas (staff, jogador, stream...) devem ser declaradas ACIMA de "/:id".
+router.get("/:id", async (req, res) => {
+	try {
+		const { id } = req.params;
+		if (!isValidObjectId(id)) return res.status(404).render("errors/404");
+
+		const ticket = await Ticket.findById(id).lean();
+		if (!ticket) return res.status(404).render("errors/404");
+
+		const channelExists = !!client.getChannel(ticket.channelId);
+		let detalhe = toDetail(ticket as unknown as TicketLike, displayName, channelExists);
+		let conversa: ConversaItem[] = [];
+		let erroConversa: string | null = null;
+
+		if (ticket.status === "closed") {
+			conversa = toConversation(id, ticket.userId, client.user.id, (ticket.transcript ?? []) as any);
+		} else {
+			try {
+				const { entries } = await withTimeout(fetchTranscript(client, ticket.channelId), 10_000);
+				conversa = toConversation(id, ticket.userId, client.user.id, entries);
+			} catch (error) {
+				if (isNotFoundError(error)) {
+					detalhe = { ...detalhe, canalApagado: true, canalApagadoSemTranscricao: true };
+				} else {
+					console.error("[TICKETS]", error);
+					erroConversa = "Não foi possível ler a conversa no Discord agora.";
+				}
+			}
+		}
+
+		res.render("tickets/detalhe", {
+			...baseLocals(req),
+			ticket: detalhe,
+			conversa,
+			conversaAoVivo: ticket.status === "open",
+			erroConversa,
+		});
+	} catch (error) {
+		console.error("[TICKETS]", error);
+		res.status(500).send("Erro ao carregar o ticket.");
 	}
 });
 

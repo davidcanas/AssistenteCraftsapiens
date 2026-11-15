@@ -295,7 +295,7 @@ export async function buildPlayerProfile(client: DGClient, guild: Guild, userId:
 	};
 }
 
-async function fetchTranscript(client: DGClient, channelId: string): Promise<{ entries: TranscriptEntry[]; truncated: boolean }> {
+export async function fetchTranscript(client: DGClient, channelId: string): Promise<{ entries: TranscriptEntry[]; truncated: boolean }> {
 	const entries: TranscriptEntry[] = [];
 	let before: string | undefined;
 	let lastPageFull = false;
