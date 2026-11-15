@@ -5,7 +5,7 @@
 import Client from "../structures/Client";
 import { Message } from "oceanic.js";
 import CommandContext from "../structures/CommandContext";
-import { isTicketChannel } from "../modules/tickets";
+import { isTicketChannel, notifyTicketMessage } from "../modules/tickets";
 
 export default class MessageCreate {
     client: Client;
@@ -20,6 +20,8 @@ export default class MessageCreate {
         const prefix = "-";
 
         if (message.author.bot) return;
+
+        notifyTicketMessage(message);
 
 		if (message.channel?.id === "1285975006597091451") {
 			message.createReaction("⭐");
