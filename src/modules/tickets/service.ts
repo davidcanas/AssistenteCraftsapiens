@@ -14,7 +14,7 @@ import type { TicketsConfig } from "./config";
 import { emitTicketEvent } from "./events";
 import { Ticket, nextTicketNumber, type TicketDoc } from "./model";
 import { SURVEY_QUESTIONS, monthlySummaryEmbed, previousMonthRange, summarizeMonth, surveyOpeningMessage } from "./survey";
-import { storeAttachments } from "./attachments";
+import { downloadsEmAndamento, storeAttachments } from "./attachments";
 import { withTimeout } from "./timeout";
 import { MAX_TRANSCRIPT_MESSAGES, formatTranscript, type TranscriptEntry } from "./transcript";
 import {
@@ -554,6 +554,8 @@ export async function purgeExpiredChannels(client: DGClient, config: TicketsConf
 	let deleted = 0;
 
 	for (const ticket of expired) {
+		// Download de anexos em andamento: apagar o canal perderia os arquivos; fica para a próxima rodada.
+		if (downloadsEmAndamento.has(String(ticket._id))) continue;
 		try {
 			try {
 				await client.rest.channels.delete(ticket.channelId);

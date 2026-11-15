@@ -15,10 +15,13 @@ export interface FetchedFile {
 	body: NodeJS.ReadableStream;
 }
 
-export type Fetcher = (url: string, init: { timeout: number }) => Promise<FetchedFile>;
+export type Fetcher = (url: string, init: { timeout: number; signal: AbortSignal }) => Promise<FetchedFile>;
+
+// Tickets com download em andamento: o purge de canais pula esses (apagar o canal apaga os anexos do Discord).
+export const downloadsEmAndamento = new Set<string>();
 
 const defaultFetcher: Fetcher = async (url, init) => {
-	const res = await fetch(url, init);
+	const res = await fetch(url, init as any);
 	return { ok: res.ok, headers: res.headers, body: res.body };
 };
 
@@ -40,6 +43,7 @@ export function attachmentName(url: string): string {
 async function downloadTo(file: string, fetched: FetchedFile): Promise<void> {
 	const length = Number(fetched.headers.get("content-length"));
 	if (Number.isFinite(length) && length > MAX_ATTACHMENT_BYTES) {
+		(fetched.body as any).destroy?.();
 		throw new Error(`Anexo acima do limite (${length} bytes)`);
 	}
 
@@ -66,11 +70,27 @@ async function downloadTo(file: string, fetched: FetchedFile): Promise<void> {
 export async function storeAttachments(
 	ticketId: string,
 	entries: TranscriptEntry[],
-	opts: { root?: string; fetchFn?: Fetcher } = {},
+	opts: { root?: string; fetchFn?: Fetcher; timeoutMs?: number } = {},
 ): Promise<TranscriptEntry[]> {
 	const root = opts.root ?? ATTACHMENTS_ROOT;
 	const fetchFn = opts.fetchFn ?? defaultFetcher;
+	const timeoutMs = opts.timeoutMs ?? ATTACHMENT_TIMEOUT_MS;
 	const dir = path.join(root, ticketId);
+	downloadsEmAndamento.add(ticketId);
+	try {
+		return await storeAll(ticketId, entries, dir, fetchFn, timeoutMs);
+	} finally {
+		downloadsEmAndamento.delete(ticketId);
+	}
+}
+
+async function storeAll(
+	_ticketId: string,
+	entries: TranscriptEntry[],
+	dir: string,
+	fetchFn: Fetcher,
+	timeoutMs: number,
+): Promise<TranscriptEntry[]> {
 	await fs.promises.mkdir(dir, { recursive: true });
 
 	let index = 0;
@@ -86,14 +106,21 @@ export async function storeAttachments(
 			const name = attachmentName(url);
 			const stored = `${index}-${sanitizeFileName(name)}`;
 			index++;
+			const controller = new AbortController();
+			const timer = setTimeout(() => controller.abort(), timeoutMs);
 			try {
-				const fetched = await fetchFn(url, { timeout: ATTACHMENT_TIMEOUT_MS });
-				if (!fetched.ok) throw new Error(`Download falhou para ${name}`);
+				const fetched = await fetchFn(url, { timeout: timeoutMs, signal: controller.signal });
+				if (!fetched.ok) {
+					(fetched.body as any).destroy?.();
+					throw new Error(`Download falhou para ${name}`);
+				}
 				await downloadTo(path.join(dir, stored), fetched);
 				files.push({ name, stored });
 			} catch (error) {
 				console.error("[TICKETS]", error);
 				files.push({ name, stored: null });
+			} finally {
+				clearTimeout(timer);
 			}
 		}
 		result.push({ ...entry, files });
