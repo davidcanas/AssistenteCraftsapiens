@@ -5,13 +5,14 @@ import isLogged from "../helpers/isLogged";
 import isAdmin from "../helpers/isAdmin";
 import { Ticket } from "../../modules/tickets/model";
 import { getTicketsConfig } from "../../modules/tickets";
-import { buildTicketFilter, PAGE_SIZE } from "../../modules/tickets/metrics";
+import { buildTicketFilter, PAGE_SIZE, parsePeriod, staffRows } from "../../modules/tickets/metrics";
+import { previousMonthRange } from "../../modules/tickets/survey";
 import { toListItem, toDetail, toConversation, isNotFoundError, resolveAttachment, isInlineFile, type ConversaItem, type Pessoa, type TicketLike } from "../../modules/tickets/siteViews";
 import { ATTACHMENTS_ROOT } from "../../modules/tickets/attachments";
 import { fetchTranscript } from "../../modules/tickets/service";
 import { withTimeout } from "../../modules/tickets/timeout";
 import type { StoredFile } from "../../modules/tickets/transcript";
-import { TICKET_CATEGORIES } from "../../modules/tickets/categories";
+import { TICKET_CATEGORIES, getCategory } from "../../modules/tickets/categories";
 
 const router = Router();
 
@@ -105,6 +106,115 @@ router.get("/anexos/:ticketId/:arquivo", async (req, res) => {
 	} catch (error) {
 		console.error("[TICKETS]", error);
 		res.status(500).send("Erro ao carregar o anexo.");
+	}
+});
+
+const ID_REGEX = /^\d{17,20}$/;
+
+// Data (AAAA-MM-DD) no fuso de São Paulo (UTC-3 fixo).
+const spYmd = (d: Date) => new Date(d.getTime() - 3 * 3_600_000).toISOString().slice(0, 10);
+
+// Ranking da staff no período (tickets fechados, por closedAt).
+router.get("/staff", async (req, res) => {
+	try {
+		const now = new Date();
+		const periodo = parsePeriod(req.query, now);
+		const tickets = await Ticket.find(
+			{ guildId: GUILD(), status: "closed", closedAt: { $gte: periodo.start, $lt: periodo.end } },
+			{ claimedBy: 1, helpers: 1, category: 1, survey: 1, createdAt: 1, claimedAt: 1, closedAt: 1 },
+		).lean();
+		const { linhas, geral } = staffRows(tickets as any, displayName);
+
+		const mes = previousMonthRange(now);
+		const atalhos = [
+			{ nome: "7 dias", de: spYmd(new Date(now.getTime() - 6 * 86_400_000)), ate: spYmd(now) },
+			{ nome: "30 dias", de: spYmd(new Date(now.getTime() - 29 * 86_400_000)), ate: spYmd(now) },
+			{ nome: "Mês passado", de: spYmd(mes.start), ate: spYmd(new Date(mes.end.getTime() - 86_400_000)) },
+		];
+
+		res.render("tickets/staff", {
+			...baseLocals(req),
+			periodo: { de: periodo.de, ate: periodo.ate, label: periodo.label },
+			linhas,
+			geral,
+			atalhos,
+		});
+	} catch (error) {
+		console.error("[TICKETS]", error);
+		res.status(500).send("Erro ao carregar o ranking da staff.");
+	}
+});
+
+// Métricas e tickets de um atendente (como quem assumiu ou como superior).
+router.get("/staff/:userId", async (req, res) => {
+	try {
+		const { userId } = req.params;
+		if (!ID_REGEX.test(userId)) return res.status(404).render("errors/404");
+
+		const periodo = parsePeriod(req.query, new Date());
+		const tickets = await Ticket.find(
+			{
+				guildId: GUILD(),
+				status: "closed",
+				closedAt: { $gte: periodo.start, $lt: periodo.end },
+				$or: [{ claimedBy: userId }, { helpers: userId }],
+			},
+			{ transcript: 0 },
+		).sort({ createdAt: -1 }).lean();
+
+		const nome = displayName(userId);
+		const { linhas } = staffRows(tickets as any, displayName);
+		const metricas = linhas.find((l) => l.id === userId) ?? {
+			id: userId,
+			nome,
+			atendidos: 0,
+			avaliados: 0,
+			resolvidoPct: null,
+			atendimentoMedia: null,
+			tempoMedia: null,
+			mediaAteAssumir: null,
+			mediaAteFechar: null,
+			comoSuperior: 0,
+		};
+
+		res.render("tickets/staff-individual", {
+			...baseLocals(req),
+			periodo: { de: periodo.de, ate: periodo.ate, label: periodo.label },
+			atendente: { id: userId, nome },
+			metricas,
+			tickets: tickets.slice(0, 100).map((t) => toListItem(t as unknown as TicketLike, displayName, !!client.getChannel(t.channelId))),
+			totalTickets: tickets.length,
+		});
+	} catch (error) {
+		console.error("[TICKETS]", error);
+		res.status(500).send("Erro ao carregar o atendente.");
+	}
+});
+
+// Histórico de tickets de um jogador.
+router.get("/jogador/:userId", async (req, res) => {
+	try {
+		const { userId } = req.params;
+		if (!ID_REGEX.test(userId)) return res.status(404).render("errors/404");
+
+		const docs = await Ticket.find({ guildId: GUILD(), userId }, { transcript: 0 }).sort({ createdAt: -1 }).lean();
+
+		const porCategoria: Record<string, number> = {};
+		for (const t of docs) {
+			const cat = getCategory(t.category);
+			const rotulo = cat ? `${cat.emoji} ${cat.label}` : t.category;
+			porCategoria[rotulo] = (porCategoria[rotulo] ?? 0) + 1;
+		}
+
+		res.render("tickets/jogador", {
+			...baseLocals(req),
+			jogador: { id: userId, nome: displayName(userId) },
+			contagem: { total: docs.length, abertos: docs.filter((t) => t.status === "open").length, porCategoria },
+			tickets: docs.map((t) => toListItem(t as unknown as TicketLike, displayName, !!client.getChannel(t.channelId))),
+		});
+	} catch (error) {
+		console.error("[TICKETS]", error);
+		res.status(500).send("Erro ao carregar o histórico do jogador.");
 	}
 });
 

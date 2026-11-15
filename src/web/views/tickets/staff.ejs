@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Tickets - Staff</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+<style>
+  :root {
+    --bg-dark: #1e1f23;
+    --card-bg: #282a36;
+    --text-light: #f8f8f2;
+    --accent: #8be9fd;
+  }
+  body {
+    background-color: var(--bg-dark);
+    color: var(--text-light);
+    font-family: 'Segoe UI', sans-serif;
+  }
+  .card-box {
+    background: var(--card-bg);
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 20px;
+  }
+  .table { --bs-table-bg: transparent; --bs-table-color: var(--text-light); --bs-table-border-color: #44475a; }
+  a { color: var(--accent); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+</style>
+</head>
+<body>
+  <%- include('../../partials/navbar.ejs') %>
+  <%
+    const fmt = (v) => (v === null || v === undefined ? "-" : String(v));
+    const nota = (v) => (v === null || v === undefined ? "-" : Number(v).toFixed(1));
+    const pct = (v) => (v === null || v === undefined ? "-" : Math.round(v) + "%");
+    const sufixo = (n) => (n > 0 ? " (" + n + " avaliações)" : "");
+  %>
+  <div class="container py-4">
+    <h1 class="h3 mb-4"><i class="fa-solid fa-ranking-star me-2"></i> Staff - tickets</h1>
+
+    <form method="get" action="/tickets/staff" class="card-box row g-3 align-items-end">
+      <div class="col-md-3">
+        <label class="form-label" for="f-de">De</label>
+        <input type="date" class="form-control" id="f-de" name="de" value="<%= periodo.de %>">
+      </div>
+      <div class="col-md-3">
+        <label class="form-label" for="f-ate">Até</label>
+        <input type="date" class="form-control" id="f-ate" name="ate" value="<%= periodo.ate %>">
+      </div>
+      <div class="col-md-6">
+        <button type="submit" class="btn btn-primary"><i class="fa-solid fa-filter me-1"></i> Aplicar</button>
+        <% atalhos.forEach((a) => { %>
+          <a href="/tickets/staff?de=<%= a.de %>&amp;ate=<%= a.ate %>" class="btn btn-outline-secondary"><%= a.nome %></a>
+        <% }) %>
+      </div>
+    </form>
+
+    <div class="card-box">
+      <p class="text-secondary mb-3">Tickets fechados de <%= periodo.label %></p>
+      <div class="table-responsive">
+        <table class="table table-hover align-middle">
+          <thead>
+            <tr>
+              <th>Atendente</th><th>Atendidos</th><th>Avaliados</th><th>Resolvido</th>
+              <th>Atendimento</th><th>Rapidez</th><th>Até assumir</th><th>Até fechar</th><th>Como superior</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% if (linhas.length === 0) { %>
+              <tr><td colspan="9" class="text-center text-secondary">Nenhum ticket fechado no período.</td></tr>
+            <% } %>
+            <% linhas.forEach((l) => { %>
+              <tr>
+                <td>
+                  <% if (l.id) { %>
+                    <a href="/tickets/staff/<%= l.id %>"><%= l.nome %></a>
+                  <% } else { %>
+                    <%= l.nome %>
+                  <% } %>
+                </td>
+                <td><%= l.atendidos %></td>
+                <td><%= l.avaliados %></td>
+                <td><%= pct(l.resolvidoPct) %></td>
+                <td><%= nota(l.atendimentoMedia) %><%= sufixo(l.avaliados) %></td>
+                <td><%= nota(l.tempoMedia) %><%= sufixo(l.avaliados) %></td>
+                <td><%= fmt(l.mediaAteAssumir) %></td>
+                <td><%= fmt(l.mediaAteFechar) %></td>
+                <td><%= l.comoSuperior %></td>
+              </tr>
+            <% }) %>
+          </tbody>
+          <tfoot>
+            <tr class="fw-bold">
+              <td><%= geral.nome %></td>
+              <td><%= geral.atendidos %></td>
+              <td><%= geral.avaliados %></td>
+              <td><%= pct(geral.resolvidoPct) %></td>
+              <td><%= nota(geral.atendimentoMedia) %><%= sufixo(geral.avaliados) %></td>
+              <td><%= nota(geral.tempoMedia) %><%= sufixo(geral.avaliados) %></td>
+              <td><%= fmt(geral.mediaAteAssumir) %></td>
+              <td><%= fmt(geral.mediaAteFechar) %></td>
+              <td>-</td>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+    </div>
+  </div>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

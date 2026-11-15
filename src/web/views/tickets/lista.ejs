@@ -95,51 +95,7 @@
 
     <div class="card-box">
       <p class="text-secondary mb-3"><%= total %> ticket(s)</p>
-      <div class="table-responsive">
-        <table class="table table-hover align-middle">
-          <thead>
-            <tr>
-              <th>Nº</th><th>Categoria</th><th>Jogador</th><th>Status</th><th>Assumido por</th>
-              <th>Superiores</th><th>Aberto em</th><th>Até assumir</th><th>Até fechar</th><th>Nota</th>
-            </tr>
-          </thead>
-          <tbody>
-            <% if (itens.length === 0) { %>
-              <tr><td colspan="10" class="text-center text-secondary">Nenhum ticket encontrado.</td></tr>
-            <% } %>
-            <% itens.forEach((t) => { %>
-              <tr data-ticket-id="<%= t.id %>">
-                <td><a href="/tickets/<%= t.id %>">#<%= t.number %></a></td>
-                <td><%= t.categoria %></td>
-                <td><a href="/tickets/jogador/<%= t.jogador.id %>"><%= t.jogador.nome %></a></td>
-                <td>
-                  <% if (t.status === "open") { %>
-                    <span class="badge bg-success">aberto</span>
-                  <% } else { %>
-                    <span class="badge bg-secondary">fechado</span>
-                  <% } %>
-                  <% if (t.canalApagado) { %>
-                    <span class="badge bg-dark border border-secondary">canal apagado</span>
-                  <% } %>
-                </td>
-                <td>
-                  <% if (t.assumidoPor) { %>
-                    <a href="/tickets/staff/<%= t.assumidoPor.id %>"><%= t.assumidoPor.nome %></a>
-                  <% } else { %>-<% } %>
-                </td>
-                <td>
-                  <% if (t.superiores.length === 0) { %>-<% } %>
-                  <% t.superiores.forEach((s, i) => { %><% if (i > 0) { %>, <% } %><a href="/tickets/staff/<%= s.id %>"><%= s.nome %></a><% }) %>
-                </td>
-                <td><%= t.abertoEm %></td>
-                <td><%= t.tempoAteAssumir ?? "-" %></td>
-                <td><%= t.tempoAteFechar ?? "-" %></td>
-                <td><%= t.nota ?? "-" %></td>
-              </tr>
-            <% }) %>
-          </tbody>
-        </table>
-      </div>
+<%- include('_tabela', { itens }) %>
 
       <% if (totalPaginas > 1) { %>
       <nav aria-label="Paginação">
