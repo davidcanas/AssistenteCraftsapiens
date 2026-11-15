@@ -84,14 +84,6 @@ export interface Detalhe extends ListItem {
 	canalApagadoSemTranscricao: boolean;
 }
 
-function formatDuracao(ms: number): string {
-	const minutos = Math.max(0, Math.round(ms / 60_000));
-	if (minutos < 60) return `${minutos} min`;
-	const horas = Math.floor(minutos / 60);
-	if (horas < 24) return `${horas}h ${minutos % 60}min`;
-	return `${Math.floor(horas / 24)}d ${horas % 24}h`;
-}
-
 export function toDetail(t: TicketLike, nome: NameFn, channelExists: boolean): Detalhe {
 	const item = toListItem(t, nome, channelExists);
 	const avaliacao: { pergunta: string; resposta: string }[] = [];
@@ -103,8 +95,6 @@ export function toDetail(t: TicketLike, nome: NameFn, channelExists: boolean): D
 	}
 	return {
 		...item,
-		tempoAteAssumir: t.claimedAt ? formatDuracao(t.claimedAt.getTime() - t.createdAt.getTime()) : null,
-		tempoAteFechar: t.closedAt ? formatDuracao(t.closedAt.getTime() - t.createdAt.getTime()) : null,
 		ficha: t.answers ?? [],
 		fechadoPor: t.closedBy ? { id: t.closedBy, nome: nome(t.closedBy) } : null,
 		assumidoEm: t.claimedAt ? formatDateBR(t.claimedAt) : null,
