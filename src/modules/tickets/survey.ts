@@ -46,7 +46,7 @@ export function surveyQuestionMessage(ticketId: string, index: number): CreateMe
 			title: "⭐ Avalie o atendimento",
 			color: COLOR_PRIMARY,
 			description: `**${question.text}**${scaleHint}`,
-			footer: { text: `Pergunta ${index + 1}/${SURVEY_QUESTIONS.length} • Suas respostas são anônimas para a staff` },
+			footer: { text: `Pergunta ${index + 1}/${SURVEY_QUESTIONS.length} • Só a diretoria vê suas respostas` },
 		}],
 		components: [{
 			type: ComponentTypes.ACTION_ROW,
