@@ -1,5 +1,6 @@
 import path from "node:path";
 import { attachmentName } from "./attachments";
+import { formatDuration } from "./metrics";
 import { getCategory, type TicketAnswer } from "./categories";
 import { SURVEY_QUESTIONS, type SurveyAnswer } from "./survey";
 import { formatDateBR, type StoredFile, type TranscriptEntry } from "./transcript";
@@ -61,8 +62,8 @@ export function toListItem(t: TicketLike, nome: NameFn, channelExists: boolean):
 		assumidoPor: t.claimedBy ? pessoa(t.claimedBy) : null,
 		superiores: (t.helpers ?? []).map(pessoa),
 		abertoEm: formatDateBR(t.createdAt),
-		tempoAteAssumir: null,
-		tempoAteFechar: null,
+		tempoAteAssumir: t.claimedAt ? formatDuration(t.claimedAt.getTime() - t.createdAt.getTime()) : null,
+		tempoAteFechar: t.closedAt ? formatDuration(t.closedAt.getTime() - t.createdAt.getTime()) : null,
 		nota: serviceScore(t.survey),
 		canalApagado: t.status === "open" && !channelExists,
 	};
