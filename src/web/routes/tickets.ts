@@ -4,7 +4,8 @@ import client from "../../main";
 import isLogged from "../helpers/isLogged";
 import isAdmin from "../helpers/isAdmin";
 import { Ticket } from "../../modules/tickets/model";
-import { getTicketsConfig } from "../../modules/tickets";
+import { getTicketsConfig, ticketEvents, sseFrame } from "../../modules/tickets";
+import type { TicketEvent } from "../../modules/tickets/events";
 import { buildTicketFilter, PAGE_SIZE, parsePeriod, staffRows } from "../../modules/tickets/metrics";
 import { previousMonthRange } from "../../modules/tickets/survey";
 import { toListItem, toDetail, toConversation, isNotFoundError, resolveAttachment, isInlineFile, type ConversaItem, type Pessoa, type TicketLike } from "../../modules/tickets/siteViews";
@@ -216,6 +217,33 @@ router.get("/jogador/:userId", async (req, res) => {
 		console.error("[TICKETS]", error);
 		res.status(500).send("Erro ao carregar o histórico do jogador.");
 	}
+});
+
+// Tempo real (SSE): um listener por aba, removido uma única vez no "close".
+router.get("/stream", (req, res) => {
+	res.setHeader("Content-Type", "text/event-stream");
+	res.setHeader("Cache-Control", "no-cache");
+	res.setHeader("Connection", "keep-alive");
+	res.setHeader("X-Accel-Buffering", "no");
+	res.flushHeaders();
+
+	const safeWrite = (chunk: string) => {
+		try {
+			if (res.writableEnded || res.destroyed) return;
+			res.write(chunk);
+		} catch (error) {
+			console.error("[TICKETS]", error);
+		}
+	};
+
+	const listener = (event: TicketEvent) => safeWrite(sseFrame(event));
+	ticketEvents.on("ticket", listener);
+	const ping = setInterval(() => safeWrite(": ping\n\n"), 25_000);
+
+	req.on("close", () => {
+		ticketEvents.off("ticket", listener);
+		clearInterval(ping);
+	});
 });
 
 // Rotas fixas (staff, jogador, stream...) devem ser declaradas ACIMA de "/:id".

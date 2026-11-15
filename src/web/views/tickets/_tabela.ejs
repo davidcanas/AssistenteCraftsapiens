@@ -15,7 +15,7 @@
                 <td><a href="/tickets/<%= t.id %>">#<%= t.number %></a></td>
                 <td><%= t.categoria %></td>
                 <td><a href="/tickets/jogador/<%= t.jogador.id %>"><%= t.jogador.nome %></a></td>
-                <td>
+                <td data-col="status">
                   <% if (t.status === "open") { %>
                     <span class="badge bg-success">aberto</span>
                   <% } else { %>
@@ -25,12 +25,12 @@
                     <span class="badge bg-dark border border-secondary">canal apagado</span>
                   <% } %>
                 </td>
-                <td>
+                <td data-col="assumido">
                   <% if (t.assumidoPor) { %>
                     <a href="/tickets/staff/<%= t.assumidoPor.id %>"><%= t.assumidoPor.nome %></a>
                   <% } else { %>-<% } %>
                 </td>
-                <td>
+                <td data-col="superiores">
                   <% if (t.superiores.length === 0) { %>-<% } %>
                   <% t.superiores.forEach((s, i) => { %><% if (i > 0) { %>, <% } %><a href="/tickets/staff/<%= s.id %>"><%= s.nome %></a><% }) %>
                 </td>

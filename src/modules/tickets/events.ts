@@ -10,6 +10,8 @@ export type TicketEvent =
 
 // Barramento interno: o service emite, o stream SSE do site escuta. Evento único: "ticket".
 export const ticketEvents = new EventEmitter();
+// Um listener por aba aberta do site: sem limite, para não gerar MaxListenersExceededWarning após 10 abas.
+ticketEvents.setMaxListeners(0);
 
 /** Nunca lança: um listener com defeito não pode derrubar o fluxo do ticket. */
 export function emitTicketEvent(event: TicketEvent): void {
