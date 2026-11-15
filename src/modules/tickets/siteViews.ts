@@ -136,7 +136,8 @@ export function resolveAttachment(root: string, ticketId: string, files: StoredF
 	return path.join(root, ticketId, arquivo);
 }
 
-const INLINE_EXTENSIONS = new Set([".png", ".jpg", ".jpeg", ".gif", ".webp", ".mp4", ".webm", ".mov"]);
+// .txt vai como text/plain com nosniff: o navegador mostra como texto, nunca interpreta como HTML.
+const INLINE_EXTENSIONS = new Set([".png", ".jpg", ".jpeg", ".gif", ".webp", ".mp4", ".webm", ".mov", ".txt"]);
 
 export function isInlineFile(fileName: string): boolean {
 	return INLINE_EXTENSIONS.has(path.extname(fileName).toLowerCase());
