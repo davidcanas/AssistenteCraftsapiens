@@ -13,6 +13,7 @@ import { getCategory, type TicketAnswer, type TicketCategory } from "./categorie
 import type { TicketsConfig } from "./config";
 import { Ticket, nextTicketNumber, type TicketDoc } from "./model";
 import { SURVEY_QUESTIONS, monthlySummaryEmbed, previousMonthRange, summarizeMonth, surveyOpeningMessage } from "./survey";
+import { storeAttachments } from "./attachments";
 import { withTimeout } from "./timeout";
 import { MAX_TRANSCRIPT_MESSAGES, formatTranscript, type TranscriptEntry } from "./transcript";
 import {
@@ -369,6 +370,13 @@ export async function closeTicket(client: DGClient, config: TicketsConfig, ticke
 	try {
 		({ entries, truncated } = await fetchTranscript(client, ticket.channelId));
 		await Ticket.updateOne({ _id: ticket._id }, { $set: { transcript: entries } });
+
+		// 3b. Anexos para o disco (sem await: o fechamento não espera o download).
+		if (entries.some((e) => e.attachments.length > 0)) {
+			storeAttachments(String(ticket._id), entries)
+				.then((withFiles) => Ticket.updateOne({ _id: ticket._id }, { $set: { transcript: withFiles } }))
+				.catch((error) => console.error("[TICKETS]", error));
+		}
 	} catch (error) {
 		console.error("[TICKETS]", error);
 	}
