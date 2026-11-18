@@ -1,7 +1,6 @@
 import Command from "../../structures/Command";
 import Client from "../../structures/Client";
 import CommandContext from "../../structures/CommandContext";
-import { ConnectionState } from "vulkava";
 
 export default class Stop extends Command {
 	constructor(client: Client) {
@@ -19,7 +18,7 @@ export default class Stop extends Command {
 		
 		const currPlayer = this.client.music.players.get(ctx.guild.id as string);
     
-		if (!currPlayer || currPlayer.state === ConnectionState.DISCONNECTED) {
+		if (!currPlayer || !currPlayer.connected) {
 			ctx.sendMessage("Não estou tocando nada.");
 			return;
 		}
@@ -31,10 +30,11 @@ export default class Stop extends Command {
           return;
         }
 
-		if (currPlayer.olderMessageID) {
-			ctx.channel.deleteMessage(currPlayer.olderMessageID).catch(() => { });
+		const olderMessageID = currPlayer.get<string>("olderMessageID");
+		if (olderMessageID) {
+			ctx.channel.deleteMessage(olderMessageID).catch(() => { });
 		}
-		currPlayer.destroy();
+		await currPlayer.destroy();
 		ctx.sendMessage("Musica parada por " + ctx.author.username);
 	}
 }

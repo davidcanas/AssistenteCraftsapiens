@@ -1,7 +1,6 @@
 import Command from "../../structures/Command";
 import Client from "../../structures/Client";
 import CommandContext from "../../structures/CommandContext";
-import { ConnectionState } from "vulkava";
 import { Constants } from "oceanic.js";
 
 export default class Volume extends Command {
@@ -28,7 +27,7 @@ export default class Volume extends Command {
 		const currPlayer = this.client.music.players.get(ctx.guild.id as string);
 		const volume = Number(ctx.args[0]);
 
-		if (!currPlayer || currPlayer.state === ConnectionState.DISCONNECTED) {
+		if (!currPlayer || !currPlayer.connected) {
 			ctx.sendMessage("Não estou a tocar nada nesse momento.");
 			return;
 		}
@@ -45,7 +44,7 @@ export default class Volume extends Command {
 			return;
 		}
 
-		currPlayer.filters.setVolume(volume);
+		await currPlayer.setVolume(volume);
 		ctx.sendMessage(
 			`**${ctx.author.username}** alterou o volume para **${volume}/500**!`
 		);

@@ -18,7 +18,7 @@ import staff from "../models/staffDB";
 
 import Embed from "./Embed";
 
-import { NodeOptions } from "vulkava";
+import { LavalinkNodeOptions } from "lavalink-client";
 
 import Music from "./Music";
 
@@ -241,14 +241,14 @@ export default class DGClient extends Client {
 		console.log("\x1b[32m[CLIENT] Os slash commands foram atualizados");
 	}
 	connectLavaLink(): void {
-		const nodes: NodeOptions[] = [
+		const nodes: LavalinkNodeOptions[] = [
 			{
 				id: "Craftsapiens Lavalink Node",
-				hostname: process.env.LAVALINKURL as string,
+				host: process.env.LAVALINKURL as string,
 				port: Number(process.env.LAVALINKPORT) || 50011,
-				password: process.env.LAVALINKPASSWORD as string,
-				maxRetryAttempts: 10,
-				retryAttemptsInterval: 3000,
+				authorization: process.env.LAVALINKPASSWORD as string,
+				retryAmount: Infinity,
+				retryDelay: 10000,
 				secure: false,
 			}
 		];
@@ -256,7 +256,7 @@ export default class DGClient extends Client {
 		this.music = new Music(this, nodes);
 
 		this.music.init();
-		super.on("packet", (packet) => this.music.handleVoiceUpdate(packet));
+		super.on("packet", (packet) => this.music.sendRawData(packet as any));
 	}
 
 

@@ -1,6 +1,5 @@
 import subClient from "../../structures/sub/subClient";
 import playlist from "../../../playlist.json";
-import { DefaultQueue } from "vulkava";
 import { CommandInteraction } from "oceanic.js";
 
 const ninaBot = new subClient(process.env.NINA_TOKEN);
@@ -29,26 +28,22 @@ async function playPlaylist() {
         selfDeaf: true,
       });
 
-      player.connect();
-      const res = await ninaBot.music.search(playlist.jazz[0].url, "soundcloud");
+      await player.connect();
+      const res = await ninaBot.music.search(playlist.jazz[0].url, ninaBot.user);
 
-      if (res.loadType !== "PLAYLIST_LOADED" && res.loadType !== "TRACK_LOADED") {
+      if (res.loadType !== "playlist" && res.loadType !== "track") {
         console.log(res.loadType);
-        console.log(res.exception.message);
+        console.log(res.exception?.message);
         throw new Error("Não foi possível carregar a playlist.");
       }
 
-      res.tracks.forEach(track => {
-        track.setRequester(ninaBot.user);
-        player.queue.add(track);
-      });
+      await player.queue.add(res.tracks);
+      await player.queue.shuffle();
+      await player.setRepeatMode("queue");
 
-      (player.queue as DefaultQueue).shuffle();
-      player.setQueueLoop(true);
+      if (!player.playing) await player.play();
 
-      if (!player.playing) player.play();
-
-      console.log(`Tocando playlist: ${res.playlistInfo.name}`);
+      console.log(`Tocando playlist: ${res.playlist?.name ?? res.tracks[0]?.info.title}`);
       return; 
     } catch (error) {
       attempts++;
@@ -69,21 +64,21 @@ ninaBot.on("interactionCreate", async (interaction) => {
   if (!(interaction instanceof CommandInteraction) || interaction.data.name !== "nina") return;
 
   const player = ninaBot.music.players.get(interaction.guildID);
-  if (!player || !player.current) {
+  if (!player || !player.queue.current) {
     return interaction.createMessage({ content: "Não estou tocando nnina no momento." });
   }
 
-  const track = player.current;
-  const progressBar = ninaBot.progressBar((player.position/1000), (track.duration/1000), 20);
+  const track = player.queue.current;
+  const progressBar = ninaBot.progressBar((player.position/1000), (track.info.duration/1000), 20);
 
   const embed = {
     title: "🎷 Jazz | Tocando agora:",
-    description: `\`\`\`\n${progressBar}\n[${ninaBot.MsToHour(player.position)}]            [${ninaBot.MsToHour(track.duration)}]\n\`\`\``,
+    description: `\`\`\`\n${progressBar}\n[${ninaBot.MsToHour(player.position)}]            [${ninaBot.MsToHour(track.info.duration)}]\n\`\`\``,
     fields: [
-      { name: "🎶 Título:", value: `\`${track.title}\``, inline: false },
-      { name: "⏲️ Duração:", value: `\`${ninaBot.MsToHour(track.duration)}\``, inline: false },
+      { name: "🎶 Título:", value: `\`${track.info.title}\``, inline: false },
+      { name: "⏲️ Duração:", value: `\`${ninaBot.MsToHour(track.info.duration)}\``, inline: false },
     ],
-    thumbnail: { url: track.thumbnail },
+    thumbnail: { url: track.info.artworkUrl },
     color: Math.floor(Math.random() * 16777215),
   };
 

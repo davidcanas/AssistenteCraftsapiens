@@ -1,47 +1,39 @@
 import Client from "./subClient";
 import { TextChannel } from "oceanic.js";
-import { NodeOptions, Vulkava, Node } from "vulkava";
-import "../lavalinkChannelId";
+import { LavalinkManager, LavalinkNodeOptions, SearchPlatform } from "lavalink-client";
 
-export default class subMusic extends Vulkava {
+export default class subMusic extends LavalinkManager {
 	client: Client;
 
 
-	constructor(client: Client, nodes: NodeOptions[]) {
+	constructor(client: Client, nodes: LavalinkNodeOptions[]) {
 		super({
 			nodes,
-			sendWS(id, payload) {
-				const guild = client.guilds.get(id);
+			sendToShard(guildId, payload) {
+				const guild = client.guilds.get(guildId);
 				if (guild) guild.shard.send(payload.op, payload.d);
+			},
+			autoSkip: true,
+			playerOptions: {
+				defaultSearchPlatform: "scsearch",
+				onDisconnect: { autoReconnect: true, destroyPlayer: false },
 			},
 		});
 
 		this.client = client;
-		this.on("nodeConnect", async (node): Promise<void> => {
-			console.log(`\x1b[33m[LAVALINK] O node ${node.identifier} foi conectado!`);
 
-
-			for (const player of [...this.players.values()]
-				.filter((p) => p.node === node)
-				.values()) {
-				const position = player.position;
-				player.connect();
-				player.play({ startTime: position });
-			}
+		this.nodeManager.on("connect", (node): void => {
+			console.log(`\x1b[33m[LAVALINK] O node ${node.id} foi conectado!`);
 		});
 
-
-		this.on("error", (node, error): void => {
+		this.nodeManager.on("error", (node, error): void => {
 			console.log(
-				`\x1b[34m[SUB] Ocorreu um erro no node ${node.identifier}, erro: ${error.message}`
+				`\x1b[34m[SUB] Ocorreu um erro no node ${node.id}, erro: ${error.message}`
 			);
-
-			if (error.message.startsWith("Unable to connect after"))
-				this.reconnect(node);
 		});
 
-		this.on("nodeDisconnect", (node): void => {
-			console.log(`\x1b[33m[LAVALINK] O node do lavalink ${node.identifier} desconectou.`);
+		this.nodeManager.on("disconnect", (node): void => {
+			console.log(`\x1b[33m[LAVALINK] O node do lavalink ${node.id} desconectou.`);
 		});
 
 
@@ -50,47 +42,37 @@ export default class subMusic extends Vulkava {
 				const ch = this.client.getChannel(player.textChannelId) as TextChannel;
 				ch.createMessage({ content: "Aparentemente, aconteceu algo de errado ao continuar a transmissão de música\nPor favor, contacte DG0837." });
 
-				player.skip();
+				player.skip(0, false);
 			}
 		});
-        
+
 		this.on("queueEnd", (player): void => {
 			if (player.textChannelId) {
 				const channel = this.client.getChannel(player.textChannelId);
 				if (channel.type !== 0) return;
-				if (player.olderMessageID) {
-					channel.deleteMessage(player.olderMessageID).catch(() => { });
+				const olderMessageID = player.get<string>("olderMessageID");
+				if (olderMessageID) {
+					channel.deleteMessage(olderMessageID).catch(() => { });
 				}
-				if (channel.type !== 0) return;
 				player.destroy();
 				channel.createMessage({ content: "Por algum motivo, a minha lista de músicas acabou!" });
 			}
 		});
 	}
 
-
-
-	init() {
-		return super.start(this.client.user.id);
+	// Busca sem precisar de player: links são carregados direto; texto vai para o SoundCloud (padrão)
+	// e, se falhar, para o YouTube. A busca do SoundCloud está quebrada no lavaplayer 2.2.6
+	// ("Did not detect any supported formats", lavalink-devs/lavaplayer#204).
+	async search(query: string, requester: unknown, source?: SearchPlatform) {
+		const node = this.nodeManager.leastUsedNodes()[0];
+		if (!node) throw new Error("Nenhum node do Lavalink conectado.");
+		const res = await node.search({ query, source }, requester);
+		const isLink = /^https?:\/\//.test(query);
+		if (isLink || source || (res.loadType !== "error" && res.tracks.length)) return res;
+		return node.search({ query, source: "ytsearch" }, requester);
 	}
 
-	private reconnect(node: Node) {
-		node.disconnect();
-		this.nodes.splice(this.nodes.indexOf(node), 1);
-
-		const newNode = new Node(this, {
-			id: node.identifier as string,
-			hostname: node.options.hostname,
-			port: node.options.port,
-			password: node.options.password,
-			maxRetryAttempts: 20,
-			retryAttemptsInterval: 3000,
-			secure: false,
-			region: node.options.region,
-		});
-
-		this.nodes.push(newNode);
-
-		newNode.connect();
+	init() {
+		return super.init({ id: this.client.user.id, username: this.client.user.username });
 	}
 }

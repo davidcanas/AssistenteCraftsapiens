@@ -1,7 +1,7 @@
 import Command from "../../structures/Command";
 import Client from "../../structures/Client";
 import CommandContext from "../../structures/CommandContext";
-import { ConnectionState, Player } from "vulkava";
+import { Player, Track } from "lavalink-client";
 import { Constants, VoiceChannel } from "oceanic.js";
 
 export default class play extends Command {
@@ -48,16 +48,16 @@ export default class play extends Command {
 		};
 
 		try {
-			const res = await this.client.music.search(ctx.args.join(" "));
+			const res = await this.client.music.search(ctx.args.join(" "), ctx.author);
 
-			if (res.loadType === "LOAD_FAILED") {
+			if (res.loadType === "error") {
 				ctx.sendMessage(`Erro: \`${res.exception?.message}\``);
-			} else if (res.loadType === "NO_MATCHES") {
+			} else if (res.loadType === "empty" || !res.tracks.length) {
 				ctx.sendMessage("Não encontrei essa musica.");
 			} else {
 				const player = currPlayer || createPlayer();
 
-				if (player.state === ConnectionState.DISCONNECTED) {
+				if (!player.connected) {
 					if (
 						!voiceChannel
 							.permissionsOf(this.client.user.id)
@@ -72,19 +72,16 @@ export default class play extends Command {
 						player.destroy();
 						return;
 					}
-					player.connect();
+					await player.connect();
 				}
 
 				player.textChannelId = ctx.channel.id;
-				if (res.loadType === "PLAYLIST_LOADED") {
-					const playlist = res.playlistInfo;
+				if (res.loadType === "playlist") {
+					const playlist = res.playlist;
 
-					for (const track of res.tracks) {
-						track.setRequester(ctx.author);
-						player.queue.add(track);
-					}
+					await player.queue.add(res.tracks as Track[]);
 
-					if (!player.playing) player.play();
+					if (!player.playing) await player.play();
 
 					const embed = new this.client.embed()
 						.setColor("RANDOM")
@@ -101,16 +98,15 @@ export default class play extends Command {
 
 					ctx.sendMessage({ embeds: [embed] });
 				} else {
-					const tracks = res.tracks;
+					const track = res.tracks[0] as Track;
 
-					tracks[0].setRequester(ctx.author);
-					player.queue.add(tracks[0]);
+					await player.queue.add(track);
 
 					ctx.sendMessage(
-						`🎵 \`${tracks[0].title}\` adicionada á lista com sucesso`
+						`🎵 \`${track.info.title}\` adicionada á lista com sucesso`
 					);
 
-					if (!player.playing) player.play();
+					if (!player.playing) await player.play();
 				}
 			}
 		} catch (err: any) {
