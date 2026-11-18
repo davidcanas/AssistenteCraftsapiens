@@ -153,11 +153,15 @@ export async function aplicarGrupos(
 
 	const adicionados: string[] = [];
 	const removidos: string[] = [];
+	// Qualquer falha de cargo vira `aplicado: false`: o plugin só guarda os grupos no cache quando vem `true`,
+	// então assim ele tenta de novo. Os cargos que deram certo continuam aplicados.
+	let falhou = false;
 	for (const cargo of plano.adicionar) {
 		try {
 			await guild.addMemberRole(membro.id, cargo, MOTIVO_GRUPOS);
 			adicionados.push(cargo);
 		} catch (erro) {
+			falhou = true;
 			console.error(`[VINCULO] Falha ao dar o cargo ${cargo} a ${membro.id}:`, erro);
 		}
 	}
@@ -166,11 +170,13 @@ export async function aplicarGrupos(
 			await guild.removeMemberRole(membro.id, cargo, MOTIVO_GRUPOS);
 			removidos.push(cargo);
 		} catch (erro) {
+			falhou = true;
 			console.error(`[VINCULO] Falha ao tirar o cargo ${cargo} de ${membro.id}:`, erro);
 		}
 	}
 	registrarMudanca(membro.id, chave, adicionados, removidos);
 
+	// A falha do apelido não conta: é esperada com o dono do servidor ou com cargo acima do bot.
 	await trocarApelido(guild, membro, nick, MOTIVO_GRUPOS);
 
 	if (doc.nick !== nick) {
@@ -181,7 +187,7 @@ export async function aplicarGrupos(
 		}
 	}
 
-	return { aplicado: true };
+	return { aplicado: !falhou };
 }
 
 export async function desvincular(client: DGClient, uuid: string): Promise<{ removido: boolean }> {
