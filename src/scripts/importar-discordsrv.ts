@@ -29,6 +29,17 @@ async function main(): Promise<void> {
 
 	await connect(process.env.MONGODB as string);
 
+	// Garante que os índices únicos (uuid e discordId) existem antes de contar ou gravar;
+	// sem eles o upsert poderia duplicar um discordId.
+	try {
+		await Vinculo.init();
+	} catch (erro) {
+		console.error("Erro: não foi possível criar/verificar os índices únicos da coleção vinculo. Nada foi gravado.");
+		console.error(erro);
+		await disconnect().catch(() => undefined);
+		process.exit(1);
+	}
+
 	const existentes = await Vinculo.find({
 		$or: [
 			{ uuid: { $in: contas.map((c) => c.uuid) } },
