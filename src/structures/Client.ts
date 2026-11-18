@@ -249,6 +249,9 @@ export default class DGClient extends Client {
 				authorization: process.env.LAVALINKPASSWORD as string,
 				retryAmount: Infinity,
 				retryDelay: 10000,
+				// Playlists grandes do SoundCloud demoram para carregar (o Lavalink testa e pula as faixas
+				// em formato não suportado; em produção a de lofi leva ~48 s). O padrão de 10 s não basta.
+				requestSignalTimeoutMS: 120000,
 				secure: false,
 			}
 		];
