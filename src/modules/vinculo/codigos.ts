@@ -25,7 +25,13 @@ export class CodigoStore {
 		private aleatorio: () => number = () => randomInt(0, 2 ** 32) / 2 ** 32,
 	) {}
 
+	/** Quantidade de códigos pendentes guardados (inclui vencidos ainda não varridos). */
+	get tamanho(): number {
+		return this.porCodigo.size;
+	}
+
 	gerar(uuid: string, nick: string): { codigo: string; expiraEm: number } {
+		this.limparVencidos();
 		const anterior = this.porUuid.get(uuid);
 		if (anterior) this.porCodigo.delete(anterior);
 
@@ -61,6 +67,14 @@ export class CodigoStore {
 		if (pendente) this.remover(chave, pendente);
 	}
 
+	/** Apaga os códigos vencidos dos dois Maps, para a memória não crescer com códigos que ninguém usou. */
+	private limparVencidos(): void {
+		const agora = this.agora();
+		for (const [codigo, pendente] of this.porCodigo) {
+			if (agora > pendente.expiraEm) this.remover(codigo, pendente);
+		}
+	}
+
 	private remover(codigo: string, pendente: Pendente): void {
 		this.porCodigo.delete(codigo);
 		if (this.porUuid.get(pendente.uuid) === codigo) this.porUuid.delete(pendente.uuid);
@@ -73,14 +87,29 @@ export class LimiteTentativas {
 
 	constructor(private agora: () => number = Date.now) {}
 
+	/** Quantidade de usuários com erros guardados. */
+	get tamanho(): number {
+		return this.erros.size;
+	}
+
 	bloqueado(discordId: string): boolean {
+		this.limparAntigos();
 		return this.recentes(discordId).length >= MAX_TENTATIVAS;
 	}
 
 	registrarErro(discordId: string): void {
+		this.limparAntigos();
 		const lista = this.recentes(discordId);
 		lista.push(this.agora());
 		this.erros.set(discordId, lista);
+	}
+
+	/** Descarta os usuários cujos erros saíram todos da janela. */
+	private limparAntigos(): void {
+		const limite = this.agora() - JANELA_TENTATIVAS_MS;
+		for (const [discordId, lista] of this.erros) {
+			if (!lista.some((t) => t >= limite)) this.erros.delete(discordId);
+		}
 	}
 
 	private recentes(discordId: string): number[] {

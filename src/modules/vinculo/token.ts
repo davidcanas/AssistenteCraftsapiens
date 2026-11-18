@@ -1,18 +1,19 @@
-import { timingSafeEqual } from "crypto";
+import { createHash, timingSafeEqual } from "crypto";
 import type { RequestHandler } from "express";
 
 const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
-/** Confere o cabeçalho `Authorization: Bearer <token>` em tempo constante. */
+function sha256(valor: string): Buffer {
+	return createHash("sha256").update(valor).digest();
+}
+
+/**
+ * Confere o cabeçalho `Authorization: Bearer <token>` em tempo constante.
+ * Compara os hashes SHA-256 (sempre 32 bytes), então o tamanho do token não vaza pelo tempo de resposta.
+ */
 export function tokenValido(cabecalho: string | undefined, esperado: string | undefined): boolean {
 	if (!cabecalho || !esperado) return false;
-	const recebido = cabecalho.startsWith("Bearer ") ? cabecalho.slice(7) : "";
-	if (!recebido) return false;
-
-	const a = Buffer.from(recebido);
-	const b = Buffer.from(esperado);
-	if (a.length !== b.length) return false;
-	return timingSafeEqual(a, b);
+	return timingSafeEqual(sha256(cabecalho), sha256(`Bearer ${esperado}`));
 }
 
 /** Middleware: 503 sem token configurado, 401 com token errado. O token é lido a cada requisição. */
