@@ -12,10 +12,8 @@ export default class subClient extends Client {
 			auth: token,
 			defaultImageFormat: "png",
 			gateway: {
-				getAllUsers: true,
-				intents: [
-					"ALL"
-				],
+				// Só entram em canal de voz e respondem slash command: não precisam de intents privilegiadas.
+				intents: ["GUILDS", "GUILD_VOICE_STATES"],
 			},
 			collectionLimits: {
 				messages: 100,
