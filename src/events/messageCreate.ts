@@ -79,13 +79,13 @@ export default class MessageCreate {
 
 				message.author.createDM().then(a => 
 					a.createMessage({ 
-						content: `<:sir_derp:1145737198868647936> Olá, ${message.author.mention}!\nParece que você está tentando vincular sua conta do discord com o Minecraft, por favor, envie o código \`${message.content}\` para o privado do <@968686499409313804>`,
+						content: `<:sir_derp:1145737198868647936> Olá, ${message.author.mention}!\nPara vincular sua conta, use \`/vincular\` no Minecraft e depois \`/vincular codigo:<código>\` aqui no Discord.`,
 					}));
 
 				return;
 			}
 			return message.channel.createMessage({
-				content: `<:sir_derp:1145737198868647936> Olá, <@${message.author.id}>!\nParece que você está tentando vincular sua conta do discord com o Minecraft, por favor, envie o código \`${message.content}\` para o privado do <@968686499409313804>`,
+				content: `<:sir_derp:1145737198868647936> Olá, <@${message.author.id}>!\nPara vincular sua conta, use \`/vincular\` no Minecraft e depois \`/vincular codigo:<código>\` aqui no Discord.`,
 				messageReference: { messageID: message.id },
 				components: [component]
 			});
@@ -506,7 +506,7 @@ export default class MessageCreate {
 			if (!this.client.getDiscordByNick(message.member.nick)) {
 				const embed = new this.client.embed()
 				.setDescription("**Para usar o sistema de Música, você precisa de ter a sua conta discord vinculada com o minecraft!**")
-				.addField("Como vincular?", "> Para vincular sua conta use o comando `/discord link` no minecraft da Craftsapiens!")
+				.addField("Como vincular?", "> Para vincular sua conta use o comando `/vincular` no minecraft da Craftsapiens e depois `/vincular codigo:<código>` aqui no Discord!")
 				.setColor("16711680")
 				.setFooter("Qualquer duvida, contacte um STAFF | Essa mensagem se autodestruirá em 1 minuto!");
 

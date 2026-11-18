@@ -121,7 +121,7 @@ export default class InteractionCreate {
         if (!this.client.getDiscordByNick(interaction.member.nick)) {
             const embed = new this.client.embed()
                 .setDescription("**Para usar o sistema de música da Craftsapiens, você precisa de ter a sua conta discord vinculada com o minecraft!**")
-                .addField("Como vincular?", "> Use o comando /discord link no minecraft da Craftsapiens!")
+                .addField("Como vincular?", "> Use o comando /vincular no minecraft da Craftsapiens e depois /vincular codigo:<código> aqui no Discord!")
                 .setColor("16711680")
                 .setFooter("Qualquer dúvida, contate um STAFF");
 
