@@ -79,13 +79,13 @@ export default class MessageCreate {
 
 				message.author.createDM().then(a => 
 					a.createMessage({ 
-						content: `<:sir_derp:1145737198868647936> Olá, ${message.author.mention}!\nParece que você está tentando vincular sua conta do discord com o Minecraft, por favor, envie o código \`${message.content}\` para o privado do <@968686499409313804>`,
+						content: `<:sir_derp:1145737198868647936> Olá, ${message.author.mention}!\nPara vincular sua conta, use \`/vincular\` no Minecraft e depois \`/vincular codigo:<código>\` aqui no Discord.`,
 					}));
 
 				return;
 			}
 			return message.channel.createMessage({
-				content: `<:sir_derp:1145737198868647936> Olá, <@${message.author.id}>!\nParece que você está tentando vincular sua conta do discord com o Minecraft, por favor, envie o código \`${message.content}\` para o privado do <@968686499409313804>`,
+				content: `<:sir_derp:1145737198868647936> Olá, <@${message.author.id}>!\nPara vincular sua conta, use \`/vincular\` no Minecraft e depois \`/vincular codigo:<código>\` aqui no Discord.`,
 				messageReference: { messageID: message.id },
 				components: [component]
 			});
