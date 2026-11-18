@@ -1,6 +1,7 @@
 import Client from "./subClient";
 import { TextChannel } from "oceanic.js";
 import { NodeOptions, Vulkava, Node } from "vulkava";
+import "../lavalinkChannelId";
 
 export default class subMusic extends Vulkava {
 	client: Client;

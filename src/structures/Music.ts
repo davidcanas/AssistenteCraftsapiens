@@ -2,6 +2,7 @@ import Client from "./Client";
 import CommandContext from "./CommandContext";
 import { TextChannel, VoiceChannel } from "oceanic.js";
 import { NodeOptions, Vulkava, Player, Node } from "vulkava";
+import "./lavalinkChannelId";
 
 export default class Music extends Vulkava {
 	client: Client;
