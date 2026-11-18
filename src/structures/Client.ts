@@ -245,7 +245,7 @@ export default class DGClient extends Client {
 			{
 				id: "Craftsapiens Lavalink Node",
 				hostname: process.env.LAVALINKURL as string,
-				port: 50011,
+				port: Number(process.env.LAVALINKPORT) || 50011,
 				password: process.env.LAVALINKPASSWORD as string,
 				maxRetryAttempts: 10,
 				retryAttemptsInterval: 3000,
