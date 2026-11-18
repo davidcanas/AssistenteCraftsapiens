@@ -66,7 +66,13 @@ export async function statusVinculo(
 ): Promise<{ vinculado: boolean; discordId?: string; discordNome?: string }> {
 	const doc = await Vinculo.findOne({ uuid: uuid.toLowerCase() }).lean();
 	if (!doc) return { vinculado: false };
-	const membro = await obterMembro(client, doc.discordId);
+	// Aqui o membro só serve para mostrar um nome: se o Discord oscilar, cai para o username em cache ou o id.
+	let membro: Member | null = null;
+	try {
+		membro = await obterMembro(client, doc.discordId);
+	} catch (erro) {
+		console.warn(`[VINCULO] Não foi possível buscar o membro ${doc.discordId} para o nome; usando o fallback:`, erro);
+	}
 	return { vinculado: true, discordId: doc.discordId, discordNome: nomeDoMembro(client, doc.discordId, membro) };
 }
 
