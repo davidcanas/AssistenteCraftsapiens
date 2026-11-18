@@ -8,6 +8,7 @@ import dash from "./routes/dash";
 import punicoes from "./routes/punicoes";
 import mapa from "./routes/mapa";
 import tickets from "./routes/tickets";
+import vinculo from "./routes/vinculo";
 import isAdmin from "./helpers/isAdmin";
 
 const app = express();
@@ -50,6 +51,7 @@ passport.serializeUser(function(user, done) {
   app.use("/punicoes", punicoes);
   app.use("/mapa", mapa);
   app.use("/tickets", tickets);
+  app.use("/api/vinculo", vinculo);
 
 app.get("/", isAdmin, (req, res) => {
 	res.status(200).render("index", { 
