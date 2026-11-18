@@ -71,7 +71,7 @@ export async function statusVinculo(
 	try {
 		membro = await obterMembro(client, doc.discordId);
 	} catch (erro) {
-		console.warn(`[VINCULO] Não foi possível buscar o membro ${doc.discordId} para o nome; usando o fallback:`, erro);
+		console.warn(`[VINCULO] Não foi possível buscar o membro ${doc.discordId} para o nome; usando o fallback:`, (erro as any)?.message ?? erro);
 	}
 	return { vinculado: true, discordId: doc.discordId, discordNome: nomeDoMembro(client, doc.discordId, membro) };
 }
