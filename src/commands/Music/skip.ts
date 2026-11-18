@@ -1,7 +1,6 @@
 import Command from "../../structures/Command";
 import Client from "../../structures/Client";
 import CommandContext from "../../structures/CommandContext";
-import { ConnectionState } from "vulkava";
 
 export default class Skip extends Command {
 	constructor(client: Client) {
@@ -20,7 +19,7 @@ export default class Skip extends Command {
 		const currPlayer = this.client.music.players.get(ctx.guild.id as string);
 
    
-		if (!currPlayer || currPlayer.state === ConnectionState.DISCONNECTED) {
+		if (!currPlayer || !currPlayer.connected) {
 			ctx.sendMessage("Não existe nenhuma música para ser pulada.");
 			return;
 		}
@@ -32,7 +31,7 @@ export default class Skip extends Command {
           return;
         }
 
-		currPlayer.skip();
+		await currPlayer.skip(0, false);
 		ctx.sendMessage("Musica pulada por " + ctx.author.username);
 	}
 }

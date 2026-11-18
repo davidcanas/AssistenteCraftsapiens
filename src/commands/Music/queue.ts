@@ -1,7 +1,7 @@
 import Command from "../../structures/Command";
 import Client from "../../structures/Client";
 import CommandContext from "../../structures/CommandContext";
-import { DefaultQueue } from "vulkava";
+import { Track } from "lavalink-client";
 import { User } from "oceanic.js";
 
 export default class Queue extends Command {
@@ -25,13 +25,13 @@ export default class Queue extends Command {
 		
 
 		let test: Array<string> = [];
-		const playerQueue = player.queue as DefaultQueue;
+		const playerQueue = player.queue;
 		playerQueue.tracks.forEach((q) => {
 			const requester = q.requester as User;
 			const autor = this.client.users.get(requester.id);
 			test.push(
 				"`" +
-                q.title +
+                (q as Track).info.title +
                 "`" +
                 "- " +
                 "_(" +

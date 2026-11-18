@@ -1,5 +1,5 @@
 import { Client, ClientOptions } from "oceanic.js";
-import { NodeOptions } from "vulkava";
+import { LavalinkNodeOptions } from "lavalink-client";
 
 import Music from "./subMusic";
 
@@ -30,14 +30,14 @@ export default class subClient extends Client {
 	}
 
 	connectLavaLink(): void {
-		const nodes: NodeOptions[] = [
+		const nodes: LavalinkNodeOptions[] = [
 			{
 				id: `${this.user.username}'s Lavalink`,
-				hostname: process.env.LAVALINKURL as string,
+				host: process.env.LAVALINKURL as string,
 				port: Number(process.env.LAVALINKPORT) || 50011,
-				password: process.env.LAVALINKPASSWORD as string,
-				maxRetryAttempts: 10,
-				retryAttemptsInterval: 3000,
+				authorization: process.env.LAVALINKPASSWORD as string,
+				retryAmount: Infinity,
+				retryDelay: 10000,
 				secure: false,
 			}
 		];
@@ -45,7 +45,7 @@ export default class subClient extends Client {
 		this.music = new Music(this, nodes);
 
 		this.music.init();
-		super.on("packet", (packet) => this.music.handleVoiceUpdate(packet));
+		super.on("packet", (packet) => this.music.sendRawData(packet as any));
 	}
 
 	registerSlashCommands(): void {

@@ -1,7 +1,6 @@
 import Command from "../../structures/Command";
 import Client from "../../structures/Client";
 import CommandContext from "../../structures/CommandContext";
-import { ConnectionState } from "vulkava";
 import { Constants } from "oceanic.js";
 
 export default class Effect extends Command {
@@ -38,7 +37,7 @@ export default class Effect extends Command {
 
         const currPlayer = this.client.music.players.get(ctx.guild.id as string);
 
-        if (!currPlayer || currPlayer.state === ConnectionState.DISCONNECTED) {
+        if (!currPlayer || !currPlayer.connected) {
             ctx.sendMessage("Não estou a tocar nada nesse momento.");
             return;
         }
@@ -55,19 +54,20 @@ export default class Effect extends Command {
 
         // LÓGICA DO SPEEDUP
         if (effectType === "speedup") {
-            if (!currPlayer.speedup) {
+            if (!currPlayer.get<boolean>("speedup")) {
                 // Ativa Speedup (valores > 1.0)
-                currPlayer.filters.setTimescale({ pitch: 1.18, rate: 1.10, speed: 1.15 });
+                currPlayer.filterManager.data.timescale = { pitch: 1.18, rate: 1.10, speed: 1.15 };
+                await currPlayer.filterManager.applyPlayerFilters();
                 
                 // Atualiza estados
-                currPlayer.speedup = true;
-                currPlayer.slowed = false; // Garante que o slowed esteja desligado
+                currPlayer.set("speedup", true);
+                currPlayer.set("slowed", false); // Garante que o slowed esteja desligado
                 
                 ctx.sendMessage("⏩ O efeito **Speedup** foi ativado!");
             } else {
                 // Desativa Speedup
-                currPlayer.filters.clear();
-                currPlayer.speedup = false;
+                await currPlayer.filterManager.resetFilters();
+                currPlayer.set("speedup", false);
                 ctx.sendMessage("⏹️ O efeito **Speedup** foi desativado!");
             }
             return;
@@ -75,20 +75,21 @@ export default class Effect extends Command {
 
         // LÓGICA DO SLOWED
         if (effectType === "slowed") {
-            if (!currPlayer.slowed) {
+            if (!currPlayer.get<boolean>("slowed")) {
                 // Ativa Slowed (valores < 1.0 para ficar grave e lento)
                 // pitch: 0.9 (mais grave), rate: 0.85 (mais lento)
-                currPlayer.filters.setTimescale({ pitch: 0.9, rate: 0.85, speed: 0.85 });
+                currPlayer.filterManager.data.timescale = { pitch: 0.9, rate: 0.85, speed: 0.85 };
+                await currPlayer.filterManager.applyPlayerFilters();
 
                 // Atualiza estados
-                currPlayer.slowed = true;
-                currPlayer.speedup = false; // Garante que o speedup esteja desligado
+                currPlayer.set("slowed", true);
+                currPlayer.set("speedup", false); // Garante que o speedup esteja desligado
 
                 ctx.sendMessage("◀️ O efeito **Slowed** foi ativado!");
             } else {
                 // Desativa Slowed
-                currPlayer.filters.clear();
-                currPlayer.slowed = false;
+                await currPlayer.filterManager.resetFilters();
+                currPlayer.set("slowed", false);
                 ctx.sendMessage("⏹️ O efeito **Slowed** foi desativado!");
             }
             return;

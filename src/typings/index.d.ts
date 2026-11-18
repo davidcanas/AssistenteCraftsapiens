@@ -88,12 +88,5 @@ interface IEditInteractionData {
   file?: MessageFile;
 }
 
-declare module "vulkava" {
-  export interface Player {
-    olderMessageID?: string;
-    speedup?: boolean;
-    slowed?: boolean;
-  }
-}
 
 

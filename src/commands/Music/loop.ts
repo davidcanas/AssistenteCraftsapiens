@@ -1,7 +1,6 @@
 import Command from "../../structures/Command";
 import Client from "../../structures/Client";
 import CommandContext from "../../structures/CommandContext";
-import { ConnectionState } from "vulkava";
 import { Constants } from "oceanic.js";
 
 export default class Loop extends Command {
@@ -38,7 +37,7 @@ export default class Loop extends Command {
     
 		const currPlayer = this.client.music.players.get(ctx.guild.id as string);
   
-		if (!currPlayer || currPlayer.state === ConnectionState.DISCONNECTED) {
+		if (!currPlayer || !currPlayer.connected) {
 			ctx.sendMessage("Não estou a tocar nada nesse momento.");
 			return; 
 		}
@@ -51,11 +50,11 @@ export default class Loop extends Command {
         }
 
         if (ctx.args[0] === "queue") {
-            currPlayer.setQueueLoop(!currPlayer.queueRepeat);
-            ctx.sendMessage(`O loop da queue foi ${currPlayer.queueRepeat ? "ativado" : "desativado"}.`);
+            await currPlayer.setRepeatMode(currPlayer.repeatMode === "queue" ? "off" : "queue");
+            ctx.sendMessage(`O loop da queue foi ${currPlayer.repeatMode === "queue" ? "ativado" : "desativado"}.`);
         } else if (ctx.args[0] === "track") {
-            currPlayer.setTrackLoop(!currPlayer.trackRepeat);
-            ctx.sendMessage(`O loop da música atual foi ${currPlayer.trackRepeat ? "ativado" : "desativado"}.`);
+            await currPlayer.setRepeatMode(currPlayer.repeatMode === "track" ? "off" : "track");
+            ctx.sendMessage(`O loop da música atual foi ${currPlayer.repeatMode === "track" ? "ativado" : "desativado"}.`);
         }
 
        

@@ -22,6 +22,7 @@
     "express-session": "^1.18.1",
     "jimp": "^1.6.0",
     "jsdom": "^26.0.0",
+    "lavalink-client": "^2.11.2",
     "mathjs": "^14.4.0",
     "mongoose": "^8.13.2",
     "node-cron": "^3.0.3",
@@ -32,8 +33,7 @@
     "prettier": "^3.5.3",
     "sourcebin": "^5.0.0",
     "twemoji-parser": "^14.0.0",
-    "util": "^0.12.5",
-    "vulkava": "^1.6.4"
+    "util": "^0.12.5"
   },
   "devDependencies": {
     "@types/dotenv": "^8.2.0",

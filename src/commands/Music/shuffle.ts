@@ -1,7 +1,6 @@
 import Command from "../../structures/Command";
 import Client from "../../structures/Client";
 import CommandContext from "../../structures/CommandContext";
-import { ConnectionState, DefaultQueue } from "vulkava";
 
 export default class Shuffle extends Command {
 	constructor(client: Client) {
@@ -20,7 +19,7 @@ export default class Shuffle extends Command {
     
 		const currPlayer = this.client.music.players.get(ctx.guild.id as string);
   
-		if (!currPlayer || currPlayer.state === ConnectionState.DISCONNECTED) {
+		if (!currPlayer || !currPlayer.connected) {
 			ctx.sendMessage("Não estou a tocar nada nesse momento.");
 			return; 
 		}
@@ -32,7 +31,7 @@ export default class Shuffle extends Command {
           return;
         }
 
-        (currPlayer.queue as DefaultQueue).shuffle();
+        await currPlayer.queue.shuffle();
 
         ctx.sendMessage("Lista de músicas embaralhada com sucesso!");
 

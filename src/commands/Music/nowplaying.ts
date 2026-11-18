@@ -1,7 +1,6 @@
 import Command from "../../structures/Command";
 import Client from "../../structures/Client";
 import CommandContext from "../../structures/CommandContext";
-import { ConnectionState } from "vulkava";
 import { User } from "oceanic.js";
 
 export default class NowPlaying extends Command {
@@ -22,22 +21,22 @@ export default class NowPlaying extends Command {
 		const currPlayer = this.client.music.players.get(ctx.guild.id as string);
 		
 
-		if (!currPlayer || currPlayer.state === ConnectionState.DISCONNECTED) {
+		if (!currPlayer || !currPlayer.connected) {
 			ctx.sendMessage("Não estou a tocar nada nesse momento.");
 			return;
 		}
 
 		
-        const song = currPlayer.current; 
+        const song = currPlayer.queue.current; 
         const requester = song.requester as User;
-        const progressBar = ctx.progressBar((currPlayer.position/1000), (song.duration/1000), 20);
+        const progressBar = ctx.progressBar((currPlayer.position/1000), (song.info.duration/1000), 20);
         const embed = new this.client.embed()
             .setTitle("🎵 Tocando agora:")
-            .setDescription(`\`\`\`\n${progressBar}\n[${ctx.MsToHour(currPlayer.position)}]            [${ctx.MsToHour(song.duration)}]\n\`\`\``)
-            .addField("🎶 Título:", `\`${song.title}\``)
-            .addField("⏲️ Duração:", `\`${ctx.MsToHour(song.duration)}\``)
+            .setDescription(`\`\`\`\n${progressBar}\n[${ctx.MsToHour(currPlayer.position)}]            [${ctx.MsToHour(song.info.duration)}]\n\`\`\``)
+            .addField("🎶 Título:", `\`${song.info.title}\``)
+            .addField("⏲️ Duração:", `\`${ctx.MsToHour(song.info.duration)}\``)
             .addField("👤 Pedido por:", `<@${requester.id}>`)
-            .setThumbnail(song.thumbnail)
+            .setThumbnail(song.info.artworkUrl)
             .setColor("RANDOM");
         
         ctx.sendMessage({ embeds: [embed]});

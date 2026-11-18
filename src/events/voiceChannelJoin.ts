@@ -3,7 +3,6 @@ import Client from "../structures/Client";
 import { ObjectId } from "mongodb";
 import playlist from "../../playlist.json";
 import subClient from "../structures/sub/subClient";
-import { DefaultQueue } from "vulkava";
 
 export default class voiceChannelJoin {
     client: Client;
@@ -40,7 +39,7 @@ export default class voiceChannelJoin {
         let isPlaying = false;
         if (bot && bot.music && player && player.playing) {
             isPlaying = true;
-            console.log(`(${member.username} - o bot está a tocar "${player.current.title}" nesta Call de Estudo`);
+            console.log(`(${member.username} - o bot está a tocar "${player.queue.current?.info.title}" nesta Call de Estudo`);
         } else {
             console.log(`(${member.username} - por algum motivo o bot não está a tocar nada nesta Call de Estudo, a tentar iniciar!`);
             try {
@@ -50,22 +49,18 @@ export default class voiceChannelJoin {
                     selfDeaf: true,
                 });
 
-                player.connect();
-                const res = await bot.music.search(playlist[selectedPlaylist][0].url);
+                await player.connect();
+                const res = await bot.music.search(playlist[selectedPlaylist][0].url, bot.user);
 
-                if (res.loadType !== "PLAYLIST_LOADED") throw new Error("Não foi possível carregar a playlist.");
+                if (res.loadType !== "playlist") throw new Error("Não foi possível carregar a playlist.");
 
-                res.tracks.forEach(track => {
-                    track.setRequester(bot.user);
-                    player.queue.add(track);
-                });
+                await player.queue.add(res.tracks);
+                await player.queue.shuffle();
+                await player.setRepeatMode("queue");
 
-                (player.queue as DefaultQueue).shuffle();
-                player.setQueueLoop(true);
+                if (!player.playing) await player.play();
 
-                if (!player.playing) player.play();
-
-                console.log(`Tocando playlist: ${res.playlistInfo.name}`);
+                console.log(`Tocando playlist: ${res.playlist.name}`);
                 isPlaying = true;
             } catch (error) {
                 console.error("Erro ao tocar a playlist automaticamente:", error);
