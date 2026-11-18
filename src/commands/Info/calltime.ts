@@ -45,7 +45,7 @@ export default class CallTimeCommand extends Command {
 		if (!this.client.getDiscordByNick(ctx.member?.nick)) {
 			const embed = new this.client.embed()
 			.setDescription("**Para usufruir do sistema #EstudoFocado, você precisa de ter a sua conta discord vinculada com o minecraft!**")
-			.addField("Como vincular?", "> Para vincular sua conta use o comando `/discord link` no minecraft da Craftsapiens!")
+			.addField("Como vincular?", "> Para vincular sua conta use o comando `/vincular` no minecraft da Craftsapiens e depois `/vincular codigo:<código>` aqui no Discord!")
 			.setColor("16711680")
 			.setFooter("Qualquer dúvida, contacte um STAFF | Essa mensagem se autodestruirá em 30 segundos!");
 

@@ -1,4 +1,4 @@
-import type { Guild, Member } from "oceanic.js";
+import { DiscordHTTPError, DiscordRESTError, JSONErrorCodes, type Guild, type Member } from "oceanic.js";
 import type DGClient from "../../structures/Client";
 import { cargosDoDesvinculo, normalizarGrupos, planejarCargos } from "./cargos";
 import { CodigoStore, LimiteTentativas, decidirVinculo, normalizarCodigo, type DecisaoVinculo } from "./codigos";
@@ -12,15 +12,34 @@ const MOTIVO_DESVINCULO = "Vínculo: conta do Minecraft desvinculada";
 export const codigos = new CodigoStore();
 export const tentativas = new LimiteTentativas();
 
-/** Membro da guilda ou `null` se ele saiu (ou se a busca falhou). */
+/** O Discord confirmou que o membro não existe na guilda (HTTP 404 ou código 10007, Unknown Member). */
+function membroInexistente(erro: unknown): boolean {
+	if (erro instanceof DiscordRESTError) return erro.code === JSONErrorCodes.UNKNOWN_MEMBER || erro.status === 404;
+	if (erro instanceof DiscordHTTPError) return erro.status === 404;
+	return false;
+}
+
+/**
+ * Membro da guilda ou `null` só quando o Discord confirma que ele não está nela.
+ * Qualquer outra falha (ou guilda fora do cache) lança: a rota responde 500 e o plugin manda tentar de novo.
+ */
 async function obterMembro(client: DGClient, discordId: string): Promise<Member | null> {
+	const guild = client.guilds.get(GUILD_ID);
+	if (!guild) throw new Error(`[VINCULO] Guilda ${GUILD_ID} fora do cache`);
+	const emCache = guild.members.get(discordId);
+	if (emCache) return emCache;
 	try {
-		const guild = client.guilds.get(GUILD_ID);
-		if (!guild) return null;
-		return guild.members.get(discordId) ?? (await guild.getMember(discordId));
-	} catch {
-		return null;
+		return await guild.getMember(discordId);
+	} catch (erro) {
+		if (membroInexistente(erro)) return null;
+		throw erro;
 	}
+}
+
+/** Trilha de auditoria: uma linha por membro cujos cargos mudaram de fato. */
+function registrarMudanca(discordId: string, uuid: string, adicionados: string[], removidos: string[]): void {
+	if (!adicionados.length && !removidos.length) return;
+	console.log(`[VINCULO] ${discordId} uuid=${uuid} +[${adicionados.join(",")}] -[${removidos.join(",")}]`);
 }
 
 function nomeDoMembro(client: DGClient, discordId: string, membro: Member | null): string {
@@ -126,9 +145,12 @@ export async function aplicarGrupos(
 	const guild = membro.guild;
 	const plano = planejarCargos(normalizarGrupos(grupos), membro.roles);
 
+	const adicionados: string[] = [];
+	const removidos: string[] = [];
 	for (const cargo of plano.adicionar) {
 		try {
 			await guild.addMemberRole(membro.id, cargo, MOTIVO_GRUPOS);
+			adicionados.push(cargo);
 		} catch (erro) {
 			console.error(`[VINCULO] Falha ao dar o cargo ${cargo} a ${membro.id}:`, erro);
 		}
@@ -136,10 +158,12 @@ export async function aplicarGrupos(
 	for (const cargo of plano.remover) {
 		try {
 			await guild.removeMemberRole(membro.id, cargo, MOTIVO_GRUPOS);
+			removidos.push(cargo);
 		} catch (erro) {
 			console.error(`[VINCULO] Falha ao tirar o cargo ${cargo} de ${membro.id}:`, erro);
 		}
 	}
+	registrarMudanca(membro.id, chave, adicionados, removidos);
 
 	await trocarApelido(guild, membro, nick, MOTIVO_GRUPOS);
 
@@ -159,15 +183,19 @@ export async function desvincular(client: DGClient, uuid: string): Promise<{ rem
 	const doc = await Vinculo.findOne({ uuid: chave }).lean();
 	if (!doc) return { removido: false };
 
+	// Se a busca do membro falhar, lança antes de apagar: o vínculo continua e o plugin tenta de novo.
 	const membro = await obterMembro(client, doc.discordId);
 	if (membro) {
+		const removidos: string[] = [];
 		for (const cargo of cargosDoDesvinculo(membro.roles)) {
 			try {
 				await membro.guild.removeMemberRole(membro.id, cargo, MOTIVO_DESVINCULO);
+				removidos.push(cargo);
 			} catch (erro) {
 				console.error(`[VINCULO] Falha ao tirar o cargo ${cargo} de ${membro.id}:`, erro);
 			}
 		}
+		registrarMudanca(membro.id, chave, [], removidos);
 	}
 
 	const resultado = await Vinculo.deleteOne({ uuid: chave });

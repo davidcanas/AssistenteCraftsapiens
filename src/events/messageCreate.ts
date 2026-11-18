@@ -506,7 +506,7 @@ export default class MessageCreate {
 			if (!this.client.getDiscordByNick(message.member.nick)) {
 				const embed = new this.client.embed()
 				.setDescription("**Para usar o sistema de Música, você precisa de ter a sua conta discord vinculada com o minecraft!**")
-				.addField("Como vincular?", "> Para vincular sua conta use o comando `/discord link` no minecraft da Craftsapiens!")
+				.addField("Como vincular?", "> Para vincular sua conta use o comando `/vincular` no minecraft da Craftsapiens e depois `/vincular codigo:<código>` aqui no Discord!")
 				.setColor("16711680")
 				.setFooter("Qualquer duvida, contacte um STAFF | Essa mensagem se autodestruirá em 1 minuto!");
 

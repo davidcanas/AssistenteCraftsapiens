@@ -35,21 +35,35 @@ export function uuidValido(valor: unknown): valor is string {
 	return typeof valor === "string" && UUID_REGEX.test(valor);
 }
 
-function textoNaoVazio(valor: unknown): valor is string {
-	return typeof valor === "string" && valor.trim().length > 0;
+const MAX_NICK = 32;
+const MAX_GRUPOS = 50;
+const MAX_GRUPO = 64;
+
+/** Nick com 1 a 32 caracteres depois do trim. */
+function nickValido(valor: unknown): valor is string {
+	if (typeof valor !== "string") return false;
+	const tamanho = valor.trim().length;
+	return tamanho >= 1 && tamanho <= MAX_NICK;
+}
+
+/** Nome de grupo com 1 a 64 caracteres. */
+function grupoValido(valor: unknown): valor is string {
+	return typeof valor === "string" && valor.length >= 1 && valor.length <= MAX_GRUPO;
 }
 
 export function validarCorpoCodigo(corpo: unknown): { uuid: string; nick: string } | null {
 	if (!corpo || typeof corpo !== "object") return null;
 	const { uuid, nick } = corpo as Record<string, unknown>;
-	if (!uuidValido(uuid) || !textoNaoVazio(nick)) return null;
+	if (!uuidValido(uuid) || !nickValido(nick)) return null;
 	return { uuid, nick: nick.trim() };
 }
 
+/** Lista de grupos vazia é recusada: todo jogador tem ao menos `default`, então vazio indica erro do lado do plugin. */
 export function validarCorpoGrupos(corpo: unknown): { uuid: string; nick: string; grupos: string[] } | null {
 	if (!corpo || typeof corpo !== "object") return null;
 	const { uuid, nick, grupos } = corpo as Record<string, unknown>;
-	if (!uuidValido(uuid) || !textoNaoVazio(nick)) return null;
-	if (!Array.isArray(grupos) || !grupos.every((g) => typeof g === "string")) return null;
+	if (!uuidValido(uuid) || !nickValido(nick)) return null;
+	if (!Array.isArray(grupos) || grupos.length === 0 || grupos.length > MAX_GRUPOS) return null;
+	if (!grupos.every(grupoValido)) return null;
 	return { uuid, nick: nick.trim(), grupos };
 }

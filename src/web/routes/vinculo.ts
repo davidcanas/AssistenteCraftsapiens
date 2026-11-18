@@ -55,12 +55,16 @@ router.delete("/:uuid", async (req, res) => {
 	}
 });
 
-// Corpo que não é JSON válido (ou grande demais) vira 400 em vez da página de erro padrão.
-router.use((err: any, _req: express.Request, res: Response, next: express.NextFunction) => {
-	if (err?.type === "entity.parse.failed" || err?.type === "entity.too.large") {
-		return res.status(400).json({ erro: "corpo invalido" });
+// Toda falha aqui responde JSON: nunca cai na página HTML padrão do Express (que mostra o stack trace).
+// O quarto parâmetro precisa existir para o Express tratar isto como manipulador de erro.
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+router.use((err: any, _req: express.Request, res: Response, _next: express.NextFunction) => {
+	if (err?.type) {
+		// Erro do body-parser (JSON inválido, corpo grande demais, charset etc.).
+		return res.status(err?.status && err.status < 500 ? err.status : 400).json({ erro: "corpo invalido" });
 	}
-	return next(err);
+	console.error("[VINCULO] Erro inesperado na rota:", err);
+	return res.status(500).json({ erro: "interno" });
 });
 
 export default router;
