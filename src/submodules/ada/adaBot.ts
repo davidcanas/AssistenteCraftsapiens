@@ -15,7 +15,10 @@ adaBot.on("ready", async () => {
 
 async function playPlaylist() {
   const currPlayer = adaBot.music.players.get("892472046729179136");
-  if (currPlayer) return;
+  const naCall = adaBot.guilds.get("892472046729179136")?.voiceStates.get(adaBot.user.id)?.channelID === "1005889304658202704";
+  if (currPlayer?.playing && naCall) return;
+  // Player parado ou bot fora da call (ex.: caiu numa reconexão com o Discord): recomeça do zero.
+  if (currPlayer) await currPlayer.destroy();
 
   const maxRetries = 4;
   let attempts = 0;

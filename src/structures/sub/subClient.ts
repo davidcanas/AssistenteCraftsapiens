@@ -22,7 +22,10 @@ export default class subClient extends Client {
 
 		super(clientOptions);
 
-
+		// Sem listener, um erro de conexão com o Discord vira "Uncaught 'error' event".
+		this.on("error", (err) => {
+			console.log(`\x1b[34m[SUB] Erro de conexão (${this.user?.username ?? "sub-bot"}): ${err instanceof Error ? err.message : err}`);
+		});
 	}
 
 	connect(): Promise<void> {
@@ -30,6 +33,10 @@ export default class subClient extends Client {
 	}
 
 	connectLavaLink(): void {
+		// O "ready" dispara de novo a cada reconexão com o Discord: o gerenciador é criado uma vez só,
+		// senão cada reconexão abre outra sessão no Lavalink e deixa players duplicados.
+		if (this.music) return;
+
 		const nodes: LavalinkNodeOptions[] = [
 			{
 				id: `${this.user.username}'s Lavalink`,
