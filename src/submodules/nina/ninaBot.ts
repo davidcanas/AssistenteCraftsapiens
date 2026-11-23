@@ -15,7 +15,10 @@ ninaBot.on("ready", async () => {
 
 async function playPlaylist() {
   const currPlayer = ninaBot.music.players.get("892472046729179136");
-  if (currPlayer) return;
+  const naCall = ninaBot.guilds.get("892472046729179136")?.voiceStates.get(ninaBot.user.id)?.channelID === "1005889464293392466";
+  if (currPlayer?.playing && naCall) return;
+  // Player parado ou bot fora da call (ex.: caiu numa reconexão com o Discord): recomeça do zero.
+  if (currPlayer) await currPlayer.destroy();
 
   const maxRetries = 4;
   let attempts = 0;

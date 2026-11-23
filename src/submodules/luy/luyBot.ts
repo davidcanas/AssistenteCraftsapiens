@@ -4,7 +4,7 @@ import { CommandInteraction } from "oceanic.js";
 
 const luyBot = new subClient(process.env.LUY_TOKEN);
 
-luyBot.once("ready", async () => {
+luyBot.on("ready", async () => {
   console.log("\x1b[34m[SUB] luy Bot está online!");
   luyBot.connectLavaLink();
   luyBot.registerSlashCommands();
@@ -15,7 +15,10 @@ luyBot.once("ready", async () => {
 
 async function playPlaylist() {
   const currPlayer = luyBot.music.players.get("892472046729179136");
-  if (currPlayer) return;
+  const naCall = luyBot.guilds.get("892472046729179136")?.voiceStates.get(luyBot.user.id)?.channelID === "1005889381762084976";
+  if (currPlayer?.playing && naCall) return;
+  // Player parado ou bot fora da call (ex.: caiu numa reconexão com o Discord): recomeça do zero.
+  if (currPlayer) await currPlayer.destroy();
 
   const maxRetries = 4;
   let attempts = 0;
