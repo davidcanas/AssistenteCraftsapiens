@@ -6,19 +6,35 @@ const ninaBot = new subClient(process.env.NINA_TOKEN);
 
 ninaBot.on("ready", async () => {
   console.log("\x1b[34m[SUB] Nina Bot está online!");
+  const primeiraConexao = !ninaBot.music;
   ninaBot.connectLavaLink();
+  // Se o Lavalink reiniciar, o node reconecta numa sessão nova, sem os players: recomeça a playlist.
+  if (primeiraConexao) ninaBot.music.nodeManager.on("connect", () => setTimeout(playPlaylist, 25000));
   ninaBot.registerSlashCommands();
 
   ninaBot.editStatus("idle", [{ name: `🎷 | Pronta para ajudar você estudando!`, type: 2 }]);
   setTimeout(playPlaylist, 25000); 
 });
 
+// Discord e Lavalink podem pedir a playlist quase ao mesmo tempo (ex.: na inicialização): uma por vez.
+let iniciando = false;
 async function playPlaylist() {
+  if (iniciando) return;
+  iniciando = true;
+  try {
+    await iniciarPlaylist();
+  } finally {
+    iniciando = false;
+  }
+}
+
+async function iniciarPlaylist() {
   const currPlayer = ninaBot.music.players.get("892472046729179136");
   const naCall = ninaBot.guilds.get("892472046729179136")?.voiceStates.get(ninaBot.user.id)?.channelID === "1005889464293392466";
   if (currPlayer?.playing && naCall) return;
-  // Player parado ou bot fora da call (ex.: caiu numa reconexão com o Discord): recomeça do zero.
-  if (currPlayer) await currPlayer.destroy();
+  // Player parado ou bot fora da call (ex.: caiu numa reconexão com o Discord ou o Lavalink reiniciou):
+  // recomeça do zero. Depois de um reinício do Lavalink o player já não existe lá, então a remoção pode falhar.
+  if (currPlayer) await currPlayer.destroy().catch(() => { });
 
   const maxRetries = 4;
   let attempts = 0;
