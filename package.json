@@ -23,7 +23,7 @@
     "jimp": "^1.6.0",
     "jsdom": "^26.0.0",
     "lavalink-client": "^2.11.2",
-    "mathjs": "^14.4.0",
+    "mathjs": "^15.3.0",
     "mongoose": "^8.13.2",
     "node-cron": "^3.0.3",
     "node-fetch": "^2.6.7",

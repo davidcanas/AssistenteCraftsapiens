@@ -86,7 +86,7 @@ async function main(): Promise<void> {
 							discordId: c.discordId,
 							uuid: c.uuid,
 							nick: null,
-							origem: "discordsrv",
+							origem: "discordsrv" as const,
 							vinculadoEm: agora,
 						},
 					},
