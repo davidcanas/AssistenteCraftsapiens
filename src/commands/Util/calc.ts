@@ -13,7 +13,7 @@ export default class calcClass extends Command {
 			aliases: ["calcular"],
 			options: [
 				{
-					type: Constants.ApplicationCommandOptionTypes.USER,
+					type: Constants.ApplicationCommandOptionTypes.STRING,
 					name: "calculo",
 					description: "A expressão matemática que você quer calcular",
 					required: true
