@@ -89,6 +89,10 @@ luyBot.on("interactionCreate", async (interaction) => {
   }
 
   const track = player.queue.current;
+  // Rádio ao vivo: não tem duração nem nome da faixa, mostra a rádio.
+  if (track.info.isStream) {
+    return interaction.createMessage({ embeds: [{ title: "🎧 LO-FI | Tocando agora:", description: `🔴 Ao vivo: **${playlist.lofi[0].title}**`, color: Math.floor(Math.random() * 16777215) }] });
+  }
   const progressBar = luyBot.progressBar((player.position/1000), (track.info.duration/1000), 20);
 
   const embed = {
