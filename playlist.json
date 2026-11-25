@@ -1,24 +1,24 @@
 {
     "jazz": [
      {
-        "title": "Jazz Instrumentals No AI",
-        "artist": "Various Artists",
-        "url": "https://www.youtube.com/playlist?list=PLKKsG3tLDLeZEGCh0MxDniGFdGZcPMsIS"
+        "title": "Radio Swiss Jazz",
+        "artist": "SRG SSR",
+        "url": "https://stream.srg-ssr.ch/m/rsj/mp3_128"
      }
     ],
 
     "lofi": [
        {
-        "title": "Lofi Fruits Music - lofi hip hop beats to study, relax & sleep to",
-        "artist": "Lofi Fruits Music",
-        "url": "https://www.youtube.com/playlist?list=PL6fhs6TSspZv0F0YgsG-p7Mn189CU2XKS"
+        "title": "SomaFM Fluid",
+        "artist": "SomaFM",
+        "url": "https://ice2.somafm.com/fluid-128-mp3"
        }
     ],
     "classical": [
       {
-        "title": "Music For Reading and Studying",
-        "artist": "HalidonMusic",
-        "url": "https://www.youtube.com/playlist?list=PLcGkkXtask_dpTfQVYT_fxdl-byp1eQoG"
+        "title": "Radio Swiss Classic",
+        "artist": "SRG SSR",
+        "url": "https://stream.srg-ssr.ch/m/rsc_de/mp3_128"
       }
     ]
 }

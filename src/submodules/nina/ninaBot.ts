@@ -88,6 +88,10 @@ ninaBot.on("interactionCreate", async (interaction) => {
   }
 
   const track = player.queue.current;
+  // Rádio ao vivo: não tem duração nem nome da faixa, mostra a rádio.
+  if (track.info.isStream) {
+    return interaction.createMessage({ embeds: [{ title: "🎷 Jazz | Tocando agora:", description: `🔴 Ao vivo: **${playlist.jazz[0].title}**`, color: Math.floor(Math.random() * 16777215) }] });
+  }
   const progressBar = ninaBot.progressBar((player.position/1000), (track.info.duration/1000), 20);
 
   const embed = {

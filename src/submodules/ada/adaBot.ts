@@ -89,6 +89,10 @@ adaBot.on("interactionCreate", async (interaction) => {
   }
 
   const track = player.queue.current;
+  // Rádio ao vivo: não tem duração nem nome da faixa, mostra a rádio.
+  if (track.info.isStream) {
+    return interaction.createMessage({ embeds: [{ title: "🎻 Clássica | Tocando agora:", description: `🔴 Ao vivo: **${playlist.classical[0].title}**`, color: Math.floor(Math.random() * 16777215) }] });
+  }
   const progressBar = adaBot.progressBar((player.position / 1000), (track.info.duration / 1000), 20);
   const embed = {
     title: "🎻 Clássica | Tocando agora:",
