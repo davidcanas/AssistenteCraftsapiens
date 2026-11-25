@@ -1,24 +1,24 @@
 {
     "jazz": [
      {
-        "title": "Jazz Chillout Playlist",
+        "title": "Jazz Instrumentals No AI",
         "artist": "Various Artists",
-        "url": "https://on.soundcloud.com/C7Z9ZLDZbZYFmm676"
+        "url": "https://www.youtube.com/playlist?list=PLKKsG3tLDLeZEGCh0MxDniGFdGZcPMsIS"
      }
     ],
 
     "lofi": [
        {
-        "title": "Lofi - música para estudar/relaxar",
-        "artist": "TX052",
-        "url": "https://on.soundcloud.com/Nzh4RB5qNRaz3mck7"
+        "title": "Lofi Fruits Music - lofi hip hop beats to study, relax & sleep to",
+        "artist": "Lofi Fruits Music",
+        "url": "https://www.youtube.com/playlist?list=PL6fhs6TSspZv0F0YgsG-p7Mn189CU2XKS"
        }
     ],
     "classical": [
       {
-        "title": "Classical Bangers",
-        "artist": "nexus",
-        "url": "https://soundcloud.com/user658175136/sets/classical-bangers"
+        "title": "Music For Reading and Studying",
+        "artist": "HalidonMusic",
+        "url": "https://www.youtube.com/playlist?list=PLcGkkXtask_dpTfQVYT_fxdl-byp1eQoG"
       }
     ]
 }
