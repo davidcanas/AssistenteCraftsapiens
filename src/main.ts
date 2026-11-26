@@ -30,6 +30,7 @@ require("./web/app");
 require("./submodules/nina/ninaBot");
 require("./submodules/ada/adaBot");
 require("./submodules/luy/luyBot");
+require("./submodules/echo/echoBot");
 
 async function sendMonthlyTopCallTime(client: DGClient) {
 	const channelId = process.env.TOP_CALL_CHANNEL_ID;

@@ -58,10 +58,10 @@ export default class subClient extends Client {
 		super.on("packet", (packet) => this.music.sendRawData(packet as any));
 	}
 
-	registerSlashCommands(): void {
+	registerSlashCommands(nome = this.user.username.toLowerCase()): void {
 		const cmds = [
 			{
-				name: this.user.username.toLowerCase(),
+				name: nome,
 				description: this.user.username + " | Mostra a música que está tocando no momento",
 				type: 1,
 				options: []

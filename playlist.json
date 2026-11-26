@@ -20,5 +20,12 @@
         "artist": "SRG SSR",
         "url": "https://stream.srg-ssr.ch/m/rsc_de/mp3_128"
       }
+    ],
+    "electronic": [
+      {
+        "title": "SomaFM Groove Salad",
+        "artist": "SomaFM",
+        "url": "https://ice1.somafm.com/groovesalad-128-mp3"
+      }
     ]
 }
